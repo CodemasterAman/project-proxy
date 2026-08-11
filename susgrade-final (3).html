@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>/susgrade — see what's worth testing</title>
+<meta name="description" content="susgrade is a free, in-browser test-effectiveness analyzer for Python. It measures cyclomatic complexity and runs mutation testing to show which code is risky and whether your tests actually catch bugs — no install, no backend." />
+<meta name="keywords" content="mutation testing, cyclomatic complexity, python, test effectiveness, code quality, unit tests, susgrade" />
+<meta name="robots" content="index, follow" />
+<meta property="og:title" content="/susgrade — see what's actually worth testing" />
+<meta property="og:description" content="A free, in-browser tool that fuses cyclomatic complexity and mutation testing to show what's worth testing in your Python code." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<script>
+  // Set theme before paint to avoid a flash
+  (function () {
+    try {
+      var t = localStorage.getItem("susgrade-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+  })();
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  :root, [data-theme="light"] {
+    --bg:#F2F1EA; --surface:#FBFAF5; --text:#14110D; --dim:#4A453C; --faint:#B7B3A6;
+    --border:#14110D; --hairline:#DAD8CD; --shadow:#14110D;
+    --panel:#14110D; --panel-text:#F2F1EA; --track:#E8E6DC;
+    --nav-bg:rgba(242,241,234,.82); --pct-bg:rgba(251,250,245,.8);
+    --hero-bg:#2E2AFF; --code-op:.16; --code-col:rgba(255,255,255,.85);
+    --blue:#2E2AFF; --blue-lo:#E7E6FF; --coral:#FF4B2B; --pink:#FF3E9A; --violet:#7A3AFF;
+    --green:#12B76A; --amber:#FFB020; --orange:#FF6B1A; --red:#F0384C;
+  }
+  [data-theme="dark"] {
+    --bg:#0E0D13; --surface:#181620; --text:#F1EFEA; --dim:#A6A1B0; --faint:#5E5967;
+    --border:#332F3D; --hairline:#2A2733; --shadow:#000000;
+    --panel:#060509; --panel-text:#F1EFEA; --track:#2A2733;
+    --nav-bg:rgba(14,13,19,.82); --pct-bg:rgba(24,22,32,.82);
+    --hero-bg:#0A0912; --code-op:.30; --code-col:rgba(188,204,255,.62);
+    --blue:#5A57FF; --blue-lo:#1C1B3A; --coral:#FF5A3C; --pink:#FF4FA6; --violet:#9A6BFF;
+    --green:#2BD07E; --amber:#FFC24B; --orange:#FF8A3D; --red:#FF5468;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Manrope',system-ui,sans-serif; background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased; line-height:1.5; overflow-x:hidden;
+    transition:background-color .4s ease, color .4s ease; }
+  body::before { content:""; position:fixed; inset:0; z-index:9990; pointer-events:none; opacity:.05;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  [data-theme="dark"] body::before { opacity:.04; mix-blend-mode:overlay; }
+  .mono { font-family:'Space Mono',monospace; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 26px; }
+  a { color:inherit; text-decoration:none; }
+  .eyebrow { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.22em; text-transform:uppercase; display:inline-flex; align-items:center; gap:10px; }
+  .eyebrow .slash { color:var(--coral); font-weight:700; }
+
+  /* theme-switch transition (temporary, added on toggle) */
+  html.theming, html.theming * { transition: background-color .4s ease, border-color .4s ease, color .35s ease, box-shadow .4s ease, fill .35s ease !important; }
+
+  /* CURSOR */
+  .cur-dot,.cur-ring { position:fixed; top:0; left:0; border-radius:50%; pointer-events:none; z-index:9999; mix-blend-mode:difference; }
+  .cur-dot { width:7px; height:7px; background:#fff; transform:translate(-50%,-50%); }
+  .cur-ring { width:38px; height:38px; border:1.5px solid #fff; transform:translate(-50%,-50%); transition:width .25s var(--spring),height .25s var(--spring),background .25s; }
+  .cur-ring.big { width:64px; height:64px; background:rgba(255,255,255,.12); }
+  body.cursor-on { cursor:none; } body.cursor-on a, body.cursor-on button, body.cursor-on textarea { cursor:none; }
+  :root { --spring:cubic-bezier(.34,1.56,.64,1); --ease:cubic-bezier(.2,.7,.2,1); }
+
+  /* SCROLL PROGRESS */
+  .prog { position:fixed; top:0; left:0; height:3px; background:var(--coral); width:0; z-index:9995; }
+  .pct { position:fixed; bottom:22px; right:22px; z-index:120; font-family:'Space Mono',monospace; font-size:11px;
+    letter-spacing:.1em; color:var(--dim); background:var(--pct-bg); backdrop-filter:blur(6px);
+    border:1px solid var(--hairline); border-radius:999px; padding:7px 12px; }
+  @media (max-width:620px){ .pct{ display:none; } }
+
+  /* TOASTS */
+  .toasts { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9997; display:flex; flex-direction:column; gap:10px; align-items:center; max-width:92vw; }
+  .toast { font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; color:var(--panel-text);
+    background:var(--panel); border:2px solid var(--panel); border-radius:999px; padding:12px 22px; box-shadow:4px 4px 0 var(--coral);
+    transform:translateY(20px) scale(.96); opacity:0; transition:transform .35s var(--spring),opacity .35s; display:flex; align-items:center; gap:10px; text-align:center; }
+  .toast.show { transform:translateY(0) scale(1); opacity:1; }
+  .toast .spark { color:var(--coral); }
+
+  /* NAV */
+  .nav { position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 26px; background:var(--nav-bg); backdrop-filter:blur(12px); border-bottom:1px solid var(--hairline); }
+  .brand { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; letter-spacing:-.02em; display:flex; align-items:center; color:var(--text); }
+  .brand .sl { color:var(--coral); }
+  .brand-wm { height:26px; width:auto; display:block; }
+  .footer-wm { height:30px; width:auto; display:block; }
+  .nav-mid { display:flex; align-items:center; gap:24px; }
+  .nav-link { font-size:13.5px; font-weight:600; color:var(--dim); position:relative; transition:color .2s; }
+  .nav-link::after { content:""; position:absolute; left:0; bottom:-4px; height:2px; width:0; background:var(--coral); transition:width .25s var(--ease); }
+  .nav-link:hover { color:var(--text); } .nav-link:hover::after { width:100%; }
+  .nav-link .soon { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--coral); vertical-align:super; margin-left:3px; }
+  .nav-right { display:flex; align-items:center; gap:12px; }
+  .nav-signin { font-size:13.5px; font-weight:700; color:var(--text); }
+  .theme-tog { width:38px; height:38px; border-radius:999px; border:1.5px solid var(--hairline); background:transparent; color:var(--text);
+    display:grid; place-items:center; cursor:pointer; transition:background .2s, border-color .2s, transform .2s var(--spring); }
+  .theme-tog:hover { background:var(--surface); transform:rotate(18deg); }
+  .theme-tog .ic-sun { display:none; } .theme-tog .ic-moon { display:block; }
+  [data-theme="dark"] .theme-tog .ic-sun { display:block; } [data-theme="dark"] .theme-tog .ic-moon { display:none; }
+  .nav-cta { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em; background:var(--text); color:var(--bg); padding:10px 18px; border-radius:999px; will-change:transform; transition:background .2s, color .2s; }
+  .nav-cta:hover { background:var(--blue); color:#fff; }
+  @media (max-width:900px){ .nav-mid,.nav-signin{ display:none; } }
+
+  /* HERO */
+  .hero { background:var(--hero-bg); color:#fff; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;
+    padding:80px 0 0; position:relative; overflow:hidden; transition:background-color .4s ease; }
+  .hero-code { position:absolute; inset:0; z-index:1; overflow:hidden; opacity:var(--code-op); pointer-events:none;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent); mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent); }
+  .code-col { position:absolute; top:0; }
+  .code-inner { display:flex; flex-direction:column; animation:codeUp linear infinite; will-change:transform; }
+  .code-line { font-family:'Space Mono',monospace; font-size:13px; line-height:1.75; white-space:pre; color:var(--code-col); }
+  [data-theme="dark"] .code-line { text-shadow:0 0 8px rgba(120,150,255,.35); }
+  @keyframes codeUp { from { transform:translateY(0); } to { transform:translateY(-50%); } }
+  .orb { position:absolute; z-index:0; border-radius:50%; filter:blur(64px); opacity:.55; pointer-events:none; will-change:transform; }
+  .orb-1 { width:440px; height:440px; background:var(--pink); top:-120px; right:-80px; animation:drift 14s var(--ease) infinite alternate; }
+  .orb-2 { width:360px; height:360px; background:var(--coral); bottom:-150px; left:-60px; animation:drift 18s var(--ease) infinite alternate-reverse; }
+  .orb-3 { width:280px; height:280px; background:var(--violet); top:40%; left:40%; opacity:.4; animation:drift 22s var(--ease) infinite alternate; }
+  @keyframes drift { to { transform:translate(50px,36px) scale(1.14); } }
+  .hero-inner { position:relative; z-index:2; flex:1; width:100%; padding:0 clamp(16px,4vw,36px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .hero-eyebrow { color:rgba(255,255,255,.82); margin-bottom:22px; opacity:0; animation:fadeUp .7s var(--ease) .15s forwards; }
+  .hero-eyebrow .slash { color:var(--coral); }
+  .hero-name { display:block; width:100%; margin:0; line-height:0; }
+  .hero-wm { display:block; width:min(90vw, 1400px); height:auto; margin:0 auto; color:#fff; opacity:0; transform:translateY(26px); }
+  .hero-name .slash { color:var(--coral); }
+  .hn-text { display:inline-block; white-space:nowrap; }
+  .hero-tag { margin-top:24px; font-size:clamp(1.05rem,2.4vw,1.7rem); font-weight:600; color:rgba(255,255,255,.9); opacity:0; animation:fadeUp .8s var(--ease) .5s forwards; }
+  .hero-tag .em { color:var(--coral); font-style:italic; }
+  .rl { display:block; } .rl>span { display:block; opacity:0; transform:translateY(26px); }
+  body.loaded .hero-wm { animation:lineUp .9s var(--ease) forwards; }
+  @keyframes lineUp { to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:translateY(0);} }
+  .hero-actions { margin-top:36px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; opacity:0; animation:fadeUp .8s var(--ease) .62s forwards; }
+  .scrollcue { position:relative; z-index:2; margin:0 auto; padding:22px 0 26px; display:inline-flex; align-items:center; gap:12px; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.7); opacity:0; animation:fadeUp .8s var(--ease) .9s forwards; align-self:center; }
+  .scrollcue .m { width:24px; height:38px; border:1.5px solid rgba(255,255,255,.5); border-radius:13px; position:relative; }
+  .scrollcue .m::after { content:""; position:absolute; top:7px; left:50%; transform:translateX(-50%); width:4px; height:8px; border-radius:2px; background:var(--coral); animation:scrolldot 1.6s var(--ease) infinite; }
+  @keyframes scrolldot { 0%,100%{ top:7px; opacity:1;} 50%{ top:18px; opacity:.3;} }
+
+  .btn { font-family:'Space Mono',monospace; font-weight:700; font-size:13px; letter-spacing:.04em; padding:15px 26px; border-radius:999px; cursor:pointer; border:none; display:inline-flex; align-items:center; gap:10px; will-change:transform; transition:box-shadow .22s,background .2s,color .2s; }
+  .btn-primary { background:#F4F2EB; color:#14110D; }
+  .btn-primary:hover { box-shadow:0 14px 30px -12px rgba(0,0,0,.5); }
+  .btn-ghost { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.4); }
+  .btn-ghost:hover { border-color:#fff; }
+  .btn .arrow { transition:transform .22s var(--spring); } .btn:hover .arrow { transform:translateX(4px); }
+
+  /* MARQUEE */
+  .marquee { background:var(--panel); color:var(--panel-text); padding:18px 0; overflow:hidden; border-top:3px solid var(--coral); border-bottom:3px solid var(--coral); }
+  .marquee.alt { background:var(--bg); color:var(--text); border-color:var(--border); padding:14px 0; }
+  .mtrack { display:flex; width:max-content; }
+  .mtrack.l { animation:marqL 26s linear infinite; } .mtrack.r { animation:marqR 30s linear infinite; }
+  .marquee:hover .mtrack { animation-play-state:paused; }
+  .mitem { font-family:'Syne',sans-serif; font-weight:700; font-size:clamp(1.3rem,3vw,2.2rem); letter-spacing:-.01em; padding:0 28px; display:flex; align-items:center; gap:28px; white-space:nowrap; }
+  .mitem .sl { color:var(--coral); }
+  @keyframes marqL { to { transform:translateX(-50%); } }
+  @keyframes marqR { from { transform:translateX(-50%);} to { transform:translateX(0);} }
+
+  /* SECTIONS */
+  .section { padding:88px 0; }
+  .sec-head { margin-bottom:44px; }
+  .sec-head h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2rem,5vw,3.6rem); line-height:1; letter-spacing:-.02em; margin-top:16px; max-width:20ch; color:var(--text); }
+  .sec-head .lead { margin-top:18px; max-width:54ch; color:var(--dim); font-size:1.05rem; }
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s var(--ease),transform .7s var(--ease); }
+  .reveal.in { opacity:1; transform:translateY(0); }
+  .reveal-2.in { transition-delay:.08s; } .reveal-3.in { transition-delay:.16s; }
+
+  /* FEATURES */
+  .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:860px){ .feat-grid{ grid-template-columns:1fr; } }
+  .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; }
+  .feat:nth-child(3n+1){ box-shadow:6px 6px 0 var(--blue); } .feat:nth-child(3n+2){ box-shadow:6px 6px 0 var(--coral); } .feat:nth-child(3n){ box-shadow:6px 6px 0 var(--green); }
+  .feat:hover { box-shadow:10px 10px 0 var(--shadow); }
+  .feat-ic { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; color:#fff; margin-bottom:18px; }
+  .feat h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.35rem; letter-spacing:-.01em; color:var(--text); }
+  .feat h3 .tag { display:inline-block; vertical-align:middle; margin-left:8px; white-space:nowrap; }
+  .feat p { color:var(--dim); font-size:.97rem; margin-top:10px; }
+  .tag { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:999px; }
+  .tag-live { background:var(--green); color:#fff; } .tag-soon { background:var(--bg); color:var(--dim); border:1.5px solid var(--hairline); }
+  .feat-link { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--coral); margin-top:16px; display:inline-flex; align-items:center; gap:6px; }
+
+  /* ANALYZER */
+  .analyzer { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:22px; align-items:start; }
+  @media (max-width:940px){ .analyzer{ grid-template-columns:1fr; } }
+  .card { background:var(--surface); border:2px solid var(--border); border-radius:22px; overflow:hidden; box-shadow:6px 6px 0 var(--shadow); transition:background-color .4s ease, border-color .4s ease, box-shadow .4s ease; }
+  .card-blue { box-shadow:6px 6px 0 var(--blue); }
+  .tabs { display:flex; gap:6px; padding:12px 12px 0; flex-wrap:wrap; border-bottom:2px solid var(--border); background:var(--bg); }
+  .tab { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--dim); background:transparent; border:none; cursor:pointer; padding:9px 14px; border-radius:10px 10px 0 0; transition:all .18s; }
+  .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--coral); }
+  .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); }
+  .gutter { font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
+  .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; }
+  .code::placeholder { color:var(--faint); }
+  .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-top:2px solid var(--border); background:var(--bg); flex-wrap:wrap; }
+  .toolbar-left { display:flex; align-items:center; gap:10px; }
+  .toolbar-hint { font-family:'Space Mono',monospace; font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px; opacity:0; transition:opacity .2s; }
+  .toolbar-hint.show { opacity:1; } .toolbar-hint kbd { background:var(--surface); border:1px solid var(--hairline); border-radius:5px; padding:1px 6px; }
+  .btn-sm { font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.03em; border:2px solid var(--border); cursor:pointer; padding:10px 16px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; will-change:transform; transition:box-shadow .18s; }
+  .btn-analyze { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-analyze:hover { box-shadow:4px 4px 0 var(--shadow); }
+  .btn-mut { background:var(--surface); color:var(--text); box-shadow:3px 3px 0 var(--violet); }
+  .btn-mut:hover { box-shadow:4px 4px 0 var(--violet); }
+  .btn-mut .lock { font-size:11px; }
+  .report { padding:20px; min-height:320px; }
+  .report-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+  .badge { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:5px 12px; border-radius:999px; border:2px solid var(--border); display:inline-flex; align-items:center; gap:7px; }
+  .badge .dot { width:7px; height:7px; border-radius:50%; }
+  .badge-engine { background:var(--blue); color:#fff; border-color:var(--blue); } .badge-engine .dot { background:#fff; }
+  .badge-est { background:var(--bg); color:var(--dim); } .badge-est .dot { background:var(--dim); }
+  .verdict { background:var(--panel); color:var(--panel-text); border-radius:16px; padding:20px; margin-bottom:20px; }
+  .verdict-label { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .verdict-fn { font-family:'Space Mono',monospace; font-size:13px; margin-top:8px; color:var(--panel-text); }
+  .verdict-row { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-top:6px; }
+  .verdict-num { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(3rem,9vw,5rem); line-height:.9; letter-spacing:-.03em; }
+  .verdict-say { font-family:'Manrope',sans-serif; font-weight:700; font-size:1.05rem; text-align:right; max-width:16ch; color:var(--panel-text); }
+  .fnrow { padding:13px 4px; border-bottom:1px dashed var(--hairline); } .fnrow:last-child { border-bottom:none; }
+  .fnrow-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:10px; }
+  .fnrow-name { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text); }
+  .fnrow-name .mut { color:var(--faint); }
+  .fnrow-score { font-family:'Syne',sans-serif; font-weight:800; font-size:26px; line-height:1; letter-spacing:-.02em; flex:none; }
+  .bar-wrap { height:14px; border-radius:8px; background:var(--track); overflow:hidden; }
+  .bar-fill { height:100%; width:0; border-radius:8px; transition:width .85s var(--spring); }
+  .fnrow-meta { font-family:'Space Mono',monospace; font-size:10.5px; color:var(--dim); margin-top:8px; }
+  .fnrow-meta .pill { padding:2px 8px; border-radius:999px; font-weight:700; }
+  .footnote { margin-top:18px; font-size:11.5px; color:var(--dim); display:flex; gap:8px; line-height:1.5; } .footnote b { color:var(--text); }
+  .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-height:280px; gap:14px; }
+  .empty-big { font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; letter-spacing:-.02em; color:var(--text); }
+  .empty p { color:var(--dim); max-width:32ch; }
+
+  /* STAT BAND (brand-coloured, same both themes) */
+  .statband { background:var(--coral); color:#fff; padding:78px 0; }
+  .statband .eyebrow { color:rgba(255,255,255,.85); } .statband .eyebrow .slash { color:#14110D; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:30px; margin-top:40px; }
+  @media (max-width:820px){ .stat-grid{ grid-template-columns:repeat(2,1fr); gap:34px; } }
+  .stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(3rem,8vw,6rem); line-height:.9; letter-spacing:-.03em; }
+  .stat-label { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.04em; margin-top:12px; color:rgba(255,255,255,.9); }
+  .stat-label .aside { color:rgba(255,255,255,.6); }
+
+  /* HOW */
+  .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:820px){ .how-grid{ grid-template-columns:1fr; } }
+  .how-card { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; transition:background-color .4s ease, border-color .4s ease; }
+  .how-card:nth-child(1){ box-shadow:5px 5px 0 var(--blue); } .how-card:nth-child(2){ box-shadow:5px 5px 0 var(--coral); } .how-card:nth-child(3){ box-shadow:5px 5px 0 var(--green); }
+  .how-num { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--coral); letter-spacing:.1em; }
+  .how-card h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; margin:14px 0 10px; letter-spacing:-.01em; color:var(--text); }
+  .how-card p { color:var(--dim); font-size:.98rem; }
+
+  /* CTA (brand-coloured) */
+  .cta { background:var(--blue); color:#fff; padding:96px 0; position:relative; overflow:hidden; text-align:center; }
+  .cta h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2.4rem,7vw,5.4rem); line-height:.98; letter-spacing:-.03em; max-width:16ch; margin:0 auto; }
+  .cta h2 .em { color:var(--coral); font-style:italic; }
+  .cta .btn { margin-top:36px; }
+
+  /* FOOTER */
+  .footer { background:var(--panel); color:var(--panel-text); padding:76px 0 34px; }
+  .footer-grid { display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:30px; }
+  @media (max-width:820px){ .footer-grid{ grid-template-columns:1fr 1fr; gap:34px; } }
+  .footer-brand { font-family:'Syne',sans-serif; font-weight:800; font-size:26px; } .footer-brand .sl { color:var(--coral); }
+  .footer-tag { color:rgba(255,255,255,.6); font-size:14px; margin-top:12px; max-width:30ch; }
+  .footer-col h4 { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:14px; }
+  .footer-col a { display:block; color:rgba(255,255,255,.82); font-size:14px; margin-bottom:9px; transition:color .2s; }
+  .footer-col a:hover { color:var(--coral); }
+  .footer-bar { margin-top:60px; padding-top:24px; border-top:1px solid rgba(255,255,255,.16); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:'Space Mono',monospace; font-size:12px; color:rgba(255,255,255,.6); }
+  .footer-bar b { color:#fff; }
+
+  :focus-visible { outline:3px solid var(--coral); outline-offset:2px; border-radius:4px; }
+
+  /* MOBILE */
+  @media (max-width:600px){
+    .wrap { padding:0 18px; }
+    .section { padding:60px 0; }
+    .nav { padding:12px 18px; }
+    .sec-head { margin-bottom:32px; }
+    .feat { padding:22px; } .how-card { padding:22px; }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    *,*::before,*::after { animation:none !important; transition:none !important; }
+    .reveal { opacity:1 !important; transform:none !important; }
+    .hero-wm { opacity:1 !important; transform:none !important; } .hero-actions,.scrollcue,.hero-eyebrow,.hero-tag { opacity:1 !important; }
+  }
+  /* ---- MUTATION TESTING ---- */
+  .mut-note { font-family:'Space Mono',monospace; font-size:12.5px; color:var(--dim); background:var(--surface); border:1.5px solid var(--hairline); border-radius:14px; padding:13px 16px; margin-bottom:22px; line-height:1.7; }
+  .mut-note code { background:var(--blue-lo); color:var(--text); padding:1px 6px; border-radius:5px; font-size:11.5px; }
+  .mut-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+  .card-violet { box-shadow:6px 6px 0 var(--violet); }
+  .mut-pane + .mut-pane { border-top:2px solid var(--border); }
+  .mut-label { font-family:'Space Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--dim); padding:11px 16px 2px; display:flex; justify-content:space-between; background:var(--surface); }
+  .mut-modname { color:var(--faint); text-transform:none; letter-spacing:0; }
+  .mut-ta { min-height:158px; max-height:230px; overflow:auto; }
+  .mut-endpoint { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); }
+  .btn-runmut { background:var(--violet); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runmut:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runmut:disabled { opacity:.6; cursor:default; }
+  .mut-report { padding:0; }
+  .mut-msg { padding:24px; font-size:13.5px; color:var(--dim); line-height:1.7; } .mut-msg b { color:var(--text); }
+  .mut-loading { padding:24px; display:flex; align-items:center; gap:14px; font-size:13.5px; color:var(--text); }
+  .mut-loading span { color:var(--faint); font-size:12px; }
+  .mut-spin { width:22px; height:22px; border:3px solid var(--hairline); border-top-color:var(--violet); border-radius:50%; animation:mutspin .8s linear infinite; flex:none; }
+  @keyframes mutspin { to { transform:rotate(360deg); } }
+  .mut-result { padding:22px; }
+  .mut-score { display:inline-flex; flex-direction:column; align-items:center; padding:14px 24px; border-radius:16px; margin-bottom:18px; }
+  .mut-score-num { font-family:'Syne',sans-serif; font-weight:800; font-size:3.1rem; line-height:1; } .mut-score-num span { font-size:1.4rem; margin-left:1px; }
+  .mut-score-lab { font-family:'Space Mono',monospace; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; margin-top:5px; opacity:.9; }
+  .mut-score.band-hi { background:var(--green); color:#fff; } .mut-score.band-mid { background:var(--coral); color:#fff; } .mut-score.band-lo { background:var(--text); color:var(--bg); }
+  .mut-stats { display:flex; gap:18px; flex-wrap:wrap; font-family:'Space Mono',monospace; font-size:12.5px; color:var(--dim); margin-bottom:14px; } .mut-stats b { color:var(--text); }
+  .mut-verdict { font-size:14px; color:var(--text); margin-bottom:16px; line-height:1.55; }
+  .mut-survivors { display:flex; flex-direction:column; gap:8px; max-height:300px; overflow:auto; }
+  .mut-surv { display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--surface); border:1.5px solid var(--hairline); border-radius:11px; }
+  .mut-op { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.04em; padding:3px 7px; border-radius:6px; color:#fff; flex:none; }
+  .op-AOR{ background:var(--coral); } .op-ROR{ background:var(--blue); } .op-LOR{ background:var(--violet); } .op-UOR{ background:var(--pink); } .op-BCR{ background:var(--green); } .op-NCR{ background:var(--amber); color:#3a2d00; }
+  .mut-line { font-family:'Space Mono',monospace; font-size:11.5px; color:var(--faint); flex:none; }
+  .mut-desc { font-family:'Space Mono',monospace; font-size:13px; color:var(--text); }
+  .mut-allkilled { padding:18px; background:var(--surface); border:1.5px solid var(--hairline); border-radius:11px; color:var(--text); font-size:14px; }
+  .mut-badbase b, .mut-down b { color:var(--coral); display:block; margin-bottom:6px; font-size:14px; }
+  .mut-badbase p, .mut-down p { font-size:13.5px; color:var(--dim); line-height:1.6; margin-top:4px; }
+  .mut-down code { background:var(--blue-lo); color:var(--text); padding:1px 6px; border-radius:5px; font-size:11.5px; }
+  .mut-fine { font-size:12px !important; color:var(--faint) !important; margin-top:10px !important; }
+  @media (max-width:900px){ .mut-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+  <!-- CURSOR / PROGRESS / TOASTS -->
+  <div class="cur-dot" id="curDot"></div>
+  <div class="cur-ring" id="curRing"></div>
+  <div class="prog" id="prog"></div>
+  <div class="pct mono" id="pct">0%</div>
+  <div class="toasts" id="toasts"></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="#top" class="brand" aria-label="/susgrade"><svg class="brand-wm" viewBox="-30 0 6629 1003" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,766) scale(1.12,-1)"><path d="M0 -48 186.2177734375 736H308.315185546875L122.097412109375 -48Z" transform="translate(0,0)" fill="var(--coral)"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(273,0)" fill="currentColor"/><path d="M294.63037109375 -12Q178.45654296875 -12 119.641357421875 44.63037109375Q60.826171875 101.2607421875 60.826171875 212.575927734375V527.771728515625H265.19482421875V238.89111328125Q265.19482421875 214.923583984375 271.9937744140625 195.2822265625Q278.792724609375 175.640869140625 292.0482177734375 162.41259765625Q305.3037109375 149.184326171875 325.5592041015625 142.0267333984375Q345.814697265625 134.869140625 371.9560546875 134.869140625Q409.7822265625 134.869140625 439.793212890625 150.1680908203125Q469.80419921875 165.467041015625 487.2445068359375 192.836669921875Q504.684814453125 220.206298828125 504.684814453125 254.71728515625V527.771728515625H709.053466796875V0H543.2607421875L529.402099609375 86.9130859375H520.402099609375Q493.173828125 51 456.445556640625 29.3858642578125Q419.71728515625 7.771728515625 378.3314208984375 -2.1141357421875Q336.945556640625 -12 294.63037109375 -12Z" transform="translate(967,0)" fill="currentColor"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(1704,0)" fill="currentColor"/><path d="M145.23974609375 -207.2607421875Q107.728759765625 -207.2607421875 75.17431640625 -192.173828125Q42.619873046875 -177.0869140625 22.8643798828125 -148.7010498046875Q3.10888671875 -120.315185546875 3.10888671875 -82.34765625Q3.10888671875 -40.489013671875 31.380615234375 -8.945556640625Q59.65234375 22.597900390625 106.510986328125 38.141357421875Q73.19580078125 54.141357421875 57.924072265625 79.097900390625Q42.65234375 104.054443359375 42.65234375 132.7392578125Q42.65234375 178.141357421875 74.010986328125 209.2989501953125Q105.36962890625 240.45654296875 157.228271484375 247.45654296875Q116.45654296875 267.9130859375 89.2120361328125 301.0706787109375Q61.967529296875 334.228271484375 61.967529296875 373.54345703125Q61.967529296875 439.71728515625 103.5706787109375 475.945556640625Q145.173828125 512.173828125 219.162841796875 525.9727783203125Q293.15185546875 539.771728515625 389.923583984375 539.771728515625Q422.293212890625 539.771728515625 451.8204345703125 537.4293212890625Q481.34765625 535.0869140625 508.032470703125 529.858642578125Q559.89111328125 555.2607421875 581.532470703125 582.30419921875Q603.173828125 609.34765625 604.315185546875 625.173828125H791.966552734375Q791.73828125 583.771728515625 774.19482421875 556.0Q756.6513671875 528.228271484375 723.9068603515625 511.0Q691.162353515625 493.771728515625 645.531982421875 484Q679.93408203125 462.45654296875 698.9068603515625 433.684814453125Q717.879638671875 404.9130859375 717.879638671875 369.684814453125Q717.879638671875 307.510986328125 682.4775390625 270.510986328125Q647.075439453125 233.510986328125 585.1026611328125 217.4403076171875Q523.1298828125 201.36962890625 442.3037109375 201.36962890625H312.564453125Q279.705810546875 201.36962890625 264.8634033203125 192.7989501953125Q250.02099609375 184.228271484375 250.02099609375 169.858642578125Q250.02099609375 155.489013671875 263.3199462890625 145.9183349609375Q276.618896484375 136.34765625 313.705810546875 136.34765625H616.390625Q704.73828125 136.34765625 747.1676025390625 89.6466064453125Q789.596923828125 42.945556640625 789.596923828125 -29.45654296875Q789.596923828125 -84.0869140625 759.73828125 -123.902099609375Q729.879638671875 -163.71728515625 681.0916748046875 -185.489013671875Q632.3037109375 -207.2607421875 574.67333984375 -207.2607421875ZM264.162353515625 -99.45654296875H529.0869140625Q544.315185546875 -99.45654296875 556.6575927734375 -93.3424072265625Q569 -87.228271484375 576.228271484375 -75.3858642578125Q583.45654296875 -63.54345703125 583.45654296875 -48.0869140625Q583.45654296875 -24.402099609375 567.5 -11.173828125Q551.54345703125 2.054443359375 529.0869140625 2.054443359375H265.3037109375Q242.162353515625 2.054443359375 226.4775390625 -10.673828125Q210.792724609375 -23.402099609375 210.792724609375 -47.0869140625Q210.792724609375 -70.771728515625 226.1351318359375 -85.1141357421875Q241.4775390625 -99.45654296875 264.162353515625 -99.45654296875ZM390.6953125 306.402099609375Q450.119384765625 306.402099609375 481.7010498046875 321.402099609375Q513.28271484375 336.402099609375 513.28271484375 370.45654296875Q513.28271484375 404.510986328125 481.7010498046875 419.6251220703125Q450.119384765625 434.7392578125 390.6953125 434.7392578125Q332.04296875 434.7392578125 300.075439453125 419.6251220703125Q268.10791015625 404.510986328125 268.10791015625 370.45654296875Q268.10791015625 347.63037109375 282.4775390625 333.2879638671875Q296.84716796875 318.945556640625 324.1298828125 312.673828125Q351.41259765625 306.402099609375 390.6953125 306.402099609375Z" transform="translate(2398,0)" fill="currentColor"/><path d="M62.510986328125 0V527.771728515625H228.3037109375L242.162353515625 440.173828125H250.93408203125Q268.10791015625 473.575927734375 293.73828125 496.032470703125Q319.36865234375 518.489013671875 350.4827880859375 529.5162353515625Q381.596923828125 540.54345703125 414.6513671875 540.54345703125Q435.73828125 540.54345703125 454.010009765625 537.6575927734375Q472.28173828125 534.771728515625 489.36865234375 528.228271484375V372.50048828125H394.1298828125Q361.075439453125 372.50048828125 337.0482177734375 362.08740234375Q313.02099609375 351.67431640625 297.564453125 333.6905517578125Q282.10791015625 315.706787109375 274.4937744140625 292.0654296875Q266.879638671875 268.424072265625 266.879638671875 240.967529296875V0Z" transform="translate(3145,0)" fill="currentColor"/><path d="M270 -12Q219.9130859375 -12 176.7120361328125 -4.8858642578125Q133.510986328125 2.228271484375 101.467529296875 19.728271484375Q69.424072265625 37.228271484375 51.65234375 67.6141357421875Q33.880615234375 98 33.880615234375 145.315185546875Q33.880615234375 208.54345703125 67.7230224609375 244.9293212890625Q101.5654296875 281.315185546875 164.02197265625 298.4727783203125Q226.478515625 315.63037109375 311.978515625 320.402099609375Q397.478515625 325.173828125 501.337158203125 325.173828125V338.684814453125Q501.337158203125 367.28271484375 486.7664794921875 384.5816650390625Q472.19580078125 401.880615234375 444.641357421875 409.60888671875Q417.0869140625 417.337158203125 377.293212890625 417.337158203125Q350.814697265625 417.337158203125 322.988525390625 413.2664794921875Q295.162353515625 409.19580078125 276.162353515625 399.1251220703125Q257.162353515625 389.054443359375 257.162353515625 370.28271484375V364.45654296875H49.706787109375Q48.706787109375 368.45654296875 48.5926513671875 371.2989501953125Q48.478515625 374.141357421875 48.478515625 378.36962890625Q48.478515625 425.36962890625 86.7230224609375 461.9130859375Q124.967529296875 498.45654296875 200.45654296875 519.1141357421875Q275.945556640625 539.771728515625 386.749755859375 539.771728515625Q489.010498046875 539.771728515625 560.227783203125 522.3858642578125Q631.445068359375 505 668.575439453125 466.771728515625Q705.705810546875 428.54345703125 705.705810546875 364.0869140625V160.23876953125Q705.705810546875 143.553955078125 713.5916748046875 132.3963623046875Q721.4775390625 121.23876953125 738.162353515625 121.23876953125H792.249267578125V7.315185546875Q776.075439453125 1 743.401611328125 -5.5Q710.727783203125 -12 674.097412109375 -12Q622.380126953125 -12 590.5487060546875 -2.1575927734375Q558.71728515625 7.684814453125 542.4293212890625 24.36962890625Q526.141357421875 41.054443359375 519.054443359375 60.967529296875H511.054443359375Q482.28271484375 38.826171875 445.9837646484375 22.141357421875Q409.684814453125 5.45654296875 366.0 -3.271728515625Q322.315185546875 -12 270 -12ZM329.467041015625 109.662841796875Q348.34765625 109.662841796875 376.7445068359375 113.9617919921875Q405.141357421875 118.2607421875 433.8968505859375 128.2879638671875Q462.65234375 138.315185546875 481.9947509765625 154.5706787109375Q501.337158203125 170.826171875 501.337158203125 195.510986328125V227.141357421875Q408.63037109375 227.141357421875 349.793212890625 218.86962890625Q290.9560546875 210.597900390625 263.445068359375 194.9130859375Q235.93408203125 179.228271484375 235.93408203125 155.489013671875Q235.93408203125 135.80419921875 249.575439453125 125.9617919921875Q263.216796875 116.119384765625 284.9288330078125 112.89111328125Q306.640869140625 109.662841796875 329.467041015625 109.662841796875Z" transform="translate(3607,0)" fill="currentColor"/><path d="M319.228271484375 -12Q239.54345703125 -12 176.3424072265625 17.6141357421875Q113.141357421875 47.228271484375 76.1685791015625 108.3424072265625Q39.19580078125 169.45654296875 39.19580078125 263.771728515625Q39.19580078125 358.54345703125 76.054443359375 419.54345703125Q112.9130859375 480.54345703125 175.6575927734375 510.1575927734375Q238.402099609375 539.771728515625 317.173828125 539.771728515625Q349.141357421875 539.771728515625 384.054443359375 532.7010498046875Q418.967529296875 525.63037109375 450.7392578125 509.673828125Q482.510986328125 493.71728515625 504.510986328125 467.71728515625H513.054443359375V724.771728515625H717.423095703125V0H551.63037109375L535.771728515625 82.228271484375H527Q486.9130859375 29.45654296875 432.7554931640625 8.728271484375Q378.597900390625 -12 319.228271484375 -12ZM380.467041015625 134.869140625Q426.293212890625 134.869140625 455.9617919921875 151.32568359375Q485.63037109375 167.7822265625 499.8424072265625 196.4942626953125Q514.054443359375 225.206298828125 514.054443359375 260.54345703125V267Q514.054443359375 294.19580078125 506.0272216796875 317.02197265625Q498 339.84814453125 481.402099609375 356.6470947265625Q464.80419921875 373.446044921875 439.5921630859375 383.17431640625Q414.380126953125 392.902587890625 380.010498046875 392.902587890625Q334.640869140625 392.902587890625 305.08642578125 376.8319091796875Q275.531982421875 360.76123046875 261.0482177734375 333.8209228515625Q246.564453125 306.880615234375 246.564453125 272.54345703125V255.228271484375Q246.564453125 220.89111328125 261.162353515625 193.4508056640625Q275.76025390625 166.010498046875 305.314697265625 150.4398193359375Q334.869140625 134.869140625 380.467041015625 134.869140625Z" transform="translate(4364,0)" fill="currentColor"/><path d="M406.7822265625 -12Q296.293212890625 -12 213.532470703125 17.1141357421875Q130.771728515625 46.228271484375 84.9837646484375 107.6141357421875Q39.19580078125 169 39.19580078125 263.771728515625Q39.19580078125 356.54345703125 84.36962890625 418.04345703125Q129.54345703125 479.54345703125 210.2607421875 509.6575927734375Q290.97802734375 539.771728515625 397.923583984375 539.771728515625Q509.869140625 539.771728515625 590.2440185546875 510.4293212890625Q670.618896484375 481.0869140625 713.564453125 420.6575927734375Q756.510009765625 360.228271484375 756.510009765625 266.967529296875V226.684814453125H252.879638671875Q255.10791015625 186.945556640625 273.5916748046875 160.9183349609375Q292.075439453125 134.89111328125 326.6298828125 122.662841796875Q361.184326171875 110.4345703125 409.23876953125 110.4345703125Q437.41259765625 110.4345703125 461.82568359375 116.206298828125Q486.23876953125 121.97802734375 504.4073486328125 132.3638916015625Q522.575927734375 142.749755859375 532.858642578125 156.5487060546875Q543.141357421875 170.34765625 543.826171875 186.63037109375H754.8251953125Q754.8251953125 138.9130859375 728.1513671875 101.86962890625Q701.4775390625 64.826171875 654.1461181640625 39.4837646484375Q606.814697265625 14.141357421875 543.41259765625 1.0706787109375Q480.010498046875 -12 406.7822265625 -12ZM253.6513671875 326.402099609375H537.967529296875Q537.967529296875 346.141357421875 528.7120361328125 362.510986328125Q519.45654296875 378.880615234375 502.0162353515625 391.2230224609375Q484.575927734375 403.5654296875 460.1356201171875 410.4512939453125Q435.6953125 417.337158203125 406.097412109375 417.337158203125Q360.49951171875 417.337158203125 328.3309326171875 405.60888671875Q296.162353515625 393.880615234375 277.4068603515625 373.1251220703125Q258.6513671875 352.36962890625 253.6513671875 326.402099609375Z" transform="translate(5109,0)" fill="currentColor"/></g></svg></a>
+    <div class="nav-mid">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#try" class="nav-link">Complexity</a>
+      <a href="#mutation" class="nav-link">Mutation</a>
+      <a href="#" class="nav-link" data-soon="Risk reports are on the way">Risk reports<span class="soon">soon</span></a>
+    </div>
+    <div class="nav-right">
+      <a href="https://github.com/CodemasterAman/SUSGRADE" target="_blank" rel="noopener" class="nav-signin">GitHub</a>
+      <button class="theme-tog" id="themeTog" aria-label="Toggle dark mode" title="Toggle theme">
+        <svg class="ic-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+        <svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a href="#try" class="nav-cta magnetic">Get started →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <div class="hero-code" id="heroCode" aria-hidden="true"></div>
+    <div class="orb orb-1" data-par="0.18"></div>
+    <div class="orb orb-2" data-par="-0.12"></div>
+    <div class="orb orb-3" data-par="0.08"></div>
+    <div class="hero-inner">
+      <div class="eyebrow hero-eyebrow"><span class="slash">/</span> test-effectiveness for python · zero setup</div>
+      <h1 class="hero-name" role="img" aria-label="/susgrade"><svg class="hero-wm" viewBox="-30 0 6629 1003" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,766) scale(1.12,-1)"><path d="M0 -48 186.2177734375 736H308.315185546875L122.097412109375 -48Z" transform="translate(0,0)" fill="var(--coral)"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(273,0)" fill="currentColor"/><path d="M294.63037109375 -12Q178.45654296875 -12 119.641357421875 44.63037109375Q60.826171875 101.2607421875 60.826171875 212.575927734375V527.771728515625H265.19482421875V238.89111328125Q265.19482421875 214.923583984375 271.9937744140625 195.2822265625Q278.792724609375 175.640869140625 292.0482177734375 162.41259765625Q305.3037109375 149.184326171875 325.5592041015625 142.0267333984375Q345.814697265625 134.869140625 371.9560546875 134.869140625Q409.7822265625 134.869140625 439.793212890625 150.1680908203125Q469.80419921875 165.467041015625 487.2445068359375 192.836669921875Q504.684814453125 220.206298828125 504.684814453125 254.71728515625V527.771728515625H709.053466796875V0H543.2607421875L529.402099609375 86.9130859375H520.402099609375Q493.173828125 51 456.445556640625 29.3858642578125Q419.71728515625 7.771728515625 378.3314208984375 -2.1141357421875Q336.945556640625 -12 294.63037109375 -12Z" transform="translate(967,0)" fill="currentColor"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(1704,0)" fill="currentColor"/><path d="M145.23974609375 -207.2607421875Q107.728759765625 -207.2607421875 75.17431640625 -192.173828125Q42.619873046875 -177.0869140625 22.8643798828125 -148.7010498046875Q3.10888671875 -120.315185546875 3.10888671875 -82.34765625Q3.10888671875 -40.489013671875 31.380615234375 -8.945556640625Q59.65234375 22.597900390625 106.510986328125 38.141357421875Q73.19580078125 54.141357421875 57.924072265625 79.097900390625Q42.65234375 104.054443359375 42.65234375 132.7392578125Q42.65234375 178.141357421875 74.010986328125 209.2989501953125Q105.36962890625 240.45654296875 157.228271484375 247.45654296875Q116.45654296875 267.9130859375 89.2120361328125 301.0706787109375Q61.967529296875 334.228271484375 61.967529296875 373.54345703125Q61.967529296875 439.71728515625 103.5706787109375 475.945556640625Q145.173828125 512.173828125 219.162841796875 525.9727783203125Q293.15185546875 539.771728515625 389.923583984375 539.771728515625Q422.293212890625 539.771728515625 451.8204345703125 537.4293212890625Q481.34765625 535.0869140625 508.032470703125 529.858642578125Q559.89111328125 555.2607421875 581.532470703125 582.30419921875Q603.173828125 609.34765625 604.315185546875 625.173828125H791.966552734375Q791.73828125 583.771728515625 774.19482421875 556.0Q756.6513671875 528.228271484375 723.9068603515625 511.0Q691.162353515625 493.771728515625 645.531982421875 484Q679.93408203125 462.45654296875 698.9068603515625 433.684814453125Q717.879638671875 404.9130859375 717.879638671875 369.684814453125Q717.879638671875 307.510986328125 682.4775390625 270.510986328125Q647.075439453125 233.510986328125 585.1026611328125 217.4403076171875Q523.1298828125 201.36962890625 442.3037109375 201.36962890625H312.564453125Q279.705810546875 201.36962890625 264.8634033203125 192.7989501953125Q250.02099609375 184.228271484375 250.02099609375 169.858642578125Q250.02099609375 155.489013671875 263.3199462890625 145.9183349609375Q276.618896484375 136.34765625 313.705810546875 136.34765625H616.390625Q704.73828125 136.34765625 747.1676025390625 89.6466064453125Q789.596923828125 42.945556640625 789.596923828125 -29.45654296875Q789.596923828125 -84.0869140625 759.73828125 -123.902099609375Q729.879638671875 -163.71728515625 681.0916748046875 -185.489013671875Q632.3037109375 -207.2607421875 574.67333984375 -207.2607421875ZM264.162353515625 -99.45654296875H529.0869140625Q544.315185546875 -99.45654296875 556.6575927734375 -93.3424072265625Q569 -87.228271484375 576.228271484375 -75.3858642578125Q583.45654296875 -63.54345703125 583.45654296875 -48.0869140625Q583.45654296875 -24.402099609375 567.5 -11.173828125Q551.54345703125 2.054443359375 529.0869140625 2.054443359375H265.3037109375Q242.162353515625 2.054443359375 226.4775390625 -10.673828125Q210.792724609375 -23.402099609375 210.792724609375 -47.0869140625Q210.792724609375 -70.771728515625 226.1351318359375 -85.1141357421875Q241.4775390625 -99.45654296875 264.162353515625 -99.45654296875ZM390.6953125 306.402099609375Q450.119384765625 306.402099609375 481.7010498046875 321.402099609375Q513.28271484375 336.402099609375 513.28271484375 370.45654296875Q513.28271484375 404.510986328125 481.7010498046875 419.6251220703125Q450.119384765625 434.7392578125 390.6953125 434.7392578125Q332.04296875 434.7392578125 300.075439453125 419.6251220703125Q268.10791015625 404.510986328125 268.10791015625 370.45654296875Q268.10791015625 347.63037109375 282.4775390625 333.2879638671875Q296.84716796875 318.945556640625 324.1298828125 312.673828125Q351.41259765625 306.402099609375 390.6953125 306.402099609375Z" transform="translate(2398,0)" fill="currentColor"/><path d="M62.510986328125 0V527.771728515625H228.3037109375L242.162353515625 440.173828125H250.93408203125Q268.10791015625 473.575927734375 293.73828125 496.032470703125Q319.36865234375 518.489013671875 350.4827880859375 529.5162353515625Q381.596923828125 540.54345703125 414.6513671875 540.54345703125Q435.73828125 540.54345703125 454.010009765625 537.6575927734375Q472.28173828125 534.771728515625 489.36865234375 528.228271484375V372.50048828125H394.1298828125Q361.075439453125 372.50048828125 337.0482177734375 362.08740234375Q313.02099609375 351.67431640625 297.564453125 333.6905517578125Q282.10791015625 315.706787109375 274.4937744140625 292.0654296875Q266.879638671875 268.424072265625 266.879638671875 240.967529296875V0Z" transform="translate(3145,0)" fill="currentColor"/><path d="M270 -12Q219.9130859375 -12 176.7120361328125 -4.8858642578125Q133.510986328125 2.228271484375 101.467529296875 19.728271484375Q69.424072265625 37.228271484375 51.65234375 67.6141357421875Q33.880615234375 98 33.880615234375 145.315185546875Q33.880615234375 208.54345703125 67.7230224609375 244.9293212890625Q101.5654296875 281.315185546875 164.02197265625 298.4727783203125Q226.478515625 315.63037109375 311.978515625 320.402099609375Q397.478515625 325.173828125 501.337158203125 325.173828125V338.684814453125Q501.337158203125 367.28271484375 486.7664794921875 384.5816650390625Q472.19580078125 401.880615234375 444.641357421875 409.60888671875Q417.0869140625 417.337158203125 377.293212890625 417.337158203125Q350.814697265625 417.337158203125 322.988525390625 413.2664794921875Q295.162353515625 409.19580078125 276.162353515625 399.1251220703125Q257.162353515625 389.054443359375 257.162353515625 370.28271484375V364.45654296875H49.706787109375Q48.706787109375 368.45654296875 48.5926513671875 371.2989501953125Q48.478515625 374.141357421875 48.478515625 378.36962890625Q48.478515625 425.36962890625 86.7230224609375 461.9130859375Q124.967529296875 498.45654296875 200.45654296875 519.1141357421875Q275.945556640625 539.771728515625 386.749755859375 539.771728515625Q489.010498046875 539.771728515625 560.227783203125 522.3858642578125Q631.445068359375 505 668.575439453125 466.771728515625Q705.705810546875 428.54345703125 705.705810546875 364.0869140625V160.23876953125Q705.705810546875 143.553955078125 713.5916748046875 132.3963623046875Q721.4775390625 121.23876953125 738.162353515625 121.23876953125H792.249267578125V7.315185546875Q776.075439453125 1 743.401611328125 -5.5Q710.727783203125 -12 674.097412109375 -12Q622.380126953125 -12 590.5487060546875 -2.1575927734375Q558.71728515625 7.684814453125 542.4293212890625 24.36962890625Q526.141357421875 41.054443359375 519.054443359375 60.967529296875H511.054443359375Q482.28271484375 38.826171875 445.9837646484375 22.141357421875Q409.684814453125 5.45654296875 366.0 -3.271728515625Q322.315185546875 -12 270 -12ZM329.467041015625 109.662841796875Q348.34765625 109.662841796875 376.7445068359375 113.9617919921875Q405.141357421875 118.2607421875 433.8968505859375 128.2879638671875Q462.65234375 138.315185546875 481.9947509765625 154.5706787109375Q501.337158203125 170.826171875 501.337158203125 195.510986328125V227.141357421875Q408.63037109375 227.141357421875 349.793212890625 218.86962890625Q290.9560546875 210.597900390625 263.445068359375 194.9130859375Q235.93408203125 179.228271484375 235.93408203125 155.489013671875Q235.93408203125 135.80419921875 249.575439453125 125.9617919921875Q263.216796875 116.119384765625 284.9288330078125 112.89111328125Q306.640869140625 109.662841796875 329.467041015625 109.662841796875Z" transform="translate(3607,0)" fill="currentColor"/><path d="M319.228271484375 -12Q239.54345703125 -12 176.3424072265625 17.6141357421875Q113.141357421875 47.228271484375 76.1685791015625 108.3424072265625Q39.19580078125 169.45654296875 39.19580078125 263.771728515625Q39.19580078125 358.54345703125 76.054443359375 419.54345703125Q112.9130859375 480.54345703125 175.6575927734375 510.1575927734375Q238.402099609375 539.771728515625 317.173828125 539.771728515625Q349.141357421875 539.771728515625 384.054443359375 532.7010498046875Q418.967529296875 525.63037109375 450.7392578125 509.673828125Q482.510986328125 493.71728515625 504.510986328125 467.71728515625H513.054443359375V724.771728515625H717.423095703125V0H551.63037109375L535.771728515625 82.228271484375H527Q486.9130859375 29.45654296875 432.7554931640625 8.728271484375Q378.597900390625 -12 319.228271484375 -12ZM380.467041015625 134.869140625Q426.293212890625 134.869140625 455.9617919921875 151.32568359375Q485.63037109375 167.7822265625 499.8424072265625 196.4942626953125Q514.054443359375 225.206298828125 514.054443359375 260.54345703125V267Q514.054443359375 294.19580078125 506.0272216796875 317.02197265625Q498 339.84814453125 481.402099609375 356.6470947265625Q464.80419921875 373.446044921875 439.5921630859375 383.17431640625Q414.380126953125 392.902587890625 380.010498046875 392.902587890625Q334.640869140625 392.902587890625 305.08642578125 376.8319091796875Q275.531982421875 360.76123046875 261.0482177734375 333.8209228515625Q246.564453125 306.880615234375 246.564453125 272.54345703125V255.228271484375Q246.564453125 220.89111328125 261.162353515625 193.4508056640625Q275.76025390625 166.010498046875 305.314697265625 150.4398193359375Q334.869140625 134.869140625 380.467041015625 134.869140625Z" transform="translate(4364,0)" fill="currentColor"/><path d="M406.7822265625 -12Q296.293212890625 -12 213.532470703125 17.1141357421875Q130.771728515625 46.228271484375 84.9837646484375 107.6141357421875Q39.19580078125 169 39.19580078125 263.771728515625Q39.19580078125 356.54345703125 84.36962890625 418.04345703125Q129.54345703125 479.54345703125 210.2607421875 509.6575927734375Q290.97802734375 539.771728515625 397.923583984375 539.771728515625Q509.869140625 539.771728515625 590.2440185546875 510.4293212890625Q670.618896484375 481.0869140625 713.564453125 420.6575927734375Q756.510009765625 360.228271484375 756.510009765625 266.967529296875V226.684814453125H252.879638671875Q255.10791015625 186.945556640625 273.5916748046875 160.9183349609375Q292.075439453125 134.89111328125 326.6298828125 122.662841796875Q361.184326171875 110.4345703125 409.23876953125 110.4345703125Q437.41259765625 110.4345703125 461.82568359375 116.206298828125Q486.23876953125 121.97802734375 504.4073486328125 132.3638916015625Q522.575927734375 142.749755859375 532.858642578125 156.5487060546875Q543.141357421875 170.34765625 543.826171875 186.63037109375H754.8251953125Q754.8251953125 138.9130859375 728.1513671875 101.86962890625Q701.4775390625 64.826171875 654.1461181640625 39.4837646484375Q606.814697265625 14.141357421875 543.41259765625 1.0706787109375Q480.010498046875 -12 406.7822265625 -12ZM253.6513671875 326.402099609375H537.967529296875Q537.967529296875 346.141357421875 528.7120361328125 362.510986328125Q519.45654296875 378.880615234375 502.0162353515625 391.2230224609375Q484.575927734375 403.5654296875 460.1356201171875 410.4512939453125Q435.6953125 417.337158203125 406.097412109375 417.337158203125Q360.49951171875 417.337158203125 328.3309326171875 405.60888671875Q296.162353515625 393.880615234375 277.4068603515625 373.1251220703125Q258.6513671875 352.36962890625 253.6513671875 326.402099609375Z" transform="translate(5109,0)" fill="currentColor"/></g></svg></h1>
+      <p class="hero-tag">See what's <span class="em">actually</span> worth testing.</p>
+      <div class="hero-actions">
+        <a href="#try" class="btn btn-primary magnetic">Analyze my code <span class="arrow">→</span></a>
+        <a href="#features" class="btn btn-ghost magnetic">Explore features</a>
+      </div>
+    </div>
+    <div class="scrollcue"><span class="m"></span> Scroll to explore</div>
+  </header>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true"><div class="mtrack l" id="m1"></div></div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/</span> everything in one place</div>
+        <h2>One tool for the whole testing picture.</h2>
+        <p class="lead">Complexity tells you how much there is to test. Mutation testing tells you how good your tests already are. susgrade brings both together into a single risk score.</p>
+      </div>
+      <div class="feat-grid" id="featGrid"></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE ALT -->
+  <div class="marquee alt" aria-hidden="true"><div class="mtrack r" id="m2"></div></div>
+
+  <!-- ANALYZER -->
+  <section class="section" id="try">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 01</span> — complexity, live · python</div>
+        <h2>Paste Python. Watch the risk light up.</h2>
+        <p class="lead">Right now susgrade analyses <b>Python</b>, straight from its own syntax tree. Every function gets an exact path-count — the bigger and hotter the bar, the more branches hide inside, and the more tests it takes to cover them.</p>
+      </div>
+      <div class="analyzer reveal">
+        <div class="card">
+          <div class="tabs" role="tablist">
+            <button class="tab is-active" data-tab="router">router.py</button>
+            <button class="tab" data-tab="payments">payments.py</button>
+            <button class="tab" data-tab="parser">parser.py</button>
+            <button class="tab tab-custom" data-tab="custom">+ your code</button>
+          </div>
+          <div class="editor">
+            <div class="gutter" id="gutter">1</div>
+            <textarea class="code" id="code" spellcheck="false" placeholder="Paste a Python function or module, then hit Analyze…"></textarea>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn-sm btn-mut magnetic" id="goMut">Run mutation scan <span>→</span></button>
+              <div class="toolbar-hint" id="hint"><span>edits</span><kbd>⌘</kbd><kbd>↵</kbd></div>
+            </div>
+            <button class="btn-sm btn-analyze magnetic" id="analyze">Analyze <span>✦</span></button>
+          </div>
+        </div>
+        <div class="card card-blue"><div class="report" id="report"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAT BAND -->
+  <!-- MUTATION TESTING -->
+  <section class="section" id="mutation">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 02</span> — mutation testing · python</div>
+        <h2>Now score how good your <em>tests</em> are.</h2>
+        <p class="lead">Complexity shows how much there is to test. Mutation testing shows whether your tests actually catch bugs: susgrade makes tiny changes — <b>mutants</b> — to your code and re-runs your tests against each. A mutant your tests catch is <b>killed</b>; one that slips through <b>survives</b>, and every survivor is a real gap worth a test.</p>
+      </div>
+      <div class="mut-note reveal">Runs entirely in your browser &mdash; no backend, no setup. The first run loads a small Python runtime (cached afterwards), then it's instant. Your tests import the code under test from <code>subject</code>.</div>
+      <div class="mut-grid reveal">
+        <div class="card">
+          <div class="mut-pane">
+            <div class="mut-label">your code <span class="mut-modname">subject.py</span></div>
+            <textarea class="code mut-ta" id="mutCode" spellcheck="false"></textarea>
+          </div>
+          <div class="mut-pane">
+            <div class="mut-label">your tests <span class="mut-modname">test_subject.py</span></div>
+            <textarea class="code mut-ta" id="mutTests" spellcheck="false"></textarea>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left"><div class="mut-endpoint">in your browser · Pyodide</div></div>
+            <button class="btn-sm btn-runmut magnetic" id="mutRun">Run mutation analysis <span>✦</span></button>
+          </div>
+        </div>
+        <div class="card card-violet"><div class="report mut-report" id="mutReport"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="statband" id="stats">
+    <div class="wrap">
+      <div class="eyebrow reveal"><span class="slash">/</span> live from your last run</div>
+      <div class="stat-grid">
+        <div class="reveal"><div class="stat-num mono" id="st-fns">0</div><div class="stat-label">functions x-rayed</div></div>
+        <div class="reveal reveal-2"><div class="stat-num mono" id="st-total">0</div><div class="stat-label">branches counted</div></div>
+        <div class="reveal reveal-3"><div class="stat-num mono" id="st-avg">0</div><div class="stat-label">avg paths / function <span class="aside">*lower is comfier</span></div></div>
+        <div class="reveal reveal-3"><div class="stat-num mono" id="st-max">0</div><div class="stat-label">gnarliest function</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 02</span> — read it</div>
+        <h2>Three numbers, no PhD required.</h2>
+      </div>
+      <div class="how-grid">
+        <div class="how-card reveal">
+          <div class="how-num">/ 01</div><h3>Count the paths</h3>
+          <p>Every <span class="mono">if</span>, <span class="mono">for</span>, <span class="mono">and</span> or <span class="mono">except</span> adds one more way through a function. susgrade counts them exactly, from Python's own syntax tree.</p>
+        </div>
+        <div class="how-card reveal reveal-2">
+          <div class="how-num">/ 02</div><h3>Read the colour</h3>
+          <p>Green is calm, red is spicy. A function in the red has so many branches that a handful of tests will almost certainly leave gaps.</p>
+        </div>
+        <div class="how-card reveal reveal-3">
+          <div class="how-num">/ 03</div><h3>Test where it's hot</h3>
+          <p>Start with the gnarliest function, not the first one you see. That's where bugs hide and where each new test buys you the most safety.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="orb orb-2" data-par="-0.1" style="opacity:.4"></div>
+    <div class="wrap">
+      <h2 class="reveal">Ship tests that <span class="em">actually</span> catch things.</h2>
+      <a href="#try" class="btn btn-primary magnetic reveal reveal-2">Analyze my code <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand" aria-label="/susgrade"><svg class="footer-wm" viewBox="-30 0 6629 1003" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,766) scale(1.12,-1)"><path d="M0 -48 186.2177734375 736H308.315185546875L122.097412109375 -48Z" transform="translate(0,0)" fill="var(--coral)"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(273,0)" fill="currentColor"/><path d="M294.63037109375 -12Q178.45654296875 -12 119.641357421875 44.63037109375Q60.826171875 101.2607421875 60.826171875 212.575927734375V527.771728515625H265.19482421875V238.89111328125Q265.19482421875 214.923583984375 271.9937744140625 195.2822265625Q278.792724609375 175.640869140625 292.0482177734375 162.41259765625Q305.3037109375 149.184326171875 325.5592041015625 142.0267333984375Q345.814697265625 134.869140625 371.9560546875 134.869140625Q409.7822265625 134.869140625 439.793212890625 150.1680908203125Q469.80419921875 165.467041015625 487.2445068359375 192.836669921875Q504.684814453125 220.206298828125 504.684814453125 254.71728515625V527.771728515625H709.053466796875V0H543.2607421875L529.402099609375 86.9130859375H520.402099609375Q493.173828125 51 456.445556640625 29.3858642578125Q419.71728515625 7.771728515625 378.3314208984375 -2.1141357421875Q336.945556640625 -12 294.63037109375 -12Z" transform="translate(967,0)" fill="currentColor"/><path d="M362.640869140625 -12Q303.097412109375 -12 245.0811767578125 -2.5Q187.06494140625 7 139.619384765625 26.3858642578125Q92.173828125 45.771728515625 63.6575927734375 77.04345703125Q35.141357421875 108.315185546875 35.141357421875 152.63037109375Q35.141357421875 156.0869140625 35.2554931640625 159.7010498046875Q35.36962890625 163.315185546875 36.36962890625 167.315185546875H246.8251953125Q246.053466796875 164 245.9393310546875 161.3858642578125Q245.8251953125 158.771728515625 245.8251953125 156.771728515625Q246.596923828125 137.945556640625 262.69482421875 126.032470703125Q278.792724609375 114.119384765625 305.1895751953125 108.39111328125Q331.58642578125 102.662841796875 362.869140625 102.662841796875Q387.206298828125 102.662841796875 416.9183349609375 105.2335205078125Q446.63037109375 107.80419921875 467.858642578125 116.8314208984375Q489.0869140625 125.858642578125 489.0869140625 146.228271484375Q489.0869140625 166.826171875 458.9130859375 175.2392578125Q428.7392578125 183.65234375 379.7664794921875 188.2230224609375Q330.793701171875 192.793701171875 273.510986328125 200.250244140625Q230.141357421875 206.478515625 190.4130859375 217.0926513671875Q150.684814453125 227.706787109375 119.4130859375 245.978515625Q88.141357421875 264.250244140625 69.7120361328125 293.293701171875Q51.28271484375 322.337158203125 51.28271484375 364.65234375Q51.28271484375 414.597900390625 76.5706787109375 448.184814453125Q101.858642578125 481.771728515625 146.075927734375 502.04345703125Q190.293212890625 522.315185546875 248.0811767578125 531.04345703125Q305.869140625 539.771728515625 370.869140625 539.771728515625Q427.32568359375 539.771728515625 481.6136474609375 531.4293212890625Q535.901611328125 523.0869140625 579.618896484375 504.858642578125Q623.336181640625 486.63037109375 649.23828125 457.858642578125Q675.140380859375 429.0869140625 675.140380859375 388.45654296875Q675.140380859375 385.228271484375 675.140380859375 380.95654296875Q675.140380859375 376.684814453125 674.140380859375 374.228271484375H465.228271484375V381.315185546875Q465.228271484375 396.36962890625 450.7010498046875 405.8968505859375Q436.173828125 415.424072265625 414.2335205078125 420.2664794921875Q392.293212890625 425.10888671875 368.32568359375 425.10888671875Q358.640869140625 425.10888671875 339.771240234375 424.4947509765625Q320.901611328125 423.880615234375 301.4178466796875 420.5382080078125Q281.93408203125 417.19580078125 268.4068603515625 409.6251220703125Q254.879638671875 402.054443359375 254.879638671875 387.9130859375Q254.879638671875 370.54345703125 279.4937744140625 363.0162353515625Q304.10791015625 355.489013671875 344.2220458984375 351.9183349609375Q384.336181640625 348.34765625 431.336181640625 343.662841796875Q478.4775390625 338.97802734375 525.1351318359375 330.3638916015625Q571.792724609375 321.749755859375 609.6513671875 303.5921630859375Q647.510009765625 285.4345703125 670.096923828125 254.0052490234375Q692.683837890625 222.575927734375 692.683837890625 172.2607421875Q692.683837890625 119.402099609375 667.010009765625 83.5869140625Q641.336181640625 47.771728515625 596.118896484375 26.8858642578125Q550.901611328125 6 490.99951171875 -3.0Q431.097412109375 -12 362.640869140625 -12Z" transform="translate(1704,0)" fill="currentColor"/><path d="M145.23974609375 -207.2607421875Q107.728759765625 -207.2607421875 75.17431640625 -192.173828125Q42.619873046875 -177.0869140625 22.8643798828125 -148.7010498046875Q3.10888671875 -120.315185546875 3.10888671875 -82.34765625Q3.10888671875 -40.489013671875 31.380615234375 -8.945556640625Q59.65234375 22.597900390625 106.510986328125 38.141357421875Q73.19580078125 54.141357421875 57.924072265625 79.097900390625Q42.65234375 104.054443359375 42.65234375 132.7392578125Q42.65234375 178.141357421875 74.010986328125 209.2989501953125Q105.36962890625 240.45654296875 157.228271484375 247.45654296875Q116.45654296875 267.9130859375 89.2120361328125 301.0706787109375Q61.967529296875 334.228271484375 61.967529296875 373.54345703125Q61.967529296875 439.71728515625 103.5706787109375 475.945556640625Q145.173828125 512.173828125 219.162841796875 525.9727783203125Q293.15185546875 539.771728515625 389.923583984375 539.771728515625Q422.293212890625 539.771728515625 451.8204345703125 537.4293212890625Q481.34765625 535.0869140625 508.032470703125 529.858642578125Q559.89111328125 555.2607421875 581.532470703125 582.30419921875Q603.173828125 609.34765625 604.315185546875 625.173828125H791.966552734375Q791.73828125 583.771728515625 774.19482421875 556.0Q756.6513671875 528.228271484375 723.9068603515625 511.0Q691.162353515625 493.771728515625 645.531982421875 484Q679.93408203125 462.45654296875 698.9068603515625 433.684814453125Q717.879638671875 404.9130859375 717.879638671875 369.684814453125Q717.879638671875 307.510986328125 682.4775390625 270.510986328125Q647.075439453125 233.510986328125 585.1026611328125 217.4403076171875Q523.1298828125 201.36962890625 442.3037109375 201.36962890625H312.564453125Q279.705810546875 201.36962890625 264.8634033203125 192.7989501953125Q250.02099609375 184.228271484375 250.02099609375 169.858642578125Q250.02099609375 155.489013671875 263.3199462890625 145.9183349609375Q276.618896484375 136.34765625 313.705810546875 136.34765625H616.390625Q704.73828125 136.34765625 747.1676025390625 89.6466064453125Q789.596923828125 42.945556640625 789.596923828125 -29.45654296875Q789.596923828125 -84.0869140625 759.73828125 -123.902099609375Q729.879638671875 -163.71728515625 681.0916748046875 -185.489013671875Q632.3037109375 -207.2607421875 574.67333984375 -207.2607421875ZM264.162353515625 -99.45654296875H529.0869140625Q544.315185546875 -99.45654296875 556.6575927734375 -93.3424072265625Q569 -87.228271484375 576.228271484375 -75.3858642578125Q583.45654296875 -63.54345703125 583.45654296875 -48.0869140625Q583.45654296875 -24.402099609375 567.5 -11.173828125Q551.54345703125 2.054443359375 529.0869140625 2.054443359375H265.3037109375Q242.162353515625 2.054443359375 226.4775390625 -10.673828125Q210.792724609375 -23.402099609375 210.792724609375 -47.0869140625Q210.792724609375 -70.771728515625 226.1351318359375 -85.1141357421875Q241.4775390625 -99.45654296875 264.162353515625 -99.45654296875ZM390.6953125 306.402099609375Q450.119384765625 306.402099609375 481.7010498046875 321.402099609375Q513.28271484375 336.402099609375 513.28271484375 370.45654296875Q513.28271484375 404.510986328125 481.7010498046875 419.6251220703125Q450.119384765625 434.7392578125 390.6953125 434.7392578125Q332.04296875 434.7392578125 300.075439453125 419.6251220703125Q268.10791015625 404.510986328125 268.10791015625 370.45654296875Q268.10791015625 347.63037109375 282.4775390625 333.2879638671875Q296.84716796875 318.945556640625 324.1298828125 312.673828125Q351.41259765625 306.402099609375 390.6953125 306.402099609375Z" transform="translate(2398,0)" fill="currentColor"/><path d="M62.510986328125 0V527.771728515625H228.3037109375L242.162353515625 440.173828125H250.93408203125Q268.10791015625 473.575927734375 293.73828125 496.032470703125Q319.36865234375 518.489013671875 350.4827880859375 529.5162353515625Q381.596923828125 540.54345703125 414.6513671875 540.54345703125Q435.73828125 540.54345703125 454.010009765625 537.6575927734375Q472.28173828125 534.771728515625 489.36865234375 528.228271484375V372.50048828125H394.1298828125Q361.075439453125 372.50048828125 337.0482177734375 362.08740234375Q313.02099609375 351.67431640625 297.564453125 333.6905517578125Q282.10791015625 315.706787109375 274.4937744140625 292.0654296875Q266.879638671875 268.424072265625 266.879638671875 240.967529296875V0Z" transform="translate(3145,0)" fill="currentColor"/><path d="M270 -12Q219.9130859375 -12 176.7120361328125 -4.8858642578125Q133.510986328125 2.228271484375 101.467529296875 19.728271484375Q69.424072265625 37.228271484375 51.65234375 67.6141357421875Q33.880615234375 98 33.880615234375 145.315185546875Q33.880615234375 208.54345703125 67.7230224609375 244.9293212890625Q101.5654296875 281.315185546875 164.02197265625 298.4727783203125Q226.478515625 315.63037109375 311.978515625 320.402099609375Q397.478515625 325.173828125 501.337158203125 325.173828125V338.684814453125Q501.337158203125 367.28271484375 486.7664794921875 384.5816650390625Q472.19580078125 401.880615234375 444.641357421875 409.60888671875Q417.0869140625 417.337158203125 377.293212890625 417.337158203125Q350.814697265625 417.337158203125 322.988525390625 413.2664794921875Q295.162353515625 409.19580078125 276.162353515625 399.1251220703125Q257.162353515625 389.054443359375 257.162353515625 370.28271484375V364.45654296875H49.706787109375Q48.706787109375 368.45654296875 48.5926513671875 371.2989501953125Q48.478515625 374.141357421875 48.478515625 378.36962890625Q48.478515625 425.36962890625 86.7230224609375 461.9130859375Q124.967529296875 498.45654296875 200.45654296875 519.1141357421875Q275.945556640625 539.771728515625 386.749755859375 539.771728515625Q489.010498046875 539.771728515625 560.227783203125 522.3858642578125Q631.445068359375 505 668.575439453125 466.771728515625Q705.705810546875 428.54345703125 705.705810546875 364.0869140625V160.23876953125Q705.705810546875 143.553955078125 713.5916748046875 132.3963623046875Q721.4775390625 121.23876953125 738.162353515625 121.23876953125H792.249267578125V7.315185546875Q776.075439453125 1 743.401611328125 -5.5Q710.727783203125 -12 674.097412109375 -12Q622.380126953125 -12 590.5487060546875 -2.1575927734375Q558.71728515625 7.684814453125 542.4293212890625 24.36962890625Q526.141357421875 41.054443359375 519.054443359375 60.967529296875H511.054443359375Q482.28271484375 38.826171875 445.9837646484375 22.141357421875Q409.684814453125 5.45654296875 366.0 -3.271728515625Q322.315185546875 -12 270 -12ZM329.467041015625 109.662841796875Q348.34765625 109.662841796875 376.7445068359375 113.9617919921875Q405.141357421875 118.2607421875 433.8968505859375 128.2879638671875Q462.65234375 138.315185546875 481.9947509765625 154.5706787109375Q501.337158203125 170.826171875 501.337158203125 195.510986328125V227.141357421875Q408.63037109375 227.141357421875 349.793212890625 218.86962890625Q290.9560546875 210.597900390625 263.445068359375 194.9130859375Q235.93408203125 179.228271484375 235.93408203125 155.489013671875Q235.93408203125 135.80419921875 249.575439453125 125.9617919921875Q263.216796875 116.119384765625 284.9288330078125 112.89111328125Q306.640869140625 109.662841796875 329.467041015625 109.662841796875Z" transform="translate(3607,0)" fill="currentColor"/><path d="M319.228271484375 -12Q239.54345703125 -12 176.3424072265625 17.6141357421875Q113.141357421875 47.228271484375 76.1685791015625 108.3424072265625Q39.19580078125 169.45654296875 39.19580078125 263.771728515625Q39.19580078125 358.54345703125 76.054443359375 419.54345703125Q112.9130859375 480.54345703125 175.6575927734375 510.1575927734375Q238.402099609375 539.771728515625 317.173828125 539.771728515625Q349.141357421875 539.771728515625 384.054443359375 532.7010498046875Q418.967529296875 525.63037109375 450.7392578125 509.673828125Q482.510986328125 493.71728515625 504.510986328125 467.71728515625H513.054443359375V724.771728515625H717.423095703125V0H551.63037109375L535.771728515625 82.228271484375H527Q486.9130859375 29.45654296875 432.7554931640625 8.728271484375Q378.597900390625 -12 319.228271484375 -12ZM380.467041015625 134.869140625Q426.293212890625 134.869140625 455.9617919921875 151.32568359375Q485.63037109375 167.7822265625 499.8424072265625 196.4942626953125Q514.054443359375 225.206298828125 514.054443359375 260.54345703125V267Q514.054443359375 294.19580078125 506.0272216796875 317.02197265625Q498 339.84814453125 481.402099609375 356.6470947265625Q464.80419921875 373.446044921875 439.5921630859375 383.17431640625Q414.380126953125 392.902587890625 380.010498046875 392.902587890625Q334.640869140625 392.902587890625 305.08642578125 376.8319091796875Q275.531982421875 360.76123046875 261.0482177734375 333.8209228515625Q246.564453125 306.880615234375 246.564453125 272.54345703125V255.228271484375Q246.564453125 220.89111328125 261.162353515625 193.4508056640625Q275.76025390625 166.010498046875 305.314697265625 150.4398193359375Q334.869140625 134.869140625 380.467041015625 134.869140625Z" transform="translate(4364,0)" fill="currentColor"/><path d="M406.7822265625 -12Q296.293212890625 -12 213.532470703125 17.1141357421875Q130.771728515625 46.228271484375 84.9837646484375 107.6141357421875Q39.19580078125 169 39.19580078125 263.771728515625Q39.19580078125 356.54345703125 84.36962890625 418.04345703125Q129.54345703125 479.54345703125 210.2607421875 509.6575927734375Q290.97802734375 539.771728515625 397.923583984375 539.771728515625Q509.869140625 539.771728515625 590.2440185546875 510.4293212890625Q670.618896484375 481.0869140625 713.564453125 420.6575927734375Q756.510009765625 360.228271484375 756.510009765625 266.967529296875V226.684814453125H252.879638671875Q255.10791015625 186.945556640625 273.5916748046875 160.9183349609375Q292.075439453125 134.89111328125 326.6298828125 122.662841796875Q361.184326171875 110.4345703125 409.23876953125 110.4345703125Q437.41259765625 110.4345703125 461.82568359375 116.206298828125Q486.23876953125 121.97802734375 504.4073486328125 132.3638916015625Q522.575927734375 142.749755859375 532.858642578125 156.5487060546875Q543.141357421875 170.34765625 543.826171875 186.63037109375H754.8251953125Q754.8251953125 138.9130859375 728.1513671875 101.86962890625Q701.4775390625 64.826171875 654.1461181640625 39.4837646484375Q606.814697265625 14.141357421875 543.41259765625 1.0706787109375Q480.010498046875 -12 406.7822265625 -12ZM253.6513671875 326.402099609375H537.967529296875Q537.967529296875 346.141357421875 528.7120361328125 362.510986328125Q519.45654296875 378.880615234375 502.0162353515625 391.2230224609375Q484.575927734375 403.5654296875 460.1356201171875 410.4512939453125Q435.6953125 417.337158203125 406.097412109375 417.337158203125Q360.49951171875 417.337158203125 328.3309326171875 405.60888671875Q296.162353515625 393.880615234375 277.4068603515625 373.1251220703125Q258.6513671875 352.36962890625 253.6513671875 326.402099609375Z" transform="translate(5109,0)" fill="currentColor"/></g></svg></div>
+          <p class="footer-tag">See what's actually worth testing. Complexity and mutation analysis for Python, in one place.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#try">Complexity</a>
+          <a href="#mutation">Mutation testing</a>
+          <a href="#" data-soon="Risk reports are on the way">Risk reports</a>
+          <a href="#" data-soon="Multi-language support is coming">Languages</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="#how">How it works</a>
+          <a href="https://github.com/CodemasterAman/SUSGRADE" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/CodemasterAman/SUSGRADE#api-reference" target="_blank" rel="noopener">API reference</a>
+        </div>
+      </div>
+      <div class="footer-bar">
+        <span>© 2026 <b>/susgrade</b>. All rights reserved.</span>
+        <span>Crafted by <b>Aman Behera</b> &amp; <b>Bhomik Jain</b></span>
+      </div>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
+  const $ = (id) => document.getElementById(id);
+
+  /* THEME TOGGLE */
+  const html = document.documentElement;
+  $("themeTog").addEventListener("click", () => {
+    html.classList.add("theming");
+    const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", next);
+    try { localStorage.setItem("susgrade-theme", next); } catch (e) {}
+    setTimeout(() => html.classList.remove("theming"), 450);
+  });
+
+  /* BOOT — play the name reveal immediately */
+  document.body.classList.add("loaded");
+
+  
+
+  /* HERO CODE RAIN — faint "coding going on" behind the name only */
+  (function heroCodeRain() {
+    const host = $("heroCode");
+    if (!host) return;
+    const pool = [
+      "def cyclomatic_complexity(node):", "    complexity = 1", "    for child in ast.walk(node):",
+      "        if isinstance(child, ast.If):", "            complexity += 1",
+      "        elif isinstance(child, ast.BoolOp):", "            complexity += len(child.values) - 1",
+      "    return complexity", " ", "tree = ast.parse(source)", "report = grade(tree)", " ",
+      "class MutationEngine:", "    def mutate(self, tree):", "        for op in self.operators:",
+      "            yield op.apply(tree)", " ", "def run_mutants(mutants, tests):", "    killed = 0",
+      "    for m in mutants:", "        if not tests.pass_on(m):", "            killed += 1",
+      "    return killed / len(mutants)", " ", "def risk_score(cx, mutation):", "    return cx * (1 - mutation)",
+      " ", "@app.post('/analyze')", "def analyze(req):", "    return engine.run(req.source)", " ",
+      "for fn in module.functions:", "    print(fn.name, fn.complexity)", "score = killed / total * 100",
+      "if score < 80:", "    warn('weak tests')", "assert report.max <= threshold", " ",
+      "tokens = tokenize(source)", "ast_tree = build_ast(tokens)", "bands = classify(complexity)"
+    ];
+    const esc = (s) => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const N = window.innerWidth < 640 ? 4 : 6;
+    let out = "";
+    for (let i = 0; i < N; i++) {
+      const rot = Math.floor(Math.random() * pool.length);
+      const lines = pool.slice(rot).concat(pool.slice(0, rot));
+      const rep = lines.concat(lines);
+      const block = rep.map(l => `<div class="code-line">${esc(l || " ")}</div>`).join("");
+      const dur = 20 + Math.random() * 16;
+      out += `<div class="code-col" style="left:${(i / N) * 100}%;width:${100 / N}%;"><div class="code-inner" style="animation-duration:${dur}s;animation-delay:${-Math.random() * dur}s;">${block}${block}</div></div>`;
+    }
+    host.innerHTML = out;
+  })();
+
+  /* TOASTS */
+  const toasts = $("toasts");
+  let toastTimer;
+  function toast(msg) {
+    toasts.innerHTML = "";
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = '<span class="spark">\u2726</span> ' + msg;
+    toasts.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("show")));
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 400); }, 2600);
+  }
+  document.querySelectorAll("[data-soon]").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); toast(el.dataset.soon); }));
+
+  /* CURSOR */
+  if (finePointer && !reduce) {
+    document.body.classList.add("cursor-on");
+    const dot = $("curDot"), ring = $("curRing");
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+    window.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`; });
+    (function loop() { rx += (mx - rx) * .18; ry += (my - ry) * .18; ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+    document.querySelectorAll("a,button,textarea,.feat,.tab").forEach(el => {
+      el.addEventListener("mouseenter", () => ring.classList.add("big"));
+      el.addEventListener("mouseleave", () => ring.classList.remove("big"));
+    });
+  }
+
+  /* MAGNETIC */
+  if (finePointer && !reduce) {
+    document.querySelectorAll(".magnetic").forEach(el => {
+      el.addEventListener("mousemove", (e) => { const r = el.getBoundingClientRect(); const x = e.clientX - r.left - r.width / 2; const y = e.clientY - r.top - r.height / 2; el.style.transform = `translate(${x * .3}px,${y * .4}px)`; });
+      el.addEventListener("mouseleave", () => { el.style.transform = "translate(0,0)"; });
+    });
+  }
+
+  /* TILT */
+  if (finePointer && !reduce) {
+    document.querySelectorAll(".feat").forEach(el => {
+      el.addEventListener("mousemove", (e) => { const r = el.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width - .5; const py = (e.clientY - r.top) / r.height - .5; el.style.transform = `perspective(700px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg)`; });
+      el.addEventListener("mouseleave", () => { el.style.transform = "perspective(700px) rotateY(0) rotateX(0)"; });
+    });
+  }
+
+  /* SCROLL PROGRESS + PARALLAX */
+  const prog = $("prog"), pct = $("pct");
+  const parEls = [...document.querySelectorAll("[data-par]")];
+  function onScroll() {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    const p = h > 0 ? window.scrollY / h : 0;
+    prog.style.width = (p * 100) + "%";
+    pct.textContent = Math.round(p * 100) + "%";
+    if (!reduce) parEls.forEach(el => { const s = parseFloat(el.dataset.par); el.style.transform = `translateY(${window.scrollY * s}px)`; });
+  }
+  window.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  onScroll();
+
+  /* REVEALS */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  /* MARQUEE CONTENT */
+  const items = ["CYCLOMATIC COMPLEXITY", "MUTATION TESTING", "RISK SCORING", "PYTHON", "SANDBOXED", "ZERO CONFIG"];
+  function marqHTML() { const one = items.map(t => `<span>${t}</span><span class="sl">/</span>`).join(""); return `<div class="mitem">${one}</div><div class="mitem">${one}</div>`; }
+  $("m1").innerHTML = marqHTML();
+  $("m2").innerHTML = marqHTML();
+
+  /* FEATURES */
+  const FEATURES = [
+    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from Python's AST. Ranked by risk, colour-coded at a glance." },
+    { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
+    { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "soon", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
+    { ic: "M4 4h16v16H4zM9 9h6v6H9", c: "var(--green)", title: "Multi-language", tag: "soon", desc: "Today it's Python. Next: complexity across JavaScript, Java and more via Tree-sitter — one dashboard for a polyglot codebase." },
+    { ic: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", c: "var(--amber)", title: "Sandboxed runs", tag: "soon", desc: "Every mutant executes in an isolated sandbox, so untrusted code is analysed safely and never touches your machine." },
+    { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
+  ];
+  $("featGrid").innerHTML = FEATURES.map(f => `
+    <div class="feat" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
+      <div class="feat-ic" style="background:${f.c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${f.ic}"/></svg></div>
+      <h3>${f.title} <span class="tag ${f.tag === "live" ? "tag-live" : "tag-soon"}">${f.tag === "live" ? "live" : "soon"}</span></h3>
+      <p>${f.desc}</p>
+      <span class="feat-link">${f.tag === "live" ? "Try it now \u2192" : "Coming soon \u2192"}</span>
+    </div>`).join("");
+  document.querySelectorAll(".feat").forEach(el => el.addEventListener("click", () => {
+    if (el.dataset.go) { const t = document.getElementById(el.dataset.go); if (t) t.scrollIntoView({ behavior: "smooth" }); }
+    else if (el.dataset.soon) toast(el.dataset.soon);
+  }));
+
+  /* ANALYZER (live, Python) */
+  const SAMPLES = {
+    payments: { src: `def format_currency(amount, symbol="$"):
+    return f"{symbol}{amount:,.2f}"
+
+
+def is_valid_card(number):
+    digits = [int(d) for d in str(number) if d.isdigit()]
+    checksum = sum(digits)
+    return checksum % 10 == 0
+
+
+def apply_discount(price, tier):
+    if tier == "gold":
+        return price * 0.8
+    return price`, result: { functions: [{ name: "format_currency", lineno: 1, end_lineno: 2, complexity: 1, rank: "simple" }, { name: "is_valid_card", lineno: 5, end_lineno: 8, complexity: 2, rank: "simple" }, { name: "apply_discount", lineno: 11, end_lineno: 14, complexity: 2, rank: "simple" }], total_complexity: 5, average_complexity: 1.67, max_complexity: 2 } },
+    router: { src: `class RequestRouter:
+    def dispatch(self, req, user):
+        if req.method == "GET":
+            if req.path == "/health":
+                return self.health()
+            elif req.path.startswith("/api") and user.is_authenticated:
+                return self.api(req)
+            elif user.is_admin or user.has_scope("read"):
+                return self.read(req)
+        elif req.method == "POST":
+            if not user.is_authenticated:
+                return self.deny()
+            for field in req.required_fields:
+                if field not in req.body:
+                    return self.error(field)
+        return self.not_found()
+
+    def health(self):
+        return {"ok": True}`, result: { functions: [{ name: "RequestRouter.dispatch", lineno: 2, end_lineno: 16, complexity: 11, rank: "complex" }, { name: "RequestRouter.health", lineno: 18, end_lineno: 19, complexity: 1, rank: "simple" }], total_complexity: 12, average_complexity: 6.0, max_complexity: 11 } },
+    parser: { src: `def tokenize(source):
+    tokens = []
+    i = 0
+    while i < len(source):
+        ch = source[i]
+        if ch.isspace():
+            i += 1
+            continue
+        elif ch.isdigit():
+            num = ""
+            while i < len(source) and source[i].isdigit():
+                num += source[i]
+                i += 1
+            tokens.append(("NUM", num))
+        elif ch.isalpha() or ch == "_":
+            name = ""
+            while i < len(source) and (source[i].isalnum() or source[i] == "_"):
+                name += source[i]
+                i += 1
+            kind = "KEYWORD" if name in ("if", "else", "while", "for") else "NAME"
+            tokens.append((kind, name))
+        elif ch in "+-*/":
+            tokens.append(("OP", ch))
+            i += 1
+        else:
+            raise SyntaxError(f"unexpected char {ch!r}")
+    return tokens`, result: { functions: [{ name: "tokenize", lineno: 1, end_lineno: 27, complexity: 13, rank: "complex" }], total_complexity: 13, average_complexity: 13.0, max_complexity: 13 } }
+  };
+  const COLOR = { simple: "var(--green)", moderate: "var(--amber)", complex: "var(--orange)", "very complex": "var(--red)" };
+  const SAY = { simple: "Healthy — easy to test", moderate: "Manageable, a few branches to watch", complex: "Getting complex — worth a refactor", "very complex": "High risk — hard to cover fully" };
+  const codeEl = $("code"), gutterEl = $("gutter"), reportEl = $("report"), hintEl = $("hint");
+  let renderedSrc = "";
+  function syncGutter() { const n = codeEl.value.split("\n").length || 1; let s = ""; for (let i = 1; i <= n; i++) s += i + (i < n ? "\n" : ""); gutterEl.textContent = s; }
+  function axisMax(m) { return Math.max(20, Math.ceil((m * 1.2) / 5) * 5); }
+  function countUp(el, to, dec) { if (reduce) { el.textContent = to.toFixed(dec); return; } const dur = 900, t0 = performance.now(); (function s(now) { const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = (to * e).toFixed(dec); if (t < 1) requestAnimationFrame(s); else el.textContent = to.toFixed(dec); })(performance.now()); }
+  function esc(name) { const s = name.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); return s + '<span class="mut">()</span>'; }
+  function render(result, mode) {
+    const fns = result.functions;
+    if (!fns.length) { renderEmpty(mode); updateStats(result); return; }
+    const ax = axisMax(result.max_complexity), sorted = [...fns].sort((a, b) => b.complexity - a.complexity), worst = sorted[0], wc = COLOR[worst.rank];
+    const badge = mode === "engine" ? `<span class="badge badge-engine"><span class="dot"></span>Engine result</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
+    const rows = sorted.map(f => { const c = COLOR[f.rank], w = Math.max(4, (f.complexity / ax) * 100); return `<div class="fnrow"><div class="fnrow-head"><span class="fnrow-name">${esc(f.name)}</span><span class="fnrow-score" style="color:${c}">${f.complexity}</span></div><div class="bar-wrap"><div class="bar-fill" data-w="${w}" style="background:${c}"></div></div><div class="fnrow-meta">lines ${f.lineno}–${f.end_lineno} &nbsp;·&nbsp; <span class="pill" style="background:${c};color:#fff">${f.rank}</span></div></div>`; }).join("");
+    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--coral)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces — same as the API." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { reportEl.querySelectorAll(".bar-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }); }));
+    updateStats(result); renderedSrc = codeEl.value; updateHint();
+  }
+  function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some Python on the left and hit Analyze to see where the risk hides."}</p></div>`; }
+  function updateStats(r) { countUp($("st-fns"), r.functions.length, 0); countUp($("st-total"), r.total_complexity, 0); countUp($("st-avg"), r.average_complexity, 1); countUp($("st-max"), r.max_complexity, 0); }
+  function estimate(source) {
+    const raw = source.replace(/\r\n/g, "\n").split("\n"), clean = raw.map(stripSC), ind = (s) => s.length - s.replace(/^\s+/, "").length;
+    const classes = []; clean.forEach((ln, i) => { const m = ln.match(/^(\s*)class\s+([A-Za-z_]\w*)/); if (m) classes.push({ line: i, indent: m[1].length, name: m[2] }); });
+    const enc = (line, indent) => { let b = null; for (const c of classes) if (c.line < line && c.indent < indent && (!b || c.line > b.line)) b = c; return b ? b.name : null; };
+    const defs = []; clean.forEach((ln, i) => { const m = ln.match(/^(\s*)(?:async\s+)?def\s+([A-Za-z_]\w*)/); if (m) defs.push({ line: i, indent: m[1].length, name: m[2] }); });
+    const out = [];
+    defs.forEach(def => {
+      let end = def.line; const body = [];
+      for (let i = def.line + 1; i < clean.length; i++) { if (raw[i].trim() === "") { end = i; continue; } if (ind(raw[i]) <= def.indent) break; end = i; body.push({ i, text: clean[i], ind: ind(raw[i]) }); }
+      const excl = new Set(); body.forEach((bl, k) => { if (/^\s*(?:async\s+)?def\s+/.test(bl.text)) { excl.add(bl.i); for (let j = k + 1; j < body.length; j++) { if (body[j].ind > bl.ind) excl.add(body[j].i); else break; } } });
+      let c = 1; const cnt = (t, re) => (t.match(re) || []).length;
+      body.forEach(bl => { if (excl.has(bl.i)) return; const t = " " + bl.text + " "; const sf = /^\s*(?:async\s+)?for\b/.test(bl.text) ? 1 : 0; c += cnt(t, /\bif\b/g) + cnt(t, /\belif\b/g) + sf + cnt(t, /\bwhile\b/g) + cnt(t, /\bexcept\b/g) + cnt(t, /\band\b/g) + cnt(t, /\bor\b/g) + cnt(t, /\bcase\b/g); });
+      const rank = c <= 5 ? "simple" : c <= 10 ? "moderate" : c <= 20 ? "complex" : "very complex";
+      const cls = enc(def.line, def.indent); out.push({ name: (cls ? cls + "." : "") + def.name, lineno: def.line + 1, end_lineno: end + 1, complexity: c, rank });
+    });
+    return out;
+  }
+  function stripSC(line) { let o = "", i = 0, q = null; while (i < line.length) { const c = line[i]; if (q) { if (c === q) q = null; i++; continue; } if (c === "#") break; if (c === '"' || c === "'") { q = c; i++; continue; } o += c; i++; } return o; }
+  function toResult(fns) { if (!fns.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 }; const total = fns.reduce((s, f) => s + f.complexity, 0); return { functions: fns, total_complexity: total, average_complexity: Math.round((total / fns.length) * 100) / 100, max_complexity: Math.max(...fns.map(f => f.complexity)) }; }
+  function setTab(key) { document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === key)); if (key === "custom") { codeEl.value = ""; syncGutter(); renderEmpty("initial"); renderedSrc = ""; updateHint(); codeEl.focus(); } else { codeEl.value = SAMPLES[key].src; syncGutter(); render(SAMPLES[key].result, "engine"); } }
+  function runAnalyze() { const src = codeEl.value; if (!src.trim()) { renderEmpty("initial"); return; } render(toResult(estimate(src)), "estimate"); document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === "custom")); }
+  function updateHint() { hintEl.classList.toggle("show", codeEl.value !== renderedSrc && codeEl.value.trim() !== ""); }
+  document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
+  $("analyze").addEventListener("click", runAnalyze);
+  codeEl.addEventListener("input", () => { syncGutter(); updateHint(); });
+  codeEl.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); runAnalyze(); } });
+  setTab("router");
+
+  /* ---- MUTATION TESTING (runs in your browser via Pyodide — no backend) ---- */
+  (function mutationTesting() {
+    const codeTa = $("mutCode"), testsTa = $("mutTests"), runBtn = $("mutRun"), report = $("mutReport");
+    if (!codeTa || !testsTa || !runBtn || !report) return;
+
+    codeTa.value = "def grade(score):\n    if score >= 90:\n        return \"A\"\n    if score >= 80:\n        return \"B\"\n    if score >= 60:\n        return \"pass\"\n    return \"fail\"\n";
+    testsTa.value = "# Weak on purpose \u2014 run it and watch mutants survive.\nfrom subject import grade\n\ndef test_a():\n    assert grade(95) == \"A\"\n\ndef test_pass():\n    assert grade(70) == \"pass\"\n";
+
+    const escHtml = (s) => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const msg = (html) => { report.innerHTML = '<div class="mut-msg">' + html + '</div>'; };
+    const loading = (label) => { report.innerHTML = '<div class="mut-loading"><div class="mut-spin"></div><div>' + label + '</div></div>'; };
+
+    const WORKER_SRC = "const PYODIDE_URL = \"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/\";\nimportScripts(PYODIDE_URL + \"pyodide.js\");\nlet pyodide = null;\nconst PY = \"\\\"\\\"\\\"susgrade mutation engine \\u2014 browser build (runs inside Pyodide).\\n\\nMutant GENERATION is byte-for-byte the same logic as the backend\\n(backend/app/analysis/mutation.py). Only EXECUTION differs: instead of\\nwriting files and spawning pytest subprocesses, tests run in-process inside\\nthis single Pyodide interpreter. The operators, scoring, and survivor output\\nare identical.\\n\\\"\\\"\\\"\\n\\nimport ast\\nimport copy\\nimport sys\\nimport types\\nimport json\\n\\n# ---- operator tables (identical to the backend) ----\\n_BINOP_SYM = {ast.Add: \\\"+\\\", ast.Sub: \\\"-\\\", ast.Mult: \\\"*\\\",\\n              ast.Div: \\\"/\\\", ast.FloorDiv: \\\"//\\\", ast.Mod: \\\"%\\\", ast.Pow: \\\"**\\\"}\\n_BINOP_SWAPS = {ast.Add: [ast.Sub], ast.Sub: [ast.Add],\\n                ast.Mult: [ast.Div], ast.Div: [ast.Mult],\\n                ast.FloorDiv: [ast.Div], ast.Mod: [ast.Mult], ast.Pow: [ast.Mult]}\\n_CMP_SYM = {ast.Lt: \\\"<\\\", ast.LtE: \\\"<=\\\", ast.Gt: \\\">\\\", ast.GtE: \\\">=\\\",\\n            ast.Eq: \\\"==\\\", ast.NotEq: \\\"!=\\\", ast.Is: \\\"is\\\", ast.IsNot: \\\"is not\\\",\\n            ast.In: \\\"in\\\", ast.NotIn: \\\"not in\\\"}\\n_CMP_SWAPS = {ast.Lt: [ast.LtE, ast.Gt], ast.Gt: [ast.GtE, ast.Lt],\\n              ast.LtE: [ast.Lt, ast.GtE], ast.GtE: [ast.Gt, ast.LtE],\\n              ast.Eq: [ast.NotEq], ast.NotEq: [ast.Eq],\\n              ast.Is: [ast.IsNot], ast.IsNot: [ast.Is],\\n              ast.In: [ast.NotIn], ast.NotIn: [ast.In]}\\n_BOOL_SYM = {ast.And: \\\"and\\\", ast.Or: \\\"or\\\"}\\n_BOOL_SWAP = {ast.And: ast.Or, ast.Or: ast.And}\\n_UNARY_SYM = {ast.USub: \\\"-\\\", ast.UAdd: \\\"+\\\"}\\n_UNARY_SWAP = {ast.USub: ast.UAdd, ast.UAdd: ast.USub}\\n\\n_MAX_MUTANTS = 150\\n\\n\\ndef _apply(node, kind, sub, new):\\n    if kind == \\\"binop\\\":\\n        node.op = new()\\n    elif kind == \\\"compare\\\":\\n        node.ops[sub] = new()\\n    elif kind == \\\"boolop\\\":\\n        node.op = new()\\n    elif kind == \\\"unaryop\\\":\\n        node.op = new()\\n    elif kind == \\\"const\\\":\\n        node.value = new\\n\\n\\ndef generate_mutants(source):\\n    tree = ast.parse(source)\\n    recipes = []\\n    for wi, node in enumerate(ast.walk(tree)):\\n        ln = getattr(node, \\\"lineno\\\", 0)\\n        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s' -> '%s'\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s=' -> '%s='\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.Compare):\\n            for k, op in enumerate(node.ops):\\n                if type(op) in _CMP_SWAPS:\\n                    sym = _CMP_SYM[type(op)]\\n                    for rep in _CMP_SWAPS[type(op)]:\\n                        recipes.append((wi, \\\"compare\\\", k, rep, \\\"ROR\\\",\\n                                        \\\"'%s' -> '%s'\\\" % (sym, _CMP_SYM[rep]), ln))\\n        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:\\n            rep = _BOOL_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"boolop\\\", None, rep, \\\"LOR\\\",\\n                            \\\"'%s' -> '%s'\\\" % (_BOOL_SYM[type(node.op)], _BOOL_SYM[rep]), ln))\\n        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:\\n            rep = _UNARY_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"unaryop\\\", None, rep, \\\"UOR\\\",\\n                            \\\"unary '%s' -> '%s'\\\" % (_UNARY_SYM[type(node.op)], _UNARY_SYM[rep]), ln))\\n        elif isinstance(node, ast.Constant):\\n            v = node.value\\n            if isinstance(v, bool):\\n                recipes.append((wi, \\\"const\\\", None, (not v), \\\"BCR\\\", \\\"%s -> %s\\\" % (v, not v), ln))\\n            elif isinstance(v, (int, float)):\\n                recipes.append((wi, \\\"const\\\", None, v + 1, \\\"NCR\\\", \\\"%s -> %s\\\" % (v, v + 1), ln))\\n                if v != 0:\\n                    recipes.append((wi, \\\"const\\\", None, 0, \\\"NCR\\\", \\\"%s -> 0\\\" % (v,), ln))\\n\\n    mutants = []\\n    for wi, kind, sub, new, operator, desc, ln in recipes:\\n        mtree = copy.deepcopy(tree)\\n        for j, node in enumerate(ast.walk(mtree)):\\n            if j == wi:\\n                _apply(node, kind, sub, new)\\n                break\\n        ast.fix_missing_locations(mtree)\\n        mutants.append({\\\"operator\\\": operator, \\\"description\\\": desc,\\n                        \\\"lineno\\\": ln, \\\"source\\\": ast.unparse(mtree)})\\n    return mutants\\n\\n\\ndef _run_tests_against(subject_src, tests_src):\\n    \\\"\\\"\\\"Run tests_src against subject_src in-process. Returns (all_passed, num_ran).\\n\\n    Same classification as the backend's pytest run: any failing/erroring test,\\n    or code that won't import, means (False, ...). The subject is exposed as a\\n    module named ``subject`` so tests can ``from subject import ...``.\\n    \\\"\\\"\\\"\\n    import io\\n    import unittest\\n\\n    subj = types.ModuleType(\\\"subject\\\")\\n    sys.modules[\\\"subject\\\"] = subj\\n    try:\\n        exec(compile(subject_src, \\\"subject.py\\\", \\\"exec\\\"), subj.__dict__)\\n    except Exception:\\n        return (False, 0)\\n\\n    ns = {\\\"__name__\\\": \\\"test_subject\\\"}\\n    try:\\n        exec(compile(tests_src, \\\"test_subject.py\\\", \\\"exec\\\"), ns)\\n    except Exception:\\n        return (False, 0)\\n\\n    ran = 0\\n    # unittest.TestCase classes\\n    suite = unittest.TestSuite()\\n    loader = unittest.TestLoader()\\n    found_case = False\\n    for v in list(ns.values()):\\n        if isinstance(v, type) and issubclass(v, unittest.TestCase):\\n            suite.addTests(loader.loadTestsFromTestCase(v))\\n            found_case = True\\n    if found_case:\\n        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)\\n        ran += res.testsRun\\n        if not res.wasSuccessful():\\n            return (False, ran)\\n\\n    # plain test_* functions\\n    for k, v in list(ns.items()):\\n        if k.startswith(\\\"test\\\") and callable(v) and not isinstance(v, type):\\n            ran += 1\\n            try:\\n                v()\\n            except Exception:\\n                return (False, ran)\\n\\n    return (True, ran)\\n\\n\\ndef prepare(source, tests):\\n    \\\"\\\"\\\"Generate mutants and run the baseline. Returns a JSON string.\\\"\\\"\\\"\\n    try:\\n        mutants = generate_mutants(source)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"source\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n    try:\\n        ast.parse(tests)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"tests\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n\\n    passed, ran = _run_tests_against(source, tests)\\n    capped = len(mutants) > _MAX_MUTANTS\\n    run_list = mutants[:_MAX_MUTANTS]\\n    return json.dumps({\\n        \\\"error\\\": None,\\n        \\\"no_tests\\\": ran == 0,\\n        \\\"baseline_passed\\\": bool(passed and ran > 0),\\n        \\\"total_generated\\\": len(mutants),\\n        \\\"capped\\\": capped,\\n        \\\"mutants\\\": run_list,\\n    })\\n\\n\\ndef run_mutant(mutant_src, tests_src):\\n    \\\"\\\"\\\"True if the mutant is killed (tests fail on it), False if it survives.\\\"\\\"\\\"\\n    passed, _ = _run_tests_against(mutant_src, tests_src)\\n    return not passed\\n\";\nasync function ensure() {\n  if (!pyodide) {\n    pyodide = await loadPyodide({ indexURL: PYODIDE_URL });\n    pyodide.runPython(PY);\n  }\n}\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    await ensure();\n    if (m.type === \"prepare\") {\n      const f = pyodide.globals.get(\"prepare\");\n      const out = f(m.source, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: JSON.parse(out) });\n    } else if (m.type === \"runMutant\") {\n      const f = pyodide.globals.get(\"run_mutant\");\n      const killed = f(m.mutantSource, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: { killed: !!killed } });\n    }\n  } catch (err) {\n    self.postMessage({ id: m.id, ok: false, error: String(err && err.message ? err.message : err) });\n  }\n};\n";
+    let worker = null, seq = 0; const pending = {};
+    function spawn() {
+      worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "application/javascript" })));
+      worker.onmessage = (e) => {
+        const d = e.data; const p = pending[d.id]; if (!p) return;
+        delete pending[d.id]; if (p.t) clearTimeout(p.t);
+        d.ok ? p.res(d.data) : p.rej(new Error(d.error || "worker error"));
+      };
+      worker.onerror = (ev) => {
+        for (const k in pending) { const p = pending[k]; delete pending[k]; if (p.t) clearTimeout(p.t); p.rej(new Error(ev.message || "worker failed to load")); }
+      };
+    }
+    function callWorker(type, payload, timeoutMs) {
+      return new Promise((res, rej) => {
+        const id = ++seq; const p = { res, rej, t: null }; pending[id] = p;
+        if (timeoutMs) p.t = setTimeout(() => { if (pending[id]) { delete pending[id]; const e = new Error("timeout"); e.__timeout = true; rej(e); } }, timeoutMs);
+        worker.postMessage(Object.assign({ id: id, type: type }, payload));
+      });
+    }
+    function kill() { if (worker) { try { worker.terminate(); } catch (e) {} worker = null; } }
+
+    function render(d) {
+      if (!d.baseline_passed) {
+        msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>Mutation testing needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>');
+        return;
+      }
+      const pct = Math.round(d.mutation_score * 100);
+      const band = pct >= 80 ? "hi" : pct >= 50 ? "mid" : "lo";
+      const survHTML = d.survivors.length
+        ? d.survivors.map(s => '<div class="mut-surv"><span class="mut-op op-' + s.operator + '">' + s.operator + '</span><span class="mut-line">line ' + s.lineno + '</span><span class="mut-desc">' + escHtml(s.description) + '</span></div>').join("")
+        : '<div class="mut-allkilled">Every mutant was killed \u2014 your tests caught all of them. \uD83C\uDFAF</div>';
+      const verdict = d.survived === 0
+        ? "All " + d.total_run + " mutants killed. That's a thorough suite."
+        : d.survived + " of " + d.total_run + " mutants survived \u2014 each is a change your tests don't catch.";
+      const timed = d.timed_out ? ' \u00b7 <span class="mut-stat"><b>timed out</b> ' + d.timed_out + '</span>' : "";
+      report.innerHTML =
+        '<div class="mut-result">' +
+          '<div class="mut-score band-' + band + '"><div class="mut-score-num">' + pct + '<span>%</span></div><div class="mut-score-lab">mutation score</div></div>' +
+          '<div class="mut-stats"><span class="mut-stat"><b>killed</b> ' + d.killed + '</span><span class="mut-stat"><b>survived</b> ' + d.survived + '</span><span class="mut-stat"><b>total</b> ' + d.total_run + '</span>' + timed + '</div>' +
+          '<p class="mut-verdict">' + verdict + '</p>' +
+          '<div class="mut-survivors">' + survHTML + '</div>' +
+        '</div>';
+    }
+
+    let busy = false;
+    async function run() {
+      if (busy) return;
+      const source = codeTa.value, tests = testsTa.value;
+      if (!source.trim() || !tests.trim()) { msg("Add both your code and your tests, then run."); return; }
+      busy = true; runBtn.disabled = true;
+      loading('Loading Python\u2026 first run fetches the runtime (a few MB), then it\u2019s cached and instant.');
+      try {
+        if (!worker) spawn();
+        let prep;
+        try { prep = await callWorker("prepare", { source: source, tests: tests }, 120000); }
+        catch (e) { kill(); if (e && e.__timeout) throw new Error("Timed out loading the Python runtime \u2014 check your connection and try again."); throw e; }
+        if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
+        if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
+        if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return; }
+        if (!prep.baseline_passed) { render({ baseline_passed: false }); return; }
+        const mutants = prep.mutants; const total = mutants.length;
+        let killed = 0, survived = 0, timedOut = 0; const survivors = [];
+        for (let i = 0; i < total; i++) {
+          const m = mutants[i];
+          loading('Running mutants\u2026 ' + (i + 1) + '/' + total);
+          try {
+            const r = await callWorker("runMutant", { mutantSource: m.source, tests: tests }, 5000);
+            if (r.killed) killed++; else { survived++; survivors.push({ operator: m.operator, description: m.description, lineno: m.lineno }); }
+          } catch (e) {
+            if (e && e.__timeout) { timedOut++; killed++; kill(); spawn(); }
+            else throw e;
+          }
+        }
+        const score = total ? Math.round((killed / total) * 1000) / 1000 : 1;
+        render({ baseline_passed: true, total_run: total, killed: killed, survived: survived, timed_out: timedOut, mutation_score: score, survivors: survivors });
+      } catch (err) {
+        msg('<b>Something went wrong running mutation testing.</b><p>' + escHtml(err && err.message ? err.message : String(err)) + '</p>');
+      } finally {
+        busy = false; runBtn.disabled = false;
+      }
+    }
+    runBtn.addEventListener("click", run);
+    const goMut = $("goMut");
+    if (goMut) goMut.addEventListener("click", () => { const el = document.getElementById("mutation"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
+    msg("Your code and a deliberately weak test suite are loaded. Hit <b>Run mutation analysis</b> \u2014 it runs entirely in your browser (first run loads Python, then it\u2019s instant).");
+  })();
+})();
+</script>
+</body>
+</html>
