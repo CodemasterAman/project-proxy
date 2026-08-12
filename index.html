@@ -169,8 +169,10 @@
   .reveal-2.in { transition-delay:.08s; } .reveal-3.in { transition-delay:.16s; }
 
   /* FEATURES */
-  .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-  @media (max-width:860px){ .feat-grid{ grid-template-columns:1fr; } }
+  .feat-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+  .feat-grid > * { flex:0 1 320px; }
+  @media (min-width:900px){ .feat-grid > * { flex:0 0 calc((100% - 44px) / 3); } }
+  @media (max-width:620px){ .feat-grid > * { flex-basis:100%; } }
   .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; }
   .feat:nth-child(3n+1){ box-shadow:6px 6px 0 var(--blue); } .feat:nth-child(3n+2){ box-shadow:6px 6px 0 var(--coral); } .feat:nth-child(3n){ box-shadow:6px 6px 0 var(--green); }
   .feat:hover { box-shadow:10px 10px 0 var(--shadow); }
@@ -344,6 +346,9 @@
   .risk-na { color:var(--faint); }
   .risk-formula { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:14px; line-height:1.6; }
   .risk-mod { font-size:11px; color:var(--faint); margin-top:6px; }
+  .lab-right { display:flex; align-items:center; gap:9px; }
+  .ed-up { font-family:'Space Mono',monospace; font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--dim); background:var(--bg); border:1.5px solid var(--border); border-radius:6px; padding:2px 8px; cursor:pointer; transition:color .15s, border-color .15s; white-space:nowrap; }
+  .ed-up:hover { color:var(--coral); border-color:var(--coral); }
 </style>
 </head>
 <body>
@@ -433,6 +438,7 @@
           <div class="toolbar">
             <div class="toolbar-left">
               <button class="btn-sm btn-mut magnetic" id="goMut">Run mutation scan <span>→</span></button>
+              <button type="button" class="ed-up" data-target="code">↑ file</button>
               <div class="toolbar-hint" id="hint"><span>edits</span><kbd>⌘</kbd><kbd>↵</kbd></div>
             </div>
             <button class="btn-sm btn-analyze magnetic" id="analyze">Analyze <span>✦</span></button>
@@ -456,11 +462,11 @@
       <div class="mut-grid reveal">
         <div class="card">
           <div class="mut-pane">
-            <div class="mut-label">your code <span class="mut-modname">subject.py</span></div>
+            <div class="mut-label"><span>your code</span><span class="lab-right"><button type="button" class="ed-up" data-target="mutCode">↑ file</button><span class="mut-modname">subject.py</span></span></div>
             <textarea class="code mut-ta" id="mutCode" spellcheck="false"></textarea>
           </div>
           <div class="mut-pane">
-            <div class="mut-label">your tests <span class="mut-modname">test_subject.py</span></div>
+            <div class="mut-label"><span>your tests</span><span class="lab-right"><button type="button" class="ed-up" data-target="mutTests">↑ file</button><span class="mut-modname">test_subject.py</span></span></div>
             <textarea class="code mut-ta" id="mutTests" spellcheck="false"></textarea>
           </div>
           <div class="toolbar">
@@ -485,11 +491,11 @@
       <div class="mut-grid reveal">
         <div class="card">
           <div class="mut-pane">
-            <div class="mut-label">your code <span class="mut-modname">subject.py</span></div>
+            <div class="mut-label"><span>your code</span><span class="lab-right"><button type="button" class="ed-up" data-target="riskCode">↑ file</button><span class="mut-modname">subject.py</span></span></div>
             <textarea class="code mut-ta" id="riskCode" spellcheck="false"></textarea>
           </div>
           <div class="mut-pane">
-            <div class="mut-label">your tests <span class="mut-modname">test_subject.py</span></div>
+            <div class="mut-label"><span>your tests</span><span class="lab-right"><button type="button" class="ed-up" data-target="riskTests">↑ file</button><span class="mut-modname">test_subject.py</span></span></div>
             <textarea class="code mut-ta" id="riskTests" spellcheck="false"></textarea>
           </div>
           <div class="toolbar">
@@ -705,7 +711,6 @@
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
     { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
     { ic: "M4 4h16v16H4zM9 9h6v6H9", c: "var(--green)", title: "Multi-language", tag: "soon", desc: "Today it's Python. Next: complexity across JavaScript, Java and more via Tree-sitter — one dashboard for a polyglot codebase." },
-    { ic: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", c: "var(--amber)", title: "Sandboxed runs", tag: "soon", desc: "Every mutant executes in an isolated sandbox, so untrusted code is analysed safely and never touches your machine." },
     { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
   ];
   $("featGrid").innerHTML = FEATURES.map(f => `
@@ -1056,6 +1061,27 @@ def apply_discount(price, tier):
     if (goRisk) goRisk.addEventListener("click", () => { const el = document.getElementById("risk"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
     msg("A multi-function example is loaded \u2014 some functions are well tested, one isn\u2019t. Hit <b>Generate risk report</b> to see which function to test next.");
   })();
+  /* ---- FILE UPLOAD (load code/tests from a local file) ---- */
+  (function fileUpload() {
+    document.querySelectorAll(".ed-up").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var ta = document.getElementById(btn.getAttribute("data-target"));
+        if (!ta) return;
+        var inp = document.createElement("input");
+        inp.type = "file";
+        inp.accept = ".py,.txt,text/x-python,text/plain";
+        inp.addEventListener("change", function () {
+          var f = inp.files && inp.files[0];
+          if (!f) return;
+          var rd = new FileReader();
+          rd.onload = function () { ta.value = String(rd.result); ta.dispatchEvent(new Event("input", { bubbles: true })); ta.focus(); };
+          rd.readAsText(f);
+        });
+        inp.click();
+      });
+    });
+  })();
+
 })();
 </script>
 </body>
