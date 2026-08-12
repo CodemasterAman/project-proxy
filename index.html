@@ -320,6 +320,30 @@
   .mut-down code { background:var(--blue-lo); color:var(--text); padding:1px 6px; border-radius:5px; font-size:11.5px; }
   .mut-fine { font-size:12px !important; color:var(--faint) !important; margin-top:10px !important; }
   @media (max-width:900px){ .mut-grid { grid-template-columns:1fr; } }
+  /* ---- RISK REPORT ---- */
+  .card-coral { box-shadow:6px 6px 0 var(--coral); }
+  .btn-runrisk { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runrisk:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runrisk:disabled { opacity:.6; cursor:default; }
+  .risk-report { padding:0; }
+  .risk-result { padding:20px 22px; }
+  .risk-lead { font-size:15px; color:var(--text); margin-bottom:16px; line-height:1.5; }
+  .risk-lead b { color:var(--coral); }
+  .risk-clear b { color:var(--green); }
+  .risk-table { width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; }
+  .risk-table th { text-align:left; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:700; padding:6px 8px; border-bottom:1.5px solid var(--border); }
+  .risk-table td { padding:11px 8px; border-bottom:1px solid var(--hairline); font-size:13px; color:var(--text); }
+  .risk-table tbody tr:first-child td { background:var(--surface); }
+  .risk-fn { font-weight:700; }
+  .risk-rank { color:var(--faint); font-size:11px; }
+  .cx-band { display:inline-block; min-width:20px; text-align:center; padding:1px 6px; border-radius:5px; color:#fff; font-size:11px; font-weight:700; }
+  .cx-simple { background:var(--green); } .cx-moderate { background:var(--blue); } .cx-complex { background:var(--amber); color:#3a2d00; } .cx-verycomplex { background:var(--coral); }
+  .risk-mut { color:var(--dim); }
+  .risk-pill { display:inline-block; min-width:44px; text-align:center; padding:3px 8px; border-radius:7px; font-weight:700; font-size:13px; color:#fff; }
+  .risk-pill.band-hi { background:var(--coral); } .risk-pill.band-mid { background:var(--amber); color:#3a2d00; } .risk-pill.band-lo { background:var(--blue); } .risk-pill.band-none { background:var(--surface); color:var(--faint); border:1.5px solid var(--hairline); }
+  .risk-na { color:var(--faint); }
+  .risk-formula { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:14px; line-height:1.6; }
+  .risk-mod { font-size:11px; color:var(--faint); margin-top:6px; }
 </style>
 </head>
 <body>
@@ -338,7 +362,7 @@
       <a href="#features" class="nav-link">Features</a>
       <a href="#try" class="nav-link">Complexity</a>
       <a href="#mutation" class="nav-link">Mutation</a>
-      <a href="#" class="nav-link" data-soon="Risk reports are on the way">Risk reports<span class="soon">soon</span></a>
+      <a href="#risk" class="nav-link">Risk reports</a>
     </div>
     <div class="nav-right">
       <a href="https://github.com/CodemasterAman/SUSGRADE" target="_blank" rel="noopener" class="nav-signin">GitHub</a>
@@ -449,6 +473,35 @@
     </div>
   </section>
 
+  <!-- RISK REPORT -->
+  <section class="section" id="risk">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 03</span> &mdash; risk report &middot; python</div>
+        <h2>The one number: what to <em>test next</em>.</h2>
+        <p class="lead">This is the whole point of susgrade. It fuses the two signals &mdash; how complex each function is, and how well your tests actually cover it &mdash; into a single score per function: <b>risk = complexity &times; (1 &minus; mutation score)</b>. The function that's both complex and weakly tested rises to the top, so you always know where your next test belongs.</p>
+      </div>
+      <div class="mut-note reveal">Runs entirely in your browser &mdash; no backend. It measures complexity and runs mutation testing together, then ranks every function by risk.</div>
+      <div class="mut-grid reveal">
+        <div class="card">
+          <div class="mut-pane">
+            <div class="mut-label">your code <span class="mut-modname">subject.py</span></div>
+            <textarea class="code mut-ta" id="riskCode" spellcheck="false"></textarea>
+          </div>
+          <div class="mut-pane">
+            <div class="mut-label">your tests <span class="mut-modname">test_subject.py</span></div>
+            <textarea class="code mut-ta" id="riskTests" spellcheck="false"></textarea>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left"><div class="mut-endpoint">complexity &times; mutation</div></div>
+            <button class="btn-sm btn-runrisk magnetic" id="riskRun">Generate risk report ✦</button>
+          </div>
+        </div>
+        <div class="card card-coral"><div class="report risk-report" id="riskReport"></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="statband" id="stats">
     <div class="wrap">
       <div class="eyebrow reveal"><span class="slash">/</span> live from your last run</div>
@@ -506,7 +559,7 @@
           <h4>Product</h4>
           <a href="#try">Complexity</a>
           <a href="#mutation">Mutation testing</a>
-          <a href="#" data-soon="Risk reports are on the way">Risk reports</a>
+          <a href="#risk">Risk reports</a>
           <a href="#" data-soon="Multi-language support is coming">Languages</a>
         </div>
         <div class="footer-col">
@@ -650,7 +703,7 @@
   const FEATURES = [
     { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from Python's AST. Ranked by risk, colour-coded at a glance." },
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
-    { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "soon", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
+    { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
     { ic: "M4 4h16v16H4zM9 9h6v6H9", c: "var(--green)", title: "Multi-language", tag: "soon", desc: "Today it's Python. Next: complexity across JavaScript, Java and more via Tree-sitter — one dashboard for a polyglot codebase." },
     { ic: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", c: "var(--amber)", title: "Sandboxed runs", tag: "soon", desc: "Every mutant executes in an isolated sandbox, so untrusted code is analysed safely and never touches your machine." },
     { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
@@ -778,7 +831,85 @@ def apply_discount(price, tier):
   codeEl.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); runAnalyze(); } });
   setTab("router");
 
-  /* ---- MUTATION TESTING (runs in your browser via Pyodide — no backend) ---- */
+  /* ---- susgrade in-browser engine (shared by mutation + risk) ---- */
+  /* Prefers a Web Worker so a hung mutant can be killed by terminating it. If
+     the page's CSP blocks Blob-URL Workers (e.g. some sandboxes), it falls back
+     to running Pyodide on the main thread — works everywhere, but a runaway
+     mutant can't be force-interrupted in that mode. */
+  const SUS = (function () {
+    const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+    const PY = "\"\"\"susgrade mutation engine \u2014 browser build (runs inside Pyodide).\n\nMutant GENERATION is byte-for-byte the same logic as the backend\n(backend/app/analysis/mutation.py). Only EXECUTION differs: instead of\nwriting files and spawning pytest subprocesses, tests run in-process inside\nthis single Pyodide interpreter. The operators, scoring, and survivor output\nare identical.\n\"\"\"\n\nimport ast\nimport copy\nimport sys\nimport types\nimport json\n\n# ---- operator tables (identical to the backend) ----\n_BINOP_SYM = {ast.Add: \"+\", ast.Sub: \"-\", ast.Mult: \"*\",\n              ast.Div: \"/\", ast.FloorDiv: \"//\", ast.Mod: \"%\", ast.Pow: \"**\"}\n_BINOP_SWAPS = {ast.Add: [ast.Sub], ast.Sub: [ast.Add],\n                ast.Mult: [ast.Div], ast.Div: [ast.Mult],\n                ast.FloorDiv: [ast.Div], ast.Mod: [ast.Mult], ast.Pow: [ast.Mult]}\n_CMP_SYM = {ast.Lt: \"<\", ast.LtE: \"<=\", ast.Gt: \">\", ast.GtE: \">=\",\n            ast.Eq: \"==\", ast.NotEq: \"!=\", ast.Is: \"is\", ast.IsNot: \"is not\",\n            ast.In: \"in\", ast.NotIn: \"not in\"}\n_CMP_SWAPS = {ast.Lt: [ast.LtE, ast.Gt], ast.Gt: [ast.GtE, ast.Lt],\n              ast.LtE: [ast.Lt, ast.GtE], ast.GtE: [ast.Gt, ast.LtE],\n              ast.Eq: [ast.NotEq], ast.NotEq: [ast.Eq],\n              ast.Is: [ast.IsNot], ast.IsNot: [ast.Is],\n              ast.In: [ast.NotIn], ast.NotIn: [ast.In]}\n_BOOL_SYM = {ast.And: \"and\", ast.Or: \"or\"}\n_BOOL_SWAP = {ast.And: ast.Or, ast.Or: ast.And}\n_UNARY_SYM = {ast.USub: \"-\", ast.UAdd: \"+\"}\n_UNARY_SWAP = {ast.USub: ast.UAdd, ast.UAdd: ast.USub}\n\n_MAX_MUTANTS = 150\n\n\ndef _apply(node, kind, sub, new):\n    if kind == \"binop\":\n        node.op = new()\n    elif kind == \"compare\":\n        node.ops[sub] = new()\n    elif kind == \"boolop\":\n        node.op = new()\n    elif kind == \"unaryop\":\n        node.op = new()\n    elif kind == \"const\":\n        node.value = new\n\n\ndef generate_mutants(source):\n    tree = ast.parse(source)\n    recipes = []\n    for wi, node in enumerate(ast.walk(tree)):\n        ln = getattr(node, \"lineno\", 0)\n        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:\n            sym = _BINOP_SYM[type(node.op)]\n            for rep in _BINOP_SWAPS[type(node.op)]:\n                recipes.append((wi, \"binop\", None, rep, \"AOR\",\n                                \"'%s' -> '%s'\" % (sym, _BINOP_SYM[rep]), ln))\n        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:\n            sym = _BINOP_SYM[type(node.op)]\n            for rep in _BINOP_SWAPS[type(node.op)]:\n                recipes.append((wi, \"binop\", None, rep, \"AOR\",\n                                \"'%s=' -> '%s='\" % (sym, _BINOP_SYM[rep]), ln))\n        elif isinstance(node, ast.Compare):\n            for k, op in enumerate(node.ops):\n                if type(op) in _CMP_SWAPS:\n                    sym = _CMP_SYM[type(op)]\n                    for rep in _CMP_SWAPS[type(op)]:\n                        recipes.append((wi, \"compare\", k, rep, \"ROR\",\n                                        \"'%s' -> '%s'\" % (sym, _CMP_SYM[rep]), ln))\n        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:\n            rep = _BOOL_SWAP[type(node.op)]\n            recipes.append((wi, \"boolop\", None, rep, \"LOR\",\n                            \"'%s' -> '%s'\" % (_BOOL_SYM[type(node.op)], _BOOL_SYM[rep]), ln))\n        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:\n            rep = _UNARY_SWAP[type(node.op)]\n            recipes.append((wi, \"unaryop\", None, rep, \"UOR\",\n                            \"unary '%s' -> '%s'\" % (_UNARY_SYM[type(node.op)], _UNARY_SYM[rep]), ln))\n        elif isinstance(node, ast.Constant):\n            v = node.value\n            if isinstance(v, bool):\n                recipes.append((wi, \"const\", None, (not v), \"BCR\", \"%s -> %s\" % (v, not v), ln))\n            elif isinstance(v, (int, float)):\n                recipes.append((wi, \"const\", None, v + 1, \"NCR\", \"%s -> %s\" % (v, v + 1), ln))\n                if v != 0:\n                    recipes.append((wi, \"const\", None, 0, \"NCR\", \"%s -> 0\" % (v,), ln))\n\n    mutants = []\n    for wi, kind, sub, new, operator, desc, ln in recipes:\n        mtree = copy.deepcopy(tree)\n        for j, node in enumerate(ast.walk(mtree)):\n            if j == wi:\n                _apply(node, kind, sub, new)\n                break\n        ast.fix_missing_locations(mtree)\n        mutants.append({\"operator\": operator, \"description\": desc,\n                        \"lineno\": ln, \"source\": ast.unparse(mtree)})\n    return mutants\n\n\ndef _run_tests_against(subject_src, tests_src):\n    \"\"\"Run tests_src against subject_src in-process. Returns (all_passed, num_ran).\n\n    Same classification as the backend's pytest run: any failing/erroring test,\n    or code that won't import, means (False, ...). The subject is exposed as a\n    module named ``subject`` so tests can ``from subject import ...``.\n    \"\"\"\n    import io\n    import unittest\n\n    subj = types.ModuleType(\"subject\")\n    sys.modules[\"subject\"] = subj\n    try:\n        exec(compile(subject_src, \"subject.py\", \"exec\"), subj.__dict__)\n    except Exception:\n        return (False, 0)\n\n    ns = {\"__name__\": \"test_subject\"}\n    try:\n        exec(compile(tests_src, \"test_subject.py\", \"exec\"), ns)\n    except Exception:\n        return (False, 0)\n\n    ran = 0\n    # unittest.TestCase classes\n    suite = unittest.TestSuite()\n    loader = unittest.TestLoader()\n    found_case = False\n    for v in list(ns.values()):\n        if isinstance(v, type) and issubclass(v, unittest.TestCase):\n            suite.addTests(loader.loadTestsFromTestCase(v))\n            found_case = True\n    if found_case:\n        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)\n        ran += res.testsRun\n        if not res.wasSuccessful():\n            return (False, ran)\n\n    # plain test_* functions\n    for k, v in list(ns.items()):\n        if k.startswith(\"test\") and callable(v) and not isinstance(v, type):\n            ran += 1\n            try:\n                v()\n            except Exception:\n                return (False, ran)\n\n    return (True, ran)\n\n\n# ---- cyclomatic complexity (McCabe, per-function) \u2014 identical to the backend ----\n\ndef _rank(c):\n    if c <= 5:\n        return \"simple\"\n    if c <= 10:\n        return \"moderate\"\n    if c <= 20:\n        return \"complex\"\n    return \"very complex\"\n\n\nclass _CxVisitor(ast.NodeVisitor):\n    def __init__(self):\n        self.complexity = 1\n\n    def visit_If(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_For(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_AsyncFor(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_While(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_ExceptHandler(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_BoolOp(self, n):\n        self.complexity += len(n.values) - 1; self.generic_visit(n)\n\n    def visit_IfExp(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_comprehension(self, n):\n        self.complexity += len(n.ifs); self.generic_visit(n)\n\n    def visit_Match(self, n):\n        for case in n.cases:\n            is_wild = isinstance(case.pattern, ast.MatchAs) and case.pattern.pattern is None\n            if not (is_wild and case.guard is None):\n                self.complexity += 1\n        self.generic_visit(n)\n\n    def visit_FunctionDef(self, n):\n        pass\n\n    def visit_AsyncFunctionDef(self, n):\n        pass\n\n    def visit_ClassDef(self, n):\n        pass\n\n\ndef _func_complexity(node):\n    v = _CxVisitor()\n    for stmt in node.body:\n        v.visit(stmt)\n    return v.complexity\n\n\nclass _FuncCollector(ast.NodeVisitor):\n    def __init__(self):\n        self.results = []\n        self._scope = []\n\n    def _fn(self, node):\n        name = \".\".join(self._scope + [node.name])\n        self.results.append({\n            \"name\": name,\n            \"lineno\": node.lineno,\n            \"end_lineno\": getattr(node, \"end_lineno\", node.lineno),\n            \"complexity\": _func_complexity(node),\n        })\n        self._scope.append(node.name)\n        self.generic_visit(node)\n        self._scope.pop()\n\n    def visit_FunctionDef(self, n):\n        self._fn(n)\n\n    def visit_AsyncFunctionDef(self, n):\n        self._fn(n)\n\n    def visit_ClassDef(self, n):\n        self._scope.append(n.name)\n        self.generic_visit(n)\n        self._scope.pop()\n\n\ndef analyze_complexity(source):\n    tree = ast.parse(source)\n    c = _FuncCollector()\n    c.visit(tree)\n    fns = sorted(c.results, key=lambda f: f[\"lineno\"])\n    for f in fns:\n        f[\"rank\"] = _rank(f[\"complexity\"])\n    return fns\n\n\ndef _attribute(functions, lineno):\n    \"\"\"Innermost function whose line range contains `lineno`, else None.\"\"\"\n    best = None\n    for f in functions:\n        if f[\"lineno\"] <= lineno <= f[\"end_lineno\"]:\n            if best is None or f[\"lineno\"] > best[\"lineno\"]:\n                best = f\n    return best[\"name\"] if best else None\n\n\ndef prepare(source, tests):\n    \"\"\"Generate mutants, per-function complexity, and run the baseline.\n\n    Each mutant is tagged with the innermost function it belongs to (``func``),\n    so the caller can compute a per-function mutation score and the fused risk\n    score. Returns a JSON string.\n    \"\"\"\n    try:\n        mutants = generate_mutants(source)\n    except SyntaxError as e:\n        return json.dumps({\"error\": \"source\", \"detail\": \"Line %s: %s\" % (e.lineno, e.msg)})\n    try:\n        ast.parse(tests)\n    except SyntaxError as e:\n        return json.dumps({\"error\": \"tests\", \"detail\": \"Line %s: %s\" % (e.lineno, e.msg)})\n\n    functions = analyze_complexity(source)\n    for m in mutants:\n        m[\"func\"] = _attribute(functions, m[\"lineno\"])\n\n    passed, ran = _run_tests_against(source, tests)\n    capped = len(mutants) > _MAX_MUTANTS\n    run_list = mutants[:_MAX_MUTANTS]\n    return json.dumps({\n        \"error\": None,\n        \"no_tests\": ran == 0,\n        \"baseline_passed\": bool(passed and ran > 0),\n        \"total_generated\": len(mutants),\n        \"capped\": capped,\n        \"functions\": functions,\n        \"mutants\": run_list,\n    })\n\n\ndef run_mutant(mutant_src, tests_src):\n    \"\"\"True if the mutant is killed (tests fail on it), False if it survives.\"\"\"\n    passed, _ = _run_tests_against(mutant_src, tests_src)\n    return not passed\n";
+    const WORKER_SRC = "const PYODIDE_URL = \"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/\";\nimportScripts(PYODIDE_URL + \"pyodide.js\");\nlet pyodide = null, engineCode = \"\";\nasync function ensure() {\n  if (!pyodide) {\n    pyodide = await loadPyodide({ indexURL: PYODIDE_URL });\n    pyodide.runPython(engineCode);\n  }\n}\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    if (m.type === \"init\") { engineCode = m.py; self.postMessage({ id: m.id, ok: true, data: {} }); return; }\n    await ensure();\n    if (m.type === \"prepare\") {\n      const f = pyodide.globals.get(\"prepare\");\n      const out = f(m.source, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: JSON.parse(out) });\n    } else if (m.type === \"runMutant\") {\n      const f = pyodide.globals.get(\"run_mutant\");\n      const killed = f(m.mutantSource, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: { killed: !!killed } });\n    }\n  } catch (err) {\n    self.postMessage({ id: m.id, ok: false, error: String(err && err.message ? err.message : err) });\n  }\n};\n";
+    let mode = null;                        // "worker" | "main"
+    let worker = null, seq = 0; const pending = {};
+    let mainPy = null;
+
+    function attach(w) {
+      w.onmessage = (e) => { const d = e.data; const p = pending[d.id]; if (!p) return; delete pending[d.id]; if (p.t) clearTimeout(p.t); d.ok ? p.res(d.data) : p.rej(new Error(d.error || "worker error")); };
+      w.onerror = (ev) => { for (const k in pending) { const p = pending[k]; delete pending[k]; if (p.t) clearTimeout(p.t); p.rej(new Error(ev.message || "worker failed to load")); } };
+    }
+    function spawn() { worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "application/javascript" }))); attach(worker); }
+    function callWorker(type, payload, timeoutMs) {
+      return new Promise((res, rej) => {
+        const id = ++seq; const p = { res, rej, t: null }; pending[id] = p;
+        if (timeoutMs) p.t = setTimeout(() => { if (pending[id]) { delete pending[id]; const e = new Error("timeout"); e.__timeout = true; rej(e); } }, timeoutMs);
+        worker.postMessage(Object.assign({ id: id, type: type }, payload));
+      });
+    }
+    function killWorker() { if (worker) { try { worker.terminate(); } catch (e) {} worker = null; } }
+
+    function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("script load failed")); document.head.appendChild(s); }); }
+    function withTimeout(promise, ms) {
+      let t; const timer = new Promise((_, rej) => { t = setTimeout(() => { const e = new Error("timeout"); e.__timeout = true; rej(e); }, ms); });
+      return Promise.race([Promise.resolve(promise).finally(() => clearTimeout(t)), timer]);
+    }
+    function ensureMain() {
+      if (!mainPy) mainPy = withTimeout((async () => { await loadScript(PYODIDE_URL + "pyodide.js"); const py = await loadPyodide({ indexURL: PYODIDE_URL }); py.runPython(PY); return py; })(), 60000);
+      return mainPy;
+    }
+
+    async function ensureMode() {
+      if (mode) return;
+      try { spawn(); await callWorker("init", { py: PY }); mode = "worker"; }
+      catch (e) { killWorker(); mode = "main"; }
+    }
+
+    async function analyze(source, tests, onProgress) {
+      await ensureMode();
+      if (mode === "worker") {
+        let prep;
+        try { prep = await callWorker("prepare", { source: source, tests: tests }, 60000); }
+        catch (e) { killWorker(); if (e && e.__timeout) throw new Error("Couldn\u2019t load the Python runtime here (WebAssembly may be blocked). It runs on your deployed page \u2014 open that URL and try there."); throw e; }
+        if (prep.error || prep.no_tests || !prep.baseline_passed) return { prep: prep };
+        const mutants = prep.mutants; const results = [];
+        for (let i = 0; i < mutants.length; i++) {
+          if (onProgress) onProgress(i, mutants.length);
+          try { const r = await callWorker("runMutant", { mutantSource: mutants[i].source, tests: tests }, 5000); results.push({ m: mutants[i], killed: r.killed, timedOut: false }); }
+          catch (e) { if (e && e.__timeout) { results.push({ m: mutants[i], killed: true, timedOut: true }); killWorker(); spawn(); await callWorker("init", { py: PY }); } else throw e; }
+        }
+        return { prep: prep, results: results };
+      }
+      // main-thread fallback (no per-mutant interrupt)
+      let py;
+      try { py = await ensureMain(); }
+      catch (e) { mainPy = null; throw new Error("Couldn\u2019t load the Python runtime in this environment \u2014 it needs WebAssembly, which some preview sandboxes block. This runs on your deployed page (GitHub Pages); open that URL and try there."); }
+      const pf = py.globals.get("prepare"); const prep = JSON.parse(pf(source, tests)); pf.destroy();
+      if (prep.error || prep.no_tests || !prep.baseline_passed) return { prep: prep };
+      const mutants = prep.mutants; const results = []; const rf = py.globals.get("run_mutant");
+      for (let i = 0; i < mutants.length; i++) {
+        if (onProgress) onProgress(i, mutants.length);
+        await new Promise(r => setTimeout(r, 0));
+        let killed = false;
+        try { killed = rf(mutants[i].source, tests); } catch (e) { killed = true; }
+        results.push({ m: mutants[i], killed: !!killed, timedOut: false });
+      }
+      rf.destroy();
+      return { prep: prep, results: results };
+    }
+    return { analyze: analyze };
+  })();
+
+  /* ---- MUTATION TESTING (in your browser via Pyodide) ---- */
   (function mutationTesting() {
     const codeTa = $("mutCode"), testsTa = $("mutTests"), runBtn = $("mutRun"), report = $("mutReport");
     if (!codeTa || !testsTa || !runBtn || !report) return;
@@ -790,46 +921,28 @@ def apply_discount(price, tier):
     const msg = (html) => { report.innerHTML = '<div class="mut-msg">' + html + '</div>'; };
     const loading = (label) => { report.innerHTML = '<div class="mut-loading"><div class="mut-spin"></div><div>' + label + '</div></div>'; };
 
-    const WORKER_SRC = "const PYODIDE_URL = \"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/\";\nimportScripts(PYODIDE_URL + \"pyodide.js\");\nlet pyodide = null;\nconst PY = \"\\\"\\\"\\\"susgrade mutation engine \\u2014 browser build (runs inside Pyodide).\\n\\nMutant GENERATION is byte-for-byte the same logic as the backend\\n(backend/app/analysis/mutation.py). Only EXECUTION differs: instead of\\nwriting files and spawning pytest subprocesses, tests run in-process inside\\nthis single Pyodide interpreter. The operators, scoring, and survivor output\\nare identical.\\n\\\"\\\"\\\"\\n\\nimport ast\\nimport copy\\nimport sys\\nimport types\\nimport json\\n\\n# ---- operator tables (identical to the backend) ----\\n_BINOP_SYM = {ast.Add: \\\"+\\\", ast.Sub: \\\"-\\\", ast.Mult: \\\"*\\\",\\n              ast.Div: \\\"/\\\", ast.FloorDiv: \\\"//\\\", ast.Mod: \\\"%\\\", ast.Pow: \\\"**\\\"}\\n_BINOP_SWAPS = {ast.Add: [ast.Sub], ast.Sub: [ast.Add],\\n                ast.Mult: [ast.Div], ast.Div: [ast.Mult],\\n                ast.FloorDiv: [ast.Div], ast.Mod: [ast.Mult], ast.Pow: [ast.Mult]}\\n_CMP_SYM = {ast.Lt: \\\"<\\\", ast.LtE: \\\"<=\\\", ast.Gt: \\\">\\\", ast.GtE: \\\">=\\\",\\n            ast.Eq: \\\"==\\\", ast.NotEq: \\\"!=\\\", ast.Is: \\\"is\\\", ast.IsNot: \\\"is not\\\",\\n            ast.In: \\\"in\\\", ast.NotIn: \\\"not in\\\"}\\n_CMP_SWAPS = {ast.Lt: [ast.LtE, ast.Gt], ast.Gt: [ast.GtE, ast.Lt],\\n              ast.LtE: [ast.Lt, ast.GtE], ast.GtE: [ast.Gt, ast.LtE],\\n              ast.Eq: [ast.NotEq], ast.NotEq: [ast.Eq],\\n              ast.Is: [ast.IsNot], ast.IsNot: [ast.Is],\\n              ast.In: [ast.NotIn], ast.NotIn: [ast.In]}\\n_BOOL_SYM = {ast.And: \\\"and\\\", ast.Or: \\\"or\\\"}\\n_BOOL_SWAP = {ast.And: ast.Or, ast.Or: ast.And}\\n_UNARY_SYM = {ast.USub: \\\"-\\\", ast.UAdd: \\\"+\\\"}\\n_UNARY_SWAP = {ast.USub: ast.UAdd, ast.UAdd: ast.USub}\\n\\n_MAX_MUTANTS = 150\\n\\n\\ndef _apply(node, kind, sub, new):\\n    if kind == \\\"binop\\\":\\n        node.op = new()\\n    elif kind == \\\"compare\\\":\\n        node.ops[sub] = new()\\n    elif kind == \\\"boolop\\\":\\n        node.op = new()\\n    elif kind == \\\"unaryop\\\":\\n        node.op = new()\\n    elif kind == \\\"const\\\":\\n        node.value = new\\n\\n\\ndef generate_mutants(source):\\n    tree = ast.parse(source)\\n    recipes = []\\n    for wi, node in enumerate(ast.walk(tree)):\\n        ln = getattr(node, \\\"lineno\\\", 0)\\n        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s' -> '%s'\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s=' -> '%s='\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.Compare):\\n            for k, op in enumerate(node.ops):\\n                if type(op) in _CMP_SWAPS:\\n                    sym = _CMP_SYM[type(op)]\\n                    for rep in _CMP_SWAPS[type(op)]:\\n                        recipes.append((wi, \\\"compare\\\", k, rep, \\\"ROR\\\",\\n                                        \\\"'%s' -> '%s'\\\" % (sym, _CMP_SYM[rep]), ln))\\n        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:\\n            rep = _BOOL_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"boolop\\\", None, rep, \\\"LOR\\\",\\n                            \\\"'%s' -> '%s'\\\" % (_BOOL_SYM[type(node.op)], _BOOL_SYM[rep]), ln))\\n        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:\\n            rep = _UNARY_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"unaryop\\\", None, rep, \\\"UOR\\\",\\n                            \\\"unary '%s' -> '%s'\\\" % (_UNARY_SYM[type(node.op)], _UNARY_SYM[rep]), ln))\\n        elif isinstance(node, ast.Constant):\\n            v = node.value\\n            if isinstance(v, bool):\\n                recipes.append((wi, \\\"const\\\", None, (not v), \\\"BCR\\\", \\\"%s -> %s\\\" % (v, not v), ln))\\n            elif isinstance(v, (int, float)):\\n                recipes.append((wi, \\\"const\\\", None, v + 1, \\\"NCR\\\", \\\"%s -> %s\\\" % (v, v + 1), ln))\\n                if v != 0:\\n                    recipes.append((wi, \\\"const\\\", None, 0, \\\"NCR\\\", \\\"%s -> 0\\\" % (v,), ln))\\n\\n    mutants = []\\n    for wi, kind, sub, new, operator, desc, ln in recipes:\\n        mtree = copy.deepcopy(tree)\\n        for j, node in enumerate(ast.walk(mtree)):\\n            if j == wi:\\n                _apply(node, kind, sub, new)\\n                break\\n        ast.fix_missing_locations(mtree)\\n        mutants.append({\\\"operator\\\": operator, \\\"description\\\": desc,\\n                        \\\"lineno\\\": ln, \\\"source\\\": ast.unparse(mtree)})\\n    return mutants\\n\\n\\ndef _run_tests_against(subject_src, tests_src):\\n    \\\"\\\"\\\"Run tests_src against subject_src in-process. Returns (all_passed, num_ran).\\n\\n    Same classification as the backend's pytest run: any failing/erroring test,\\n    or code that won't import, means (False, ...). The subject is exposed as a\\n    module named ``subject`` so tests can ``from subject import ...``.\\n    \\\"\\\"\\\"\\n    import io\\n    import unittest\\n\\n    subj = types.ModuleType(\\\"subject\\\")\\n    sys.modules[\\\"subject\\\"] = subj\\n    try:\\n        exec(compile(subject_src, \\\"subject.py\\\", \\\"exec\\\"), subj.__dict__)\\n    except Exception:\\n        return (False, 0)\\n\\n    ns = {\\\"__name__\\\": \\\"test_subject\\\"}\\n    try:\\n        exec(compile(tests_src, \\\"test_subject.py\\\", \\\"exec\\\"), ns)\\n    except Exception:\\n        return (False, 0)\\n\\n    ran = 0\\n    # unittest.TestCase classes\\n    suite = unittest.TestSuite()\\n    loader = unittest.TestLoader()\\n    found_case = False\\n    for v in list(ns.values()):\\n        if isinstance(v, type) and issubclass(v, unittest.TestCase):\\n            suite.addTests(loader.loadTestsFromTestCase(v))\\n            found_case = True\\n    if found_case:\\n        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)\\n        ran += res.testsRun\\n        if not res.wasSuccessful():\\n            return (False, ran)\\n\\n    # plain test_* functions\\n    for k, v in list(ns.items()):\\n        if k.startswith(\\\"test\\\") and callable(v) and not isinstance(v, type):\\n            ran += 1\\n            try:\\n                v()\\n            except Exception:\\n                return (False, ran)\\n\\n    return (True, ran)\\n\\n\\ndef prepare(source, tests):\\n    \\\"\\\"\\\"Generate mutants and run the baseline. Returns a JSON string.\\\"\\\"\\\"\\n    try:\\n        mutants = generate_mutants(source)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"source\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n    try:\\n        ast.parse(tests)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"tests\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n\\n    passed, ran = _run_tests_against(source, tests)\\n    capped = len(mutants) > _MAX_MUTANTS\\n    run_list = mutants[:_MAX_MUTANTS]\\n    return json.dumps({\\n        \\\"error\\\": None,\\n        \\\"no_tests\\\": ran == 0,\\n        \\\"baseline_passed\\\": bool(passed and ran > 0),\\n        \\\"total_generated\\\": len(mutants),\\n        \\\"capped\\\": capped,\\n        \\\"mutants\\\": run_list,\\n    })\\n\\n\\ndef run_mutant(mutant_src, tests_src):\\n    \\\"\\\"\\\"True if the mutant is killed (tests fail on it), False if it survives.\\\"\\\"\\\"\\n    passed, _ = _run_tests_against(mutant_src, tests_src)\\n    return not passed\\n\";\nasync function ensure() {\n  if (!pyodide) {\n    pyodide = await loadPyodide({ indexURL: PYODIDE_URL });\n    pyodide.runPython(PY);\n  }\n}\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    await ensure();\n    if (m.type === \"prepare\") {\n      const f = pyodide.globals.get(\"prepare\");\n      const out = f(m.source, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: JSON.parse(out) });\n    } else if (m.type === \"runMutant\") {\n      const f = pyodide.globals.get(\"run_mutant\");\n      const killed = f(m.mutantSource, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: { killed: !!killed } });\n    }\n  } catch (err) {\n    self.postMessage({ id: m.id, ok: false, error: String(err && err.message ? err.message : err) });\n  }\n};\n";
-    let worker = null, seq = 0; const pending = {};
-    function spawn() {
-      worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "application/javascript" })));
-      worker.onmessage = (e) => {
-        const d = e.data; const p = pending[d.id]; if (!p) return;
-        delete pending[d.id]; if (p.t) clearTimeout(p.t);
-        d.ok ? p.res(d.data) : p.rej(new Error(d.error || "worker error"));
-      };
-      worker.onerror = (ev) => {
-        for (const k in pending) { const p = pending[k]; delete pending[k]; if (p.t) clearTimeout(p.t); p.rej(new Error(ev.message || "worker failed to load")); }
-      };
+    function showPrep(prep) {
+      if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return true; }
+      if (!prep.baseline_passed) { msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>Mutation testing needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>'); return true; }
+      return false;
     }
-    function callWorker(type, payload, timeoutMs) {
-      return new Promise((res, rej) => {
-        const id = ++seq; const p = { res, rej, t: null }; pending[id] = p;
-        if (timeoutMs) p.t = setTimeout(() => { if (pending[id]) { delete pending[id]; const e = new Error("timeout"); e.__timeout = true; rej(e); } }, timeoutMs);
-        worker.postMessage(Object.assign({ id: id, type: type }, payload));
-      });
-    }
-    function kill() { if (worker) { try { worker.terminate(); } catch (e) {} worker = null; } }
 
-    function render(d) {
-      if (!d.baseline_passed) {
-        msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>Mutation testing needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>');
-        return;
-      }
-      const pct = Math.round(d.mutation_score * 100);
-      const band = pct >= 80 ? "hi" : pct >= 50 ? "mid" : "lo";
-      const survHTML = d.survivors.length
-        ? d.survivors.map(s => '<div class="mut-surv"><span class="mut-op op-' + s.operator + '">' + s.operator + '</span><span class="mut-line">line ' + s.lineno + '</span><span class="mut-desc">' + escHtml(s.description) + '</span></div>').join("")
+    function render(total, killed, survived, timedOut, survivors) {
+      const pct = total ? Math.round((killed / total) * 100) : 100;
+      const b = pct >= 80 ? "hi" : pct >= 50 ? "mid" : "lo";
+      const survHTML = survivors.length
+        ? survivors.map(m => '<div class="mut-surv"><span class="mut-op op-' + m.operator + '">' + m.operator + '</span><span class="mut-line">line ' + m.lineno + '</span><span class="mut-desc">' + escHtml(m.description) + '</span></div>').join("")
         : '<div class="mut-allkilled">Every mutant was killed \u2014 your tests caught all of them. \uD83C\uDFAF</div>';
-      const verdict = d.survived === 0
-        ? "All " + d.total_run + " mutants killed. That's a thorough suite."
-        : d.survived + " of " + d.total_run + " mutants survived \u2014 each is a change your tests don't catch.";
-      const timed = d.timed_out ? ' \u00b7 <span class="mut-stat"><b>timed out</b> ' + d.timed_out + '</span>' : "";
+      const verdict = survived === 0
+        ? "All " + total + " mutants killed. That's a thorough suite."
+        : survived + " of " + total + " mutants survived \u2014 each is a change your tests don't catch.";
+      const timed = timedOut ? ' \u00b7 <span class="mut-stat"><b>timed out</b> ' + timedOut + '</span>' : "";
       report.innerHTML =
         '<div class="mut-result">' +
-          '<div class="mut-score band-' + band + '"><div class="mut-score-num">' + pct + '<span>%</span></div><div class="mut-score-lab">mutation score</div></div>' +
-          '<div class="mut-stats"><span class="mut-stat"><b>killed</b> ' + d.killed + '</span><span class="mut-stat"><b>survived</b> ' + d.survived + '</span><span class="mut-stat"><b>total</b> ' + d.total_run + '</span>' + timed + '</div>' +
+          '<div class="mut-score band-' + b + '"><div class="mut-score-num">' + pct + '<span>%</span></div><div class="mut-score-lab">mutation score</div></div>' +
+          '<div class="mut-stats"><span class="mut-stat"><b>killed</b> ' + killed + '</span><span class="mut-stat"><b>survived</b> ' + survived + '</span><span class="mut-stat"><b>total</b> ' + total + '</span>' + timed + '</div>' +
           '<p class="mut-verdict">' + verdict + '</p>' +
           '<div class="mut-survivors">' + survHTML + '</div>' +
         '</div>';
@@ -843,29 +956,11 @@ def apply_discount(price, tier):
       busy = true; runBtn.disabled = true;
       loading('Loading Python\u2026 first run fetches the runtime (a few MB), then it\u2019s cached and instant.');
       try {
-        if (!worker) spawn();
-        let prep;
-        try { prep = await callWorker("prepare", { source: source, tests: tests }, 120000); }
-        catch (e) { kill(); if (e && e.__timeout) throw new Error("Timed out loading the Python runtime \u2014 check your connection and try again."); throw e; }
-        if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
-        if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
-        if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return; }
-        if (!prep.baseline_passed) { render({ baseline_passed: false }); return; }
-        const mutants = prep.mutants; const total = mutants.length;
+        const out = await SUS.analyze(source, tests, (i, total) => loading('Running mutants\u2026 ' + (i + 1) + '/' + total));
+        if (showPrep(out.prep)) return;
         let killed = 0, survived = 0, timedOut = 0; const survivors = [];
-        for (let i = 0; i < total; i++) {
-          const m = mutants[i];
-          loading('Running mutants\u2026 ' + (i + 1) + '/' + total);
-          try {
-            const r = await callWorker("runMutant", { mutantSource: m.source, tests: tests }, 5000);
-            if (r.killed) killed++; else { survived++; survivors.push({ operator: m.operator, description: m.description, lineno: m.lineno }); }
-          } catch (e) {
-            if (e && e.__timeout) { timedOut++; killed++; kill(); spawn(); }
-            else throw e;
-          }
-        }
-        const score = total ? Math.round((killed / total) * 1000) / 1000 : 1;
-        render({ baseline_passed: true, total_run: total, killed: killed, survived: survived, timed_out: timedOut, mutation_score: score, survivors: survivors });
+        for (const r of out.results) { if (r.timedOut) timedOut++; if (r.killed) killed++; else { survived++; survivors.push(r.m); } }
+        render(out.results.length, killed, survived, timedOut, survivors);
       } catch (err) {
         msg('<b>Something went wrong running mutation testing.</b><p>' + escHtml(err && err.message ? err.message : String(err)) + '</p>');
       } finally {
@@ -876,6 +971,90 @@ def apply_discount(price, tier):
     const goMut = $("goMut");
     if (goMut) goMut.addEventListener("click", () => { const el = document.getElementById("mutation"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
     msg("Your code and a deliberately weak test suite are loaded. Hit <b>Run mutation analysis</b> \u2014 it runs entirely in your browser (first run loads Python, then it\u2019s instant).");
+  })();
+
+  /* ---- RISK REPORT (complexity \u00d7 mutation, ranked per function) ---- */
+  (function riskReport() {
+    const codeTa = $("riskCode"), testsTa = $("riskTests"), runBtn = $("riskRun"), report = $("riskReport");
+    if (!codeTa || !testsTa || !runBtn || !report) return;
+
+    codeTa.value = "def categorize(score):\n    if score < 0:\n        return \"invalid\"\n    if score >= 90:\n        return \"A\"\n    elif score >= 80:\n        return \"B\"\n    elif score >= 70:\n        return \"C\"\n    elif score >= 60:\n        return \"D\"\n    return \"F\"\n\ndef is_even(n):\n    return n % 2 == 0\n\ndef apply_discount(price, pct):\n    if pct < 0 or pct > 100:\n        raise ValueError(\"bad pct\")\n    return price * (1 - pct / 100)\n";
+    testsTa.value = "# Two functions well tested, one barely \u2014 watch which ranks highest.\nfrom subject import categorize, is_even, apply_discount\n\ndef test_discount_basic(): assert apply_discount(100, 10) == 90\ndef test_discount_zero(): assert apply_discount(100, 0) == 100\ndef test_discount_full(): assert apply_discount(100, 100) == 0\ndef test_discount_neg():\n    try:\n        apply_discount(100, -5); assert False\n    except ValueError:\n        pass\ndef test_discount_over():\n    try:\n        apply_discount(100, 150); assert False\n    except ValueError:\n        pass\ndef test_even(): assert is_even(4) == True\ndef test_odd(): assert is_even(3) == False\ndef test_cat_a(): assert categorize(95) == \"A\"\n";
+
+    const escHtml = (s) => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const msg = (html) => { report.innerHTML = '<div class="mut-msg">' + html + '</div>'; };
+    const loading = (label) => { report.innerHTML = '<div class="mut-loading"><div class="mut-spin"></div><div>' + label + '</div></div>'; };
+
+    function showPrep(prep) {
+      if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return true; }
+      if (!prep.baseline_passed) { msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>A risk report needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>'); return true; }
+      return false;
+    }
+
+    function render(rows, module) {
+      if (!rows.length) { msg("No functions found in your code \u2014 add some <code>def</code>s and try again."); return; }
+      const top = rows.find(r => r.risk !== null && r.risk > 0);
+      const lead = top
+        ? '<div class="risk-lead">Test <b>' + escHtml(top.name) + '()</b> next \u2014 it\u2019s the most complex code your tests cover least.</div>'
+        : '<div class="risk-lead risk-clear"><b>Nothing stands out</b> \u2014 your tests cover the complex code well. \uD83C\uDF89</div>';
+      const body = rows.map(r => {
+        const b = r.risk === null ? "none" : (r.risk >= 4 ? "hi" : r.risk >= 2 ? "mid" : r.risk > 0 ? "lo" : "none");
+        const tested = r.mutscore === null ? '<span class="risk-na">no mutants</span>' : (Math.round(r.mutscore * 100) + '%');
+        const risk = r.risk === null ? '<span class="risk-na">\u2014</span>' : r.risk.toFixed(2);
+        const cxcls = "cx-" + r.rank.replace(/\s+/g, "");
+        return '<tr>' +
+          '<td class="risk-fn">' + escHtml(r.name) + '</td>' +
+          '<td><span class="cx-band ' + cxcls + '">' + r.cx + '</span> <span class="risk-rank">' + r.rank + '</span></td>' +
+          '<td class="risk-mut">' + tested + '</td>' +
+          '<td><span class="risk-pill band-' + b + '">' + risk + '</span></td>' +
+        '</tr>';
+      }).join("");
+      const modNote = module.total ? '<p class="risk-mod">Plus ' + module.killed + '/' + module.total + ' module-level mutants (outside any function), not ranked here.</p>' : '';
+      report.innerHTML =
+        '<div class="risk-result">' + lead +
+        '<table class="risk-table"><thead><tr><th>Function</th><th>Complexity</th><th>Tested</th><th>Risk</th></tr></thead><tbody>' + body + '</tbody></table>' +
+        '<p class="risk-formula">Risk = complexity \u00d7 (1 \u2212 mutation score). Higher means more untested complexity \u2014 that\u2019s where your next test belongs.</p>' + modNote +
+        '</div>';
+    }
+
+    let busy = false;
+    async function run() {
+      if (busy) return;
+      const source = codeTa.value, tests = testsTa.value;
+      if (!source.trim() || !tests.trim()) { msg("Add both your code and your tests, then run."); return; }
+      busy = true; runBtn.disabled = true;
+      loading('Loading Python\u2026 first run fetches the runtime (a few MB), then it\u2019s cached and instant.');
+      try {
+        const out = await SUS.analyze(source, tests, (i, total) => loading('Analysing\u2026 mutant ' + (i + 1) + '/' + total));
+        if (showPrep(out.prep)) return;
+        const fmap = {};
+        for (const f of out.prep.functions) fmap[f.name] = { name: f.name, cx: f.complexity, rank: f.rank, killed: 0, total: 0 };
+        let modK = 0, modT = 0;
+        for (const r of out.results) {
+          const fn = r.m.func;
+          if (fn && fmap[fn]) { fmap[fn].total++; if (r.killed) fmap[fn].killed++; }
+          else { modT++; if (r.killed) modK++; }
+        }
+        const rows = Object.keys(fmap).map(k => {
+          const d = fmap[k];
+          const ms = d.total ? d.killed / d.total : null;
+          const risk = ms === null ? null : Math.round(d.cx * (1 - ms) * 100) / 100;
+          return { name: d.name, cx: d.cx, rank: d.rank, killed: d.killed, total: d.total, mutscore: ms, risk: risk };
+        });
+        rows.sort((a, b) => ((a.risk === null) - (b.risk === null)) || ((b.risk || 0) - (a.risk || 0)));
+        render(rows, { killed: modK, total: modT });
+      } catch (err) {
+        msg('<b>Something went wrong building the risk report.</b><p>' + escHtml(err && err.message ? err.message : String(err)) + '</p>');
+      } finally {
+        busy = false; runBtn.disabled = false;
+      }
+    }
+    runBtn.addEventListener("click", run);
+    const goRisk = $("goRisk");
+    if (goRisk) goRisk.addEventListener("click", () => { const el = document.getElementById("risk"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
+    msg("A multi-function example is loaded \u2014 some functions are well tested, one isn\u2019t. Hit <b>Generate risk report</b> to see which function to test next.");
   })();
 })();
 </script>
