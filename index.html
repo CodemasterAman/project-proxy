@@ -170,9 +170,8 @@
 
   /* FEATURES */
   .feat-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
-  .feat-grid > * { flex:0 1 320px; }
-  @media (min-width:900px){ .feat-grid > * { flex:0 0 calc((100% - 44px) / 3); } }
-  @media (max-width:620px){ .feat-grid > * { flex-basis:100%; } }
+  .feat-grid > * { flex:0 1 100%; }
+  @media (min-width:680px){ .feat-grid > * { flex:0 0 calc((100% - 20px) / 2); } }
   .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; }
   .feat:nth-child(3n+1){ box-shadow:6px 6px 0 var(--blue); } .feat:nth-child(3n+2){ box-shadow:6px 6px 0 var(--coral); } .feat:nth-child(3n){ box-shadow:6px 6px 0 var(--green); }
   .feat:hover { box-shadow:10px 10px 0 var(--shadow); }
@@ -192,9 +191,15 @@
   .tabs { display:flex; gap:6px; padding:12px 12px 0; flex-wrap:wrap; border-bottom:2px solid var(--border); background:var(--bg); }
   .tab { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--dim); background:transparent; border:none; cursor:pointer; padding:9px 14px; border-radius:10px 10px 0 0; transition:all .18s; }
   .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--coral); }
-  .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); }
-  .gutter { font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
-  .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; }
+  .lang-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px 11px; background:var(--bg); border-bottom:2px solid var(--border); }
+  .lang-bar-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
+  .lang-switch { display:flex; gap:5px; flex-wrap:wrap; }
+  .lang-btn { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
+  .lang-btn:hover { color:var(--text); border-color:var(--dim); }
+  .lang-btn.is-active { background:var(--coral); color:#fff; border-color:var(--coral); }
+  .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); align-items:start; }
+  .gutter { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
+  .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; overflow:hidden; min-height:288px; box-sizing:border-box; }
   .code::placeholder { color:var(--faint); }
   .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-top:2px solid var(--border); background:var(--bg); flex-wrap:wrap; }
   .toolbar-left { display:flex; align-items:center; gap:10px; }
@@ -419,21 +424,30 @@
   <section class="section" id="try">
     <div class="wrap">
       <div class="sec-head reveal">
-        <div class="eyebrow"><span class="slash">/ 01</span> — complexity, live · python</div>
-        <h2>Paste Python. Watch the risk light up.</h2>
-        <p class="lead">Right now susgrade analyses <b>Python</b>, straight from its own syntax tree. Every function gets an exact path-count — the bigger and hotter the bar, the more branches hide inside, and the more tests it takes to cover them.</p>
+        <div class="eyebrow"><span class="slash">/ 01</span> — complexity, live · <span id="cxLang">python</span></div>
+        <h2>Paste code. Watch the risk light up.</h2>
+        <p class="lead">susgrade analyses <b>Python</b> and <b>JavaScript</b>, straight from each language's own syntax tree. Every function gets an exact path-count — the bigger and hotter the bar, the more branches hide inside, and the more tests it takes to cover them.</p>
       </div>
       <div class="analyzer reveal">
         <div class="card">
-          <div class="tabs" role="tablist">
-            <button class="tab is-active" data-tab="router">router.py</button>
-            <button class="tab" data-tab="payments">payments.py</button>
-            <button class="tab" data-tab="parser">parser.py</button>
-            <button class="tab tab-custom" data-tab="custom">+ your code</button>
+          <div class="lang-bar">
+            <span class="lang-bar-label">Language</span>
+            <div class="lang-switch">
+              <button type="button" class="lang-btn is-active" data-lang="py">Python</button>
+              <button type="button" class="lang-btn" data-lang="js">JavaScript</button>
+              <button type="button" class="lang-btn" data-lang="java">Java</button>
+              <button type="button" class="lang-btn" data-lang="c">C</button>
+              <button type="button" class="lang-btn" data-lang="cpp">C++</button>
+              <button type="button" class="lang-btn" data-lang="go">Go</button>
+              <button type="button" class="lang-btn" data-lang="rust">Rust</button>
+              <button type="button" class="lang-btn" data-lang="c_sharp">C#</button>
+              <button type="button" class="lang-btn" data-lang="typescript">TypeScript</button>
+            </div>
           </div>
+          <div class="tabs" id="cxTabs" role="tablist"></div>
           <div class="editor">
             <div class="gutter" id="gutter">1</div>
-            <textarea class="code" id="code" spellcheck="false" placeholder="Paste a Python function or module, then hit Analyze…"></textarea>
+            <textarea class="code" id="code" spellcheck="false" placeholder="Paste Python, or upload a .py file, then hit Analyze…"></textarea>
           </div>
           <div class="toolbar">
             <div class="toolbar-left">
@@ -707,10 +721,9 @@
 
   /* FEATURES */
   const FEATURES = [
-    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from Python's AST. Ranked by risk, colour-coded at a glance." },
+    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from each language's real parser — Python, JavaScript, Java, C, C++, Go, Rust, C# and TypeScript. Ranked by risk, colour-coded at a glance." },
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
     { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
-    { ic: "M4 4h16v16H4zM9 9h6v6H9", c: "var(--green)", title: "Multi-language", tag: "soon", desc: "Today it's Python. Next: complexity across JavaScript, Java and more via Tree-sitter — one dashboard for a polyglot codebase." },
     { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
   ];
   $("featGrid").innerHTML = FEATURES.map(f => `
@@ -727,6 +740,7 @@
 
   /* ANALYZER (live, Python) */
   const SAMPLES = {
+   py: {
     payments: { src: `def format_currency(amount, symbol="$"):
     return f"{symbol}{amount:,.2f}"
 
@@ -787,12 +801,350 @@ def apply_discount(price, tier):
         else:
             raise SyntaxError(f"unexpected char {ch!r}")
     return tokens`, result: { functions: [{ name: "tokenize", lineno: 1, end_lineno: 27, complexity: 13, rank: "complex" }], total_complexity: 13, average_complexity: 13.0, max_complexity: 13 } }
+   },
+   js: {
+    app: { src: "function formatCurrency(amount, symbol = \"$\") {\n  return symbol + amount.toFixed(2);\n}\n\nfunction isValidCard(number) {\n  let checksum = 0;\n  for (const ch of String(number)) {\n    if (ch >= \"0\" && ch <= \"9\") checksum += Number(ch);\n  }\n  return checksum % 10 === 0;\n}\n\nfunction applyDiscount(price, tier) {\n  if (tier === \"gold\") return price * 0.8;\n  return price;\n}" },
+    router: { src: "class RequestRouter {\n  dispatch(req, user) {\n    if (req.method === \"GET\") {\n      if (req.path === \"/health\") {\n        return this.health();\n      } else if (req.path.startsWith(\"/api\") && user.isAuthenticated) {\n        return this.api(req);\n      } else if (user.isAdmin || user.hasScope(\"read\")) {\n        return this.read(req);\n      }\n    } else if (req.method === \"POST\") {\n      if (!user.isAuthenticated) {\n        return this.deny();\n      }\n      for (const field of req.requiredFields) {\n        if (!(field in req.body)) {\n          return this.error(field);\n        }\n      }\n    }\n    return this.notFound();\n  }\n  health() {\n    return { ok: true };\n  }\n}" },
+    tokenizer: { src: "function tokenize(source) {\n  const tokens = [];\n  let i = 0;\n  while (i < source.length) {\n    const ch = source[i];\n    if (ch === \" \" || ch === \"\\n\") {\n      i += 1;\n      continue;\n    } else if (ch >= \"0\" && ch <= \"9\") {\n      let num = \"\";\n      while (i < source.length && source[i] >= \"0\" && source[i] <= \"9\") {\n        num += source[i];\n        i += 1;\n      }\n      tokens.push([\"NUM\", num]);\n    } else if (/[a-z_]/i.test(ch)) {\n      let name = \"\";\n      while (i < source.length && /[a-z0-9_]/i.test(source[i])) {\n        name += source[i];\n        i += 1;\n      }\n      const kind = name === \"if\" || name === \"for\" ? \"KEYWORD\" : \"NAME\";\n      tokens.push([kind, name]);\n    } else {\n      throw new Error(\"unexpected char \" + ch);\n    }\n  }\n  return tokens;\n}" }
+   }
   };
   const COLOR = { simple: "var(--green)", moderate: "var(--amber)", complex: "var(--orange)", "very complex": "var(--red)" };
   const SAY = { simple: "Healthy — easy to test", moderate: "Manageable, a few branches to watch", complex: "Getting complex — worth a refactor", "very complex": "High risk — hard to cover fully" };
-  const codeEl = $("code"), gutterEl = $("gutter"), reportEl = $("report"), hintEl = $("hint");
+  const codeEl = $("code"), gutterEl = $("gutter"), reportEl = $("report"), hintEl = $("hint"), cxTabsEl = $("cxTabs");
   let renderedSrc = "";
-  function syncGutter() { const n = codeEl.value.split("\n").length || 1; let s = ""; for (let i = 1; i <= n; i++) s += i + (i < n ? "\n" : ""); gutterEl.textContent = s; }
+  // susgrade — JavaScript complexity engine.
+  // Per-function cyclomatic complexity from a real Acorn AST. Same decision-point
+  // model as the Python engine (base 1 + each branch), same result shape, so the
+  // existing report renderer works unchanged. `acorn` is passed in (window.acorn
+  // in the browser, require('acorn') in Node).
+
+  function jsRank(c) {
+    if (c <= 5) return "simple";
+    if (c <= 10) return "moderate";
+    if (c <= 20) return "complex";
+    return "very complex";
+  }
+
+  function jsToResult(fns) {
+    if (!fns.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 };
+    const total = fns.reduce((s, f) => s + f.complexity, 0);
+    return {
+      functions: fns,
+      total_complexity: total,
+      average_complexity: Math.round((total / fns.length) * 100) / 100,
+      max_complexity: Math.max.apply(null, fns.map(f => f.complexity)),
+    };
+  }
+
+  function isFn(n) {
+    return n && (n.type === "FunctionDeclaration" || n.type === "FunctionExpression" || n.type === "ArrowFunctionExpression");
+  }
+
+  // complexity of one function's own body, NOT descending into nested functions
+  function jsBodyComplexity(fnNode) {
+    let c = 1;
+    function visit(node) {
+      if (!node || typeof node.type !== "string") return;
+      if (isFn(node)) return; // nested function -> counted separately, skip its internals
+      switch (node.type) {
+        case "IfStatement":
+        case "ForStatement": case "ForInStatement": case "ForOfStatement":
+        case "WhileStatement": case "DoWhileStatement":
+        case "ConditionalExpression":
+        case "CatchClause":
+          c++; break;
+        case "LogicalExpression":
+          if (node.operator === "&&" || node.operator === "||" || node.operator === "??") c++; break;
+        case "SwitchCase":
+          if (node.test) c++; break; // 'default' has test === null
+      }
+      for (const key in node) {
+        if (key === "type" || key === "loc" || key === "start" || key === "end") continue;
+        const v = node[key];
+        if (Array.isArray(v)) { for (const ch of v) visit(ch); }
+        else if (v && typeof v.type === "string") visit(v);
+      }
+    }
+    const b = fnNode.body;
+    if (b.type === "BlockStatement") { for (const st of b.body) visit(st); }
+    else visit(b); // arrow with an expression body
+    return c;
+  }
+
+  function exprName(n) {
+    if (!n) return null;
+    if (n.type === "Identifier") return n.name;
+    if (n.type === "MemberExpression") { const p = n.property && (n.property.name || n.property.value); return p != null ? String(p) : null; }
+    return null;
+  }
+
+  function jsCollect(node, scope, nameHint, out) {
+    if (!node || typeof node.type !== "string") return;
+
+    if (isFn(node)) {
+      const local = node.id ? node.id.name : (nameHint || "anonymous@" + node.loc.start.line);
+      const full = scope ? scope + "." + local : local;
+      out.push({ name: full, lineno: node.loc.start.line, end_lineno: node.loc.end.line, complexity: jsBodyComplexity(node) });
+      jsChildren(node, full, out); // nested functions get this function's name as their scope
+      return;
+    }
+    if (node.type === "ClassDeclaration" || node.type === "ClassExpression") {
+      const cn = node.id ? node.id.name : (nameHint || "Class@" + node.loc.start.line);
+      const full = scope ? scope + "." + cn : cn;
+      jsChildren(node, full, out); // methods get the class name as scope
+      return;
+    }
+    if (node.type === "VariableDeclarator" && node.init) {
+      jsCollect(node.init, scope, node.id && node.id.name ? node.id.name : null, out);
+      return;
+    }
+    if (node.type === "Property" || node.type === "MethodDefinition" || node.type === "PropertyDefinition") {
+      const k = node.key && (node.key.name || node.key.value);
+      if (node.value) jsCollect(node.value, scope, k != null ? String(k) : null, out);
+      return;
+    }
+    if (node.type === "AssignmentExpression") {
+      jsCollect(node.right, scope, exprName(node.left), out);
+      return;
+    }
+    jsChildren(node, scope, out);
+  }
+
+  function jsChildren(node, scope, out) {
+    for (const key in node) {
+      if (key === "type" || key === "loc" || key === "start" || key === "end") continue;
+      const v = node[key];
+      if (Array.isArray(v)) { for (const ch of v) if (ch && typeof ch.type === "string") jsCollect(ch, scope, null, out); }
+      else if (v && typeof v.type === "string") jsCollect(v, scope, null, out);
+    }
+  }
+
+  function jsParse(source, acorn) {
+    const opts = { ecmaVersion: 2022, locations: true, allowReturnOutsideFunction: true, allowAwaitOutsideFunction: true, allowHashBang: true, allowImportExportEverywhere: true };
+    try { return acorn.parse(source, Object.assign({ sourceType: "module" }, opts)); }
+    catch (e) { return acorn.parse(source, Object.assign({ sourceType: "script" }, opts)); }
+  }
+
+  function analyzeJS(source, acorn) {
+    const ast = jsParse(source, acorn);
+    let out = [];
+    jsCollect(ast, "", null, out);
+    // Hide trivial anonymous callbacks (e.g. `x => x+1`); keep any with real branching.
+    out = out.filter(f => !(f.name.indexOf("anonymous@") === 0 && f.complexity === 1));
+    out.sort((a, b) => a.lineno - b.lineno);
+    for (const f of out) f.rank = jsRank(f.complexity);
+    return jsToResult(out);
+  }
+
+  let lang = "py";
+  const TAB_LABEL = { py: { payments: "payments.py", router: "router.py", parser: "parser.py" }, js: { app: "app.js", router: "router.js", tokenizer: "tokenizer.js" }, java: { service: "Service.java", router: "Router.java" }, c: { checksum: "checksum.c", tokenizer: "tokenizer.c" }, cpp: { average: "average.cpp", lexer: "lexer.cpp" }, go: { handler: "handler.go", router: "router.go" }, rust: { classify: "classify.rs", lexer: "lexer.rs" }, c_sharp: { service: "Service.cs", router: "Router.cs" }, typescript: { validator: "validator.ts", router: "router.ts" } };
+  // susgrade — Tree-sitter complexity engine (Java, C, C++, extensible).
+  // Operates on an already-parsed Tree-sitter root node, so the same walk runs in
+  // Node (verification) and the browser. Returns the same result shape as the
+  // Python and Acorn engines, so the existing report renderer is reused.
+
+  // susgrade — Tree-sitter complexity engine (Java, C, C++, Go, Rust, C#, TypeScript).
+  // Shared walk on an already-parsed Tree-sitter root node (same in Node + browser).
+
+  const TS_CONFIG = {
+    java: {
+      branch: new Set(["if_statement", "for_statement", "enhanced_for_statement", "while_statement", "do_statement", "catch_clause", "ternary_expression"]),
+      caseType: "switch_label",
+      funcNodes: new Set(["method_declaration", "constructor_declaration"]),
+      classNodes: new Set(["class_declaration", "interface_declaration", "enum_declaration", "record_declaration"]),
+    },
+    c: {
+      branch: new Set(["if_statement", "for_statement", "while_statement", "do_statement", "conditional_expression"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition"]),
+      classNodes: new Set(),
+    },
+    cpp: {
+      branch: new Set(["if_statement", "for_statement", "for_range_loop", "while_statement", "do_statement", "conditional_expression", "catch_clause"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition"]),
+      classNodes: new Set(["class_specifier", "struct_specifier"]),
+    },
+    go: {
+      branch: new Set(["if_statement", "for_statement", "expression_case", "type_case", "communication_case"]),
+      caseType: null,
+      funcNodes: new Set(["function_declaration", "method_declaration"]),
+      classNodes: new Set(),
+    },
+    rust: {
+      branch: new Set(["if_expression", "for_expression", "while_expression", "loop_expression"]),
+      caseType: "match_arm",
+      funcNodes: new Set(["function_item"]),
+      classNodes: new Set(),
+    },
+    c_sharp: {
+      branch: new Set(["if_statement", "for_statement", "for_each_statement", "while_statement", "do_statement", "catch_clause", "conditional_expression"]),
+      caseType: "case_switch_label",
+      funcNodes: new Set(["method_declaration", "constructor_declaration", "local_function_statement", "destructor_declaration", "operator_declaration"]),
+      classNodes: new Set(["class_declaration", "struct_declaration", "interface_declaration", "record_declaration", "enum_declaration"]),
+    },
+    typescript: {
+      branch: new Set(["if_statement", "for_statement", "for_in_statement", "while_statement", "do_statement", "catch_clause", "ternary_expression"]),
+      caseType: "switch_case",
+      funcNodes: new Set(["function_declaration", "function_expression", "arrow_function", "method_definition", "generator_function_declaration"]),
+      classNodes: new Set(["class_declaration"]),
+    },
+  };
+
+  const TS_LOGICAL = { "&&": 1, "||": 1 };
+
+  function tsRank(c) { if (c <= 5) return "simple"; if (c <= 10) return "moderate"; if (c <= 20) return "complex"; return "very complex"; }
+
+  function isDefaultCase(n) {
+    if (/^\s*default\b/.test(n.text)) return true;
+    if (n.type === "match_arm") { var t = n.text.trim(); if (/^_\s*(=>|if\b)/.test(t)) return true; }
+    return false;
+  }
+
+  function findDeclName(node) {
+    if (!node) return null;
+    var t = node.type;
+    if (t === "identifier" || t === "field_identifier" || t === "qualified_identifier" || t === "operator_name" || t === "destructor_name") return node.text;
+    var d = node.childForFieldName ? node.childForFieldName("declarator") : null;
+    if (d) { var r = findDeclName(d); if (r) return r; }
+    for (var i = 0; i < node.childCount; i++) { var rr = findDeclName(node.child(i)); if (rr) return rr; }
+    return null;
+  }
+
+  function tsFuncName(fnNode) {
+    var nameField = fnNode.childForFieldName ? fnNode.childForFieldName("name") : null;
+    if (nameField) return nameField.text.replace(/::/g, ".");
+    var decl = fnNode.childForFieldName ? fnNode.childForFieldName("declarator") : null;
+    var nm = findDeclName(decl);
+    if (nm) return nm.replace(/::/g, ".");
+    return "anonymous@" + (fnNode.startPosition.row + 1);
+  }
+
+  function tsComplexity(fnNode, cfg) {
+    var c = 1;
+    var body = (fnNode.childForFieldName && fnNode.childForFieldName("body")) || fnNode;
+    (function visit(n) {
+      if (cfg.funcNodes.has(n.type)) return;
+      if (cfg.branch.has(n.type)) c++;
+      else if (cfg.caseType && n.type === cfg.caseType && !isDefaultCase(n)) c++;
+      else if (n.type === "binary_expression") { var op = n.child(1); if (op && TS_LOGICAL[op.text]) c++; }
+      for (var i = 0; i < n.childCount; i++) visit(n.child(i));
+    })(body);
+    return c;
+  }
+
+  function analyzeTSTree(root, langKey) {
+    var cfg = TS_CONFIG[langKey];
+    var out = [];
+    (function walk(node, scope) {
+      if (cfg.funcNodes.has(node.type)) {
+        var local = tsFuncName(node);
+        var full = scope ? scope + "." + local : local;
+        out.push({ name: full, lineno: node.startPosition.row + 1, end_lineno: node.endPosition.row + 1, complexity: tsComplexity(node, cfg) });
+        for (var i = 0; i < node.childCount; i++) walk(node.child(i), full);
+        return;
+      }
+      if (cfg.classNodes.has(node.type)) {
+        var nm = node.childForFieldName ? node.childForFieldName("name") : null;
+        var cn = nm ? nm.text : (scope || "anon");
+        var cfull = scope ? scope + "." + cn : cn;
+        for (var j = 0; j < node.childCount; j++) walk(node.child(j), cfull);
+        return;
+      }
+      for (var k = 0; k < node.childCount; k++) walk(node.child(k), scope);
+    })(root, "");
+
+    out = out.filter(function (f) { return !(f.name.indexOf("anonymous@") === 0 && f.complexity === 1); });
+    out.sort(function (a, b) { return a.lineno - b.lineno; });
+    for (var m = 0; m < out.length; m++) out[m].rank = tsRank(out[m].complexity);
+    if (!out.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 };
+    var total = out.reduce(function (s, f) { return s + f.complexity; }, 0);
+    return { functions: out, total_complexity: total, average_complexity: Math.round((total / out.length) * 100) / 100, max_complexity: Math.max.apply(null, out.map(function (f) { return f.complexity; })) };
+  }
+
+  var TS_LANGS = { java: 1, c: 1, cpp: 1, go: 1, rust: 1, c_sharp: 1, typescript: 1 };
+  var TS_FILE = { java: "tree-sitter-java", c: "tree-sitter-c", cpp: "tree-sitter-cpp", go: "tree-sitter-go", rust: "tree-sitter-rust", c_sharp: "tree-sitter-c_sharp", typescript: "tree-sitter-typescript" };
+  var TS_URL = "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.20.8/";
+  var GRAMMAR_URL = "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.13/out/";
+  var tsRuntime = null, tsLangCache = {};
+  function ensureTreeSitter() {
+    if (tsRuntime) return tsRuntime;
+    tsRuntime = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = TS_URL + "tree-sitter.js";
+      s.onload = function () {
+        var TS = window.TreeSitter;
+        if (!TS) { rej(new Error("tree-sitter global missing")); return; }
+        TS.init({ locateFile: function (p) { return TS_URL + p; } }).then(function () { res(TS); }).catch(rej);
+      };
+      s.onerror = function () { tsRuntime = null; rej(new Error("tree-sitter load failed")); };
+      document.head.appendChild(s);
+    });
+    return tsRuntime;
+  }
+  function ensureGrammar(TS, key) {
+    if (tsLangCache[key]) return Promise.resolve(tsLangCache[key]);
+    return TS.Language.load(GRAMMAR_URL + TS_FILE[key] + ".wasm").then(function (L) { tsLangCache[key] = L; return L; });
+  }
+  async function analyzeWithTS(src, key) {
+    var TS = await ensureTreeSitter();
+    var L = await ensureGrammar(TS, key);
+    var parser = new TS(); parser.setLanguage(L);
+    var tree = parser.parse(src);
+    return analyzeTSTree(tree.rootNode, key);
+  }
+  function labelFor(l) { return { py: "python", js: "javascript", java: "java", c: "c", cpp: "c++", go: "go", rust: "rust", c_sharp: "c#", typescript: "typescript" }[l] || l; }
+  function loadingHTML(msg) { return '<div class="empty"><div class="empty-big">' + (msg || "Analysing\u2026") + '</div><p>Parsing your code\u2026</p></div>'; }
+
+  Object.assign(SAMPLES, {
+    go: { handler: { src: "package main\n\nfunc ApplyDiscount(price float64, tier string) float64 {\n\tif tier == \"gold\" {\n\t\treturn price * 0.8\n\t}\n\treturn price\n}\n\nfunc Checksum(nums []int) int {\n\tsum := 0\n\tfor _, n := range nums {\n\t\tif n < 0 {\n\t\t\treturn -1\n\t\t}\n\t\tsum += n\n\t}\n\treturn sum % 10\n}" }, router: { src: "package router\n\nfunc (r *Router) Dispatch(req *Request, user *User) *Response {\n\tif req.Method == \"GET\" {\n\t\tif req.Path == \"/health\" {\n\t\t\treturn r.health()\n\t\t} else if strings.HasPrefix(req.Path, \"/api\") && user.Authenticated {\n\t\t\treturn r.api(req)\n\t\t} else if user.IsAdmin || user.HasScope(\"read\") {\n\t\t\treturn r.read(req)\n\t\t}\n\t} else if req.Method == \"POST\" {\n\t\tif !user.Authenticated {\n\t\t\treturn r.deny()\n\t\t}\n\t\tfor _, field := range req.RequiredFields {\n\t\t\tif _, ok := req.Body[field]; !ok {\n\t\t\t\treturn r.error(field)\n\t\t\t}\n\t\t}\n\t}\n\treturn r.notFound()\n}\n\nfunc (r *Router) health() *Response {\n\treturn OK()\n}" } },
+    rust: { classify: { src: "pub fn classify(n: i32) -> &'static str {\n    match n {\n        0 => \"zero\",\n        n if n < 0 => \"negative\",\n        _ => \"positive\",\n    }\n}\n\npub fn sum_positive(nums: &[i32]) -> i32 {\n    let mut total = 0;\n    for &n in nums {\n        if n > 0 {\n            total += n;\n        }\n    }\n    total\n}" }, lexer: { src: "pub fn tokenize(src: &str) -> Vec<Token> {\n    let mut tokens = Vec::new();\n    let chars: Vec<char> = src.chars().collect();\n    let mut i = 0;\n    while i < chars.len() {\n        let ch = chars[i];\n        if ch == ' ' || ch == '\\n' {\n            i += 1;\n        } else if ch.is_ascii_digit() {\n            while i < chars.len() && chars[i].is_ascii_digit() {\n                i += 1;\n            }\n            tokens.push(Token::Num);\n        } else if ch.is_alphabetic() || ch == '_' {\n            while i < chars.len() && chars[i].is_alphanumeric() {\n                i += 1;\n            }\n            tokens.push(Token::Name);\n        } else {\n            i += 1;\n        }\n    }\n    tokens\n}" } },
+    c_sharp: { service: { src: "public class Service {\n    public double ApplyDiscount(double price, string tier) {\n        if (tier == \"gold\") {\n            return price * 0.8;\n        }\n        return price;\n    }\n\n    public bool IsValid(int[] nums) {\n        int sum = 0;\n        foreach (int n in nums) {\n            if (n < 0) return false;\n            sum += n;\n        }\n        return sum % 10 == 0;\n    }\n}" }, router: { src: "public class Router {\n    public Response Dispatch(Request req, User user) {\n        if (req.Method == \"GET\") {\n            if (req.Path == \"/health\") {\n                return Health();\n            } else if (req.Path.StartsWith(\"/api\") && user.Authenticated) {\n                return Api(req);\n            } else if (user.IsAdmin || user.HasScope(\"read\")) {\n                return Read(req);\n            }\n        } else if (req.Method == \"POST\") {\n            if (!user.Authenticated) {\n                return Deny();\n            }\n            foreach (var field in req.RequiredFields) {\n                if (!req.Body.ContainsKey(field)) {\n                    return Error(field);\n                }\n            }\n        }\n        return NotFound();\n    }\n\n    public Response Health() {\n        return Response.Ok();\n    }\n}" } },
+    typescript: { validator: { src: "function applyDiscount(price: number, tier: string): number {\n    if (tier === \"gold\") {\n        return price * 0.8;\n    }\n    return price;\n}\n\nfunction isValid(nums: number[]): boolean {\n    let sum = 0;\n    for (const n of nums) {\n        if (n < 0) return false;\n        sum += n;\n    }\n    return sum % 10 === 0;\n}" }, router: { src: "class Router {\n    dispatch(req: Request, user: User): Response {\n        if (req.method === \"GET\") {\n            if (req.path === \"/health\") {\n                return this.health();\n            } else if (req.path.startsWith(\"/api\") && user.authenticated) {\n                return this.api(req);\n            } else if (user.isAdmin || user.hasScope(\"read\")) {\n                return this.read(req);\n            }\n        } else if (req.method === \"POST\") {\n            if (!user.authenticated) {\n                return this.deny();\n            }\n            for (const field of req.requiredFields) {\n                if (!(field in req.body)) {\n                    return this.error(field);\n                }\n            }\n        }\n        return this.notFound();\n    }\n\n    health(): Response {\n        return Response.ok();\n    }\n}" } }
+  });
+  Object.assign(SAMPLES, {
+    java: { service: { src: "public class Service {\n    public double applyDiscount(double price, String tier) {\n        if (tier.equals(\"gold\")) {\n            return price * 0.8;\n        }\n        return price;\n    }\n    public boolean isValid(int[] nums) {\n        int sum = 0;\n        for (int n : nums) {\n            if (n < 0) return false;\n            sum += n;\n        }\n        return sum % 10 == 0;\n    }\n}" }, router: { src: "public class Router {\n    public Response dispatch(Request req, User user) {\n        if (req.method.equals(\"GET\")) {\n            if (req.path.equals(\"/health\")) {\n                return health();\n            } else if (req.path.startsWith(\"/api\") && user.isAuthenticated) {\n                return api(req);\n            } else if (user.isAdmin || user.hasScope(\"read\")) {\n                return read(req);\n            }\n        } else if (req.method.equals(\"POST\")) {\n            if (!user.isAuthenticated) {\n                return deny();\n            }\n            for (String field : req.requiredFields) {\n                if (!req.body.containsKey(field)) {\n                    return error(field);\n                }\n            }\n        }\n        return notFound();\n    }\n    public Response health() { return Response.ok(); }\n}" } },
+    c: { checksum: { src: "double apply_discount(double price, const char *tier) {\n    if (strcmp(tier, \"gold\") == 0) {\n        return price * 0.8;\n    }\n    return price;\n}\n\nint checksum(const int *nums, int len) {\n    int sum = 0;\n    for (int i = 0; i < len; i++) {\n        if (nums[i] < 0) return -1;\n        sum += nums[i];\n    }\n    return sum % 10;\n}" }, tokenizer: { src: "int tokenize(const char *src, Token *out) {\n    int i = 0, count = 0;\n    while (src[i] != '\\0') {\n        char ch = src[i];\n        if (ch == ' ' || ch == '\\n') {\n            i++;\n        } else if (ch >= '0' && ch <= '9') {\n            while (src[i] >= '0' && src[i] <= '9') i++;\n            out[count++] = make_num();\n        } else if ((ch >= 'a' && ch <= 'z') || ch == '_') {\n            while (src[i] != '\\0' && src[i] != ' ') i++;\n            out[count++] = make_name();\n        } else {\n            return -1;\n        }\n    }\n    return count;\n}" } },
+    cpp: { average: { src: "#include <vector>\n\ndouble average(const std::vector<int>& xs) {\n    if (xs.empty()) {\n        return 0.0;\n    }\n    int sum = 0;\n    for (int x : xs) {\n        sum += x;\n    }\n    return sum / (double)xs.size();\n}" }, lexer: { src: "class Lexer {\npublic:\n    int scan(const std::string& src) {\n        int count = 0;\n        for (size_t i = 0; i < src.size(); i++) {\n            char ch = src[i];\n            if (ch == ' ' || ch == '\\t') {\n                continue;\n            } else if (ch >= '0' && ch <= '9') {\n                count++;\n            } else if (isalpha(ch) || ch == '_') {\n                count++;\n            } else {\n                throw std::runtime_error(\"bad char\");\n            }\n        }\n        return count;\n    }\n};" } }
+  });
+
+  let acornPromise = null;
+  function ensureAcorn() {
+    if (window.acorn) return Promise.resolve(window.acorn);
+    if (!acornPromise) acornPromise = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/acorn/8.11.3/acorn.min.js";
+      s.onload = function () { res(window.acorn); };
+      s.onerror = function () { acornPromise = null; rej(new Error("acorn load failed")); };
+      document.head.appendChild(s);
+    });
+    return acornPromise;
+  }
+  function renderTabs() {
+    var labels = TAB_LABEL[lang];
+    cxTabsEl.innerHTML = Object.keys(labels).map(function (k, i) { return '<button class="tab' + (i === 0 ? ' is-active' : '') + '" data-tab="' + k + '">' + labels[k] + '</button>'; }).join('') + '<button class="tab tab-custom" data-tab="custom">+ your code</button>';
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.addEventListener("click", function () { setTab(t.dataset.tab); }); });
+  }
+  async function setLang(l) {
+    if (l === lang && cxTabsEl.children.length) return;
+    lang = l;
+    document.querySelectorAll(".lang-btn").forEach(function (b) { b.classList.toggle("is-active", b.dataset.lang === l); });
+    var cxLang = $("cxLang"); if (cxLang) cxLang.textContent = labelFor(l);
+    var pretty = { py: "Python", js: "JavaScript", java: "Java", c: "C", cpp: "C++", go: "Go", rust: "Rust", c_sharp: "C#", typescript: "TypeScript" }[l] || l;
+    var ext = { py: ".py", js: ".js", java: ".java", c: ".c", cpp: ".cpp", go: ".go", rust: ".rs", c_sharp: ".cs", typescript: ".ts" }[l] || "";
+    codeEl.setAttribute("placeholder", "Paste " + pretty + ", or upload a " + ext + " file, then hit Analyze\u2026");
+    if (l === "js") {
+      reportEl.innerHTML = loadingHTML("Loading the JavaScript parser\u2026");
+      try { await ensureAcorn(); } catch (e) { toast("Couldn\u2019t load the JavaScript parser \u2014 check your connection."); }
+    } else if (TS_LANGS[l]) {
+      reportEl.innerHTML = loadingHTML("Loading the " + pretty + " parser\u2026");
+      try { var TS = await ensureTreeSitter(); await ensureGrammar(TS, l); } catch (e) { toast("Couldn\u2019t load the " + pretty + " parser \u2014 check your connection."); }
+    }
+    renderTabs();
+    setTab(Object.keys(TAB_LABEL[lang])[0]);
+  }
+
+  function syncGutter() { const n = codeEl.value.split("\n").length || 1; let s = ""; for (let i = 1; i <= n; i++) s += i + (i < n ? "\n" : ""); gutterEl.textContent = s; codeEl.style.height = "auto"; codeEl.style.height = codeEl.scrollHeight + "px"; }
   function axisMax(m) { return Math.max(20, Math.ceil((m * 1.2) / 5) * 5); }
   function countUp(el, to, dec) { if (reduce) { el.textContent = to.toFixed(dec); return; } const dur = 900, t0 = performance.now(); (function s(now) { const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = (to * e).toFixed(dec); if (t < 1) requestAnimationFrame(s); else el.textContent = to.toFixed(dec); })(performance.now()); }
   function esc(name) { const s = name.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); return s + '<span class="mut">()</span>'; }
@@ -800,13 +1152,13 @@ def apply_discount(price, tier):
     const fns = result.functions;
     if (!fns.length) { renderEmpty(mode); updateStats(result); return; }
     const ax = axisMax(result.max_complexity), sorted = [...fns].sort((a, b) => b.complexity - a.complexity), worst = sorted[0], wc = COLOR[worst.rank];
-    const badge = mode === "engine" ? `<span class="badge badge-engine"><span class="dot"></span>Engine result</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
+    const badge = (mode === "engine" || mode === "js" || mode === "ts") ? `<span class="badge badge-engine"><span class="dot"></span>${mode === "js" ? "Exact \u00b7 Acorn" : mode === "ts" ? "Exact \u00b7 Tree-sitter" : "Engine result"}</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
     const rows = sorted.map(f => { const c = COLOR[f.rank], w = Math.max(4, (f.complexity / ax) * 100); return `<div class="fnrow"><div class="fnrow-head"><span class="fnrow-name">${esc(f.name)}</span><span class="fnrow-score" style="color:${c}">${f.complexity}</span></div><div class="bar-wrap"><div class="bar-fill" data-w="${w}" style="background:${c}"></div></div><div class="fnrow-meta">lines ${f.lineno}–${f.end_lineno} &nbsp;·&nbsp; <span class="pill" style="background:${c};color:#fff">${f.rank}</span></div></div>`; }).join("");
-    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--coral)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces — same as the API." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>`;
+    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--coral)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces \u2014 same as the API." : mode === "js" ? "<b>Exact, parsed with Acorn.</b> Real cyclomatic complexity from JavaScript's own syntax tree." : mode === "ts" ? "<b>Exact, parsed with Tree-sitter.</b> Real cyclomatic complexity from the language's own grammar." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => { reportEl.querySelectorAll(".bar-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }); }));
     updateStats(result); renderedSrc = codeEl.value; updateHint();
   }
-  function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some Python on the left and hit Analyze to see where the risk hides."}</p></div>`; }
+  function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some code on the left and hit Analyze to see where the risk hides."}</p></div>`; }
   function updateStats(r) { countUp($("st-fns"), r.functions.length, 0); countUp($("st-total"), r.total_complexity, 0); countUp($("st-avg"), r.average_complexity, 1); countUp($("st-max"), r.max_complexity, 0); }
   function estimate(source) {
     const raw = source.replace(/\r\n/g, "\n").split("\n"), clean = raw.map(stripSC), ind = (s) => s.length - s.replace(/^\s+/, "").length;
@@ -827,13 +1179,41 @@ def apply_discount(price, tier):
   }
   function stripSC(line) { let o = "", i = 0, q = null; while (i < line.length) { const c = line[i]; if (q) { if (c === q) q = null; i++; continue; } if (c === "#") break; if (c === '"' || c === "'") { q = c; i++; continue; } o += c; i++; } return o; }
   function toResult(fns) { if (!fns.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 }; const total = fns.reduce((s, f) => s + f.complexity, 0); return { functions: fns, total_complexity: total, average_complexity: Math.round((total / fns.length) * 100) / 100, max_complexity: Math.max(...fns.map(f => f.complexity)) }; }
-  function setTab(key) { document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === key)); if (key === "custom") { codeEl.value = ""; syncGutter(); renderEmpty("initial"); renderedSrc = ""; updateHint(); codeEl.focus(); } else { codeEl.value = SAMPLES[key].src; syncGutter(); render(SAMPLES[key].result, "engine"); } }
-  function runAnalyze() { const src = codeEl.value; if (!src.trim()) { renderEmpty("initial"); return; } render(toResult(estimate(src)), "estimate"); document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === "custom")); }
+  function setTab(key) {
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("is-active", t.dataset.tab === key); });
+    if (key === "custom") { codeEl.value = ""; syncGutter(); renderEmpty("initial"); renderedSrc = ""; updateHint(); codeEl.focus(); return; }
+    var sample = SAMPLES[lang][key];
+    codeEl.value = sample.src; syncGutter();
+    renderedSrc = codeEl.value; updateHint();
+    if (lang === "js") { try { render(analyzeJS(sample.src, window.acorn), "js"); } catch (e) { renderEmpty("syntax"); } }
+    else if (TS_LANGS[lang]) { reportEl.innerHTML = loadingHTML(); analyzeWithTS(sample.src, lang).then(function (r) { render(r, "ts"); }).catch(function () { renderEmpty("syntax"); }); }
+    else { render(sample.result, "engine"); }
+  }
+  async function runAnalyze() {
+    var src = codeEl.value;
+    if (!src.trim()) { renderEmpty("initial"); return; }
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("is-active", t.dataset.tab === "custom"); });
+    if (lang === "js") {
+      var acorn;
+      try { acorn = await ensureAcorn(); } catch (e) { toast("Couldn\u2019t load the JavaScript parser \u2014 check your connection."); renderEmpty("initial"); return; }
+      var resj; try { resj = analyzeJS(src, acorn); } catch (e) { renderEmpty("syntax"); return; }
+      render(resj, "js");
+    } else if (TS_LANGS[lang]) {
+      reportEl.innerHTML = loadingHTML();
+      var rest;
+      try { rest = await analyzeWithTS(src, lang); }
+      catch (e) { if (String(e && e.message).indexOf("load") >= 0) { toast("Couldn\u2019t load the parser \u2014 check your connection."); renderEmpty("initial"); } else { renderEmpty("syntax"); } return; }
+      render(rest, "ts");
+    } else {
+      render(toResult(estimate(src)), "estimate");
+    }
+  }
   function updateHint() { hintEl.classList.toggle("show", codeEl.value !== renderedSrc && codeEl.value.trim() !== ""); }
-  document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
   $("analyze").addEventListener("click", runAnalyze);
   codeEl.addEventListener("input", () => { syncGutter(); updateHint(); });
   codeEl.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); runAnalyze(); } });
+  document.querySelectorAll(".lang-btn").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  renderTabs();
   setTab("router");
 
   /* ---- susgrade in-browser engine (shared by mutation + risk) ---- */
