@@ -327,6 +327,44 @@
   .mut-down code { background:var(--blue-lo); color:var(--text); padding:1px 6px; border-radius:5px; font-size:11.5px; }
   .mut-fine { font-size:12px !important; color:var(--faint) !important; margin-top:10px !important; }
   @media (max-width:900px){ .mut-grid { grid-template-columns:1fr; } }
+  /* ---- CI INTEGRATION ---- */
+  .ci-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:24px; align-items:start; }
+  @media (max-width:900px){ .ci-grid { grid-template-columns:1fr; } }
+  .ci-controls { padding:16px 16px 4px; display:flex; flex-direction:column; gap:14px; }
+  .ci-field { display:flex; flex-direction:column; gap:8px; }
+  .ci-flabel { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
+  .ci-repo { font-family:'Space Mono',monospace; font-size:12.5px; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:7px; padding:8px 11px; width:100%; box-sizing:border-box; outline:none; transition:border-color .15s; }
+  .ci-repo:focus { border-color:var(--pink); }
+  .ci-prov { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
+  .ci-prov:hover { color:var(--text); border-color:var(--dim); }
+  .ci-prov.is-active { background:var(--pink); color:#fff; border-color:var(--pink); }
+  .ci-checks { display:flex; flex-direction:column; gap:9px; padding-top:2px; }
+  .ci-check { display:flex; align-items:center; gap:9px; font-family:'Space Mono',monospace; font-size:12.5px; color:var(--text); cursor:pointer; flex-wrap:wrap; }
+  .ci-check input[type=checkbox] { width:15px; height:15px; accent-color:var(--pink); cursor:pointer; flex:none; }
+  .ci-num { width:58px; font-family:'Space Mono',monospace; font-size:12px; padding:3px 7px; border:1.5px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); }
+  .ci-suffix { font-size:11px; color:var(--faint); }
+  .ci-out { min-height:auto; max-height:380px; overflow:auto; display:block; background:var(--bg); white-space:pre-wrap; overflow-wrap:anywhere; }
+  .ci-out.ci-flash { animation:ciFlash .6s ease; }
+  @keyframes ciFlash { 0% { background:rgba(255,62,154,.16); } 100% { background:var(--bg); } }
+  .btn-runci { background:var(--pink); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runci:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runci:disabled { opacity:.6; cursor:default; }
+  .ci-placeholder { color:var(--faint); }
+  .ci-side-in { padding:20px; }
+  .ci-h { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; margin-bottom:12px; }
+  .ci-list { list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:18px; }
+  .ci-list li { font-size:13.5px; line-height:1.55; color:var(--dim); padding-left:16px; position:relative; }
+  .ci-list li::before { content:"/"; position:absolute; left:0; color:var(--blue); font-family:'Space Mono',monospace; font-weight:700; }
+  .ci-list li b { color:var(--text); }
+  .ci-codes { display:flex; flex-direction:column; gap:7px; padding:14px 0; border-top:1.5px solid var(--hairline); margin-bottom:16px; }
+  .ci-code { display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--dim); }
+  .ci-code .mono { color:var(--text); }
+  .ci-dot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .ci-dot-ok { background:var(--green); }
+  .ci-dot-bad { background:var(--red); }
+  .ci-dot-warn { background:var(--amber); }
+  .ci-badge-wrap { display:flex; flex-direction:column; gap:7px; }
+  .ci-badge { font-family:'Space Mono',monospace; font-size:10.5px; line-height:1.5; color:var(--dim); background:var(--bg); border:1.5px solid var(--hairline); border-radius:8px; padding:9px 11px; word-break:break-all; display:block; }
   /* ---- RISK REPORT ---- */
   .card-coral { box-shadow:6px 6px 0 var(--coral); }
   .btn-runrisk { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
@@ -373,6 +411,7 @@
       <a href="#try" class="nav-link">Complexity</a>
       <a href="#mutation" class="nav-link">Mutation</a>
       <a href="#risk" class="nav-link">Risk reports</a>
+      <a href="#ci" class="nav-link">CI</a>
     </div>
     <div class="nav-right">
       <a href="https://github.com/CodemasterAman/SUSGRADE" target="_blank" rel="noopener" class="nav-signin">GitHub</a>
@@ -522,6 +561,67 @@
     </div>
   </section>
 
+  <!-- CI INTEGRATION -->
+  <section class="section" id="ci">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 04</span> &mdash; ci integration &middot; quality gate</div>
+        <h2>Make risk <em>fail the build</em>.</h2>
+        <p class="lead">susgrade ships a command-line gate &mdash; the same three signals, wired to an exit code. Point it at your code in CI and the build turns red the moment a function gets too branchy, a suite stops catching mutants, or risk climbs past the line you drew. Pick your setup and copy a config that's ready to drop in.</p>
+      </div>
+      <div class="mut-note reveal">The config is generated right here, on this page &mdash; nothing to install just to look. The gate itself runs the <span class="mono">susgrade</span> command from the <span class="mono">backend/</span> package inside your pipeline.</div>
+      <div class="ci-grid reveal">
+        <div class="card">
+          <div class="ci-controls">
+            <div class="ci-field">
+              <span class="ci-flabel">Your repository</span>
+              <input type="text" class="ci-repo" id="ciRepo" value="CodemasterAman/SUSGRADE" spellcheck="false" autocomplete="off" placeholder="owner/repo" aria-label="GitHub repository, owner slash name">
+            </div>
+            <div class="ci-field">
+              <span class="ci-flabel">Where it runs</span>
+              <div class="lang-switch" id="ciProviders">
+                <button type="button" class="ci-prov is-active" data-prov="gha">GitHub Actions</button>
+                <button type="button" class="ci-prov" data-prov="gitlab">GitLab CI</button>
+                <button type="button" class="ci-prov" data-prov="precommit">pre-commit</button>
+                <button type="button" class="ci-prov" data-prov="make">Makefile</button>
+              </div>
+            </div>
+            <div class="ci-checks">
+              <label class="ci-check"><input type="checkbox" id="ciTests" checked> <span>Run the test suite</span></label>
+              <label class="ci-check"><input type="checkbox" id="ciCx" checked> <span>Complexity gate</span> <input type="number" class="ci-num" id="ciCxVal" min="1" max="50" value="10" aria-label="max complexity"></label>
+              <label class="ci-check"><input type="checkbox" id="ciMut"> <span>Mutation gate</span> <input type="number" class="ci-num" id="ciMutVal" min="0" max="100" value="80" aria-label="min mutation score percent"><span class="ci-suffix">% min</span></label>
+            </div>
+          </div>
+          <div class="mut-label"><span id="ciFilename">your CI config</span><span class="lab-right"><button type="button" class="ed-up" id="ciCopy">⧉ copy</button></span></div>
+          <pre class="code ci-out" id="ciOut"></pre>
+          <div class="toolbar">
+            <div class="toolbar-left"><div class="mut-endpoint">runs in CI &middot; exits non-zero on failure</div></div>
+            <button class="btn-sm btn-runci magnetic" id="ciRun">Generate config <span>✦</span></button>
+          </div>
+        </div>
+        <div class="card card-blue ci-side">
+          <div class="ci-side-in">
+            <h3 class="ci-h">What the gate does</h3>
+            <ul class="ci-list">
+              <li><b>Complexity</b> &mdash; scans every function and fails if any climbs past your limit. No tests required, so it runs over the whole repo.</li>
+              <li><b>Mutation</b> &mdash; injects faults into a module and fails if your tests don't catch enough of them.</li>
+              <li><b>Risk</b> &mdash; fuses the two per function (<span class="mono">complexity &times; (1 &minus; mutation score)</span>) and fails on the hotspots.</li>
+            </ul>
+            <div class="ci-codes">
+              <div class="ci-code"><span class="ci-dot ci-dot-ok"></span><span class="mono">exit 0</span> &mdash; every gate passed</div>
+              <div class="ci-code"><span class="ci-dot ci-dot-bad"></span><span class="mono">exit 1</span> &mdash; a threshold was crossed</div>
+              <div class="ci-code"><span class="ci-dot ci-dot-warn"></span><span class="mono">exit 2</span> &mdash; bad usage or unparseable file</div>
+            </div>
+            <div class="ci-badge-wrap">
+              <span class="ci-flabel">Add a status badge</span>
+              <code class="ci-badge" id="ciBadge"></code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="statband" id="stats">
     <div class="wrap">
       <div class="eyebrow reveal"><span class="slash">/</span> live from your last run</div>
@@ -580,7 +680,7 @@
           <a href="#try">Complexity</a>
           <a href="#mutation">Mutation testing</a>
           <a href="#risk">Risk reports</a>
-          <a href="#" data-soon="Multi-language support is coming">Languages</a>
+          <a href="#ci">CI integration</a>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>
@@ -714,7 +814,7 @@
   document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 
   /* MARQUEE CONTENT */
-  const items = ["CYCLOMATIC COMPLEXITY", "MUTATION TESTING", "RISK SCORING", "PYTHON", "SANDBOXED", "ZERO CONFIG"];
+  const items = ["CYCLOMATIC COMPLEXITY", "MUTATION TESTING", "RISK SCORING", "CI QUALITY GATES", "PYTHON", "SANDBOXED", "ZERO CONFIG"];
   function marqHTML() { const one = items.map(t => `<span>${t}</span><span class="sl">/</span>`).join(""); return `<div class="mitem">${one}</div><div class="mitem">${one}</div>`; }
   $("m1").innerHTML = marqHTML();
   $("m2").innerHTML = marqHTML();
@@ -724,7 +824,7 @@
     { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from each language's real parser — Python, JavaScript, Java, C, C++, Go, Rust, C# and TypeScript. Ranked by risk, colour-coded at a glance." },
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
     { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
-    { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
+    { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "live", go: "ci", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. A command-line gate on complexity, mutation score and risk — quality gates without the busywork." }
   ];
   $("featGrid").innerHTML = FEATURES.map(f => `
     <div class="feat" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
@@ -1449,7 +1549,7 @@ def apply_discount(price, tier):
         if (!ta) return;
         var inp = document.createElement("input");
         inp.type = "file";
-        inp.accept = ".py,.txt,text/x-python,text/plain";
+        inp.accept = ".py,.pyw,.js,.mjs,.cjs,.jsx,.ts,.tsx,.java,.c,.h,.cpp,.cc,.cxx,.hpp,.go,.rs,.cs,.txt,.text,text/plain";
         inp.addEventListener("change", function () {
           var f = inp.files && inp.files[0];
           if (!f) return;
@@ -1460,6 +1560,178 @@ def apply_discount(price, tier):
         inp.click();
       });
     });
+  })();
+  /* ---- CI INTEGRATION (client-side config generator) ---- */
+  (function ciGenerator() {
+    var out = document.getElementById("ciOut");
+    if (!out) return;
+    var fname = document.getElementById("ciFilename");
+    var badge = document.getElementById("ciBadge");
+    var provWrap = document.getElementById("ciProviders");
+    var cTests = document.getElementById("ciTests");
+    var cCx = document.getElementById("ciCx");
+    var vCx = document.getElementById("ciCxVal");
+    var cMut = document.getElementById("ciMut");
+    var vMut = document.getElementById("ciMutVal");
+    var copyBtn = document.getElementById("ciCopy");
+    var runBtn = document.getElementById("ciRun");
+    var repoEl = document.getElementById("ciRepo");
+    var generated = true;
+    var PLACEHOLDER = "# Pick your provider and gates above,\n# then hit \u201cGenerate config\u201d to build a\n# ready-to-commit CI file for susgrade.";
+
+    var REPO = "CodemasterAman/SUSGRADE"; // matches the code repo linked in the nav + footer
+    var provider = "gha";
+    var FILES = {
+      gha: ".github/workflows/ci.yml",
+      gitlab: ".gitlab-ci.yml",
+      precommit: ".pre-commit-config.yaml",
+      make: "Makefile"
+    };
+    var STEP_NAME = { tests: "Run the test suite", complexity: "Complexity gate", mutation: "Mutation gate" };
+
+    function clampInt(v, lo, hi, dflt) {
+      v = parseInt(v, 10);
+      if (isNaN(v)) return dflt;
+      return Math.max(lo, Math.min(hi, v));
+    }
+    function fmtScore(pct) {
+      var s = (pct / 100).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+      return s === "" ? "0" : s;
+    }
+    // Ordered list of gate commands, built from the toggles.
+    function commands() {
+      var cx = clampInt(vCx.value, 1, 50, 10);
+      var mut = fmtScore(clampInt(vMut.value, 0, 100, 80));
+      var out = [];
+      if (cTests.checked) out.push({ key: "tests", cmd: "pytest backend/tests -q" });
+      if (cCx.checked) out.push({ key: "complexity", cmd: "susgrade check backend/app --max-complexity " + cx });
+      if (cMut.checked) out.push({ key: "mutation", cmd: "susgrade mutation --source examples/subject.py --tests examples/test_subject.py --min-score " + mut });
+      return out;
+    }
+
+    function gha(cmds) {
+      var head = [
+        "name: susgrade",
+        "",
+        "on:",
+        "  push:",
+        "    branches: [ main ]",
+        "  pull_request:",
+        "",
+        "jobs:",
+        "  quality-gate:",
+        "    runs-on: ubuntu-latest",
+        "    steps:",
+        "      - uses: actions/checkout@v4",
+        "      - uses: actions/setup-python@v5",
+        "        with:",
+        "          python-version: \"3.12\"",
+        "      - name: Install susgrade",
+        "        run: pip install -e \"./backend[dev]\""
+      ];
+      cmds.forEach(function (c) {
+        head.push("      - name: " + STEP_NAME[c.key]);
+        head.push("        run: " + c.cmd);
+      });
+      return head.join("\n") + "\n";
+    }
+    function gitlab(cmds) {
+      var body = [
+        "quality-gate:",
+        "  image: python:3.12",
+        "  before_script:",
+        "    - pip install -e \"./backend[dev]\"",
+        "  script:"
+      ];
+      if (!cmds.length) body.push("    # enable a gate above");
+      cmds.forEach(function (c) { body.push("    - " + c.cmd); });
+      return body.join("\n") + "\n";
+    }
+    function precommit(cmds) {
+      var body = [
+        "# one-time setup:  pip install -e \"./backend[dev]\" pre-commit && pre-commit install",
+        "repos:",
+        "  - repo: local",
+        "    hooks:"
+      ];
+      if (!cmds.length) body.push("      # enable a gate above");
+      cmds.forEach(function (c) {
+        body.push("      - id: susgrade-" + c.key);
+        body.push("        name: susgrade " + c.key + " gate");
+        body.push("        entry: " + c.cmd);
+        body.push("        language: system");
+        body.push("        pass_filenames: false");
+        body.push("        always_run: true");
+      });
+      return body.join("\n") + "\n";
+    }
+    function makefile(cmds) {
+      // Makefile recipes MUST be tab-indented.
+      var body = [".PHONY: ci", "ci:", "\tpip install -e \"./backend[dev]\""];
+      cmds.forEach(function (c) { body.push("\t" + c.cmd); });
+      return body.join("\n") + "\n";
+    }
+
+    function render() {
+      var cmds = commands();
+      var text = provider === "gitlab" ? gitlab(cmds)
+        : provider === "precommit" ? precommit(cmds)
+        : provider === "make" ? makefile(cmds)
+        : gha(cmds);
+      if (generated) {
+        out.textContent = text;
+        out.classList.remove("ci-placeholder");
+        if (fname) fname.textContent = FILES[provider];
+      } else {
+        out.textContent = PLACEHOLDER;
+        out.classList.add("ci-placeholder");
+        if (fname) fname.textContent = "your CI config";
+      }
+      var R = (repoEl && repoEl.value.trim()) || REPO;
+      if (badge) badge.textContent =
+        "[![CI](https://github.com/" + R + "/actions/workflows/ci.yml/badge.svg)]" +
+        "(https://github.com/" + R + "/actions/workflows/ci.yml)";
+    }
+    function generate() {
+      generated = true;
+      render();
+      out.classList.remove("ci-flash"); void out.offsetWidth; out.classList.add("ci-flash");
+    }
+
+    if (provWrap) provWrap.addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest(".ci-prov") : null;
+      if (!btn) return;
+      provider = btn.getAttribute("data-prov");
+      provWrap.querySelectorAll(".ci-prov").forEach(function (x) { x.classList.toggle("is-active", x === btn); });
+      render();
+    });
+    [cTests, cCx, vCx, cMut, vMut, repoEl].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener("input", render);
+      el.addEventListener("change", render);
+    });
+    // Clicking a number field shouldn't toggle its sibling checkbox.
+    [vCx, vMut].forEach(function (el) { if (el) el.addEventListener("click", function (e) { e.stopPropagation(); }); });
+
+    if (runBtn) runBtn.addEventListener("click", generate);
+
+    if (copyBtn) copyBtn.addEventListener("click", function () {
+      if (!generated) generate();           // copying implies "give me the real config"
+      var t = out.textContent, orig = copyBtn.textContent;
+      function done() { copyBtn.textContent = "\u2713 copied"; setTimeout(function () { copyBtn.textContent = orig; }, 1400); }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done, function () { fallback(); done(); });
+      } else { fallback(); done(); }
+    });
+
+    render();
   })();
 
 })();
