@@ -1171,7 +1171,7 @@ def apply_discount(price, tier):
     if (tsRuntime) return tsRuntime;
     tsRuntime = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = TS_URL + "tree-sitter.js";
+      s.src = TS_URL + "tree-sitter.js"; s.integrity = "sha384-VSNUlp0XiZdJhmV1CPdCC5JHRB+IhWJmPCQCrCvDzMEWvyCgIhb8+c+560yaAQHC"; s.crossOrigin = "anonymous";
       s.onload = function () {
         var TS = window.TreeSitter;
         if (!TS) { rej(new Error("tree-sitter global missing")); return; }
@@ -1213,7 +1213,7 @@ def apply_discount(price, tier):
     if (window.acorn) return Promise.resolve(window.acorn);
     if (!acornPromise) acornPromise = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = "https://cdnjs.cloudflare.com/ajax/libs/acorn/8.11.3/acorn.min.js";
+      s.src = "https://cdn.jsdelivr.net/npm/acorn@8.11.3/dist/acorn.js"; s.integrity = "sha384-WgWa7IMzbWqfzzErkcVQfJDMGL8BWPguzfJMENCZenrpvc27isEGxLTnZb3cbz35"; s.crossOrigin = "anonymous";
       s.onload = function () { res(window.acorn); };
       s.onerror = function () { acornPromise = null; rej(new Error("acorn load failed")); };
       document.head.appendChild(s);
