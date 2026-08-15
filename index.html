@@ -1213,7 +1213,7 @@ def apply_discount(price, tier):
     if (window.acorn) return Promise.resolve(window.acorn);
     if (!acornPromise) acornPromise = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/acorn@8.11.3/dist/acorn.js"; s.integrity = "sha384-WgWa7IMzbWqfzzErkcVQfJDMGL8BWPguzfJMENCZenrpvc27isEGxLTnZb3cbz35"; s.crossOrigin = "anonymous";
+      s.src = "https://cdn.jsdelivr.net/npm/acorn@8.11.3/dist/acorn.js"; s.integrity = "sha384-ZzOQATwraE9ywaYqMdoWStSsI1G6qRnAvJpKgcT3mrvl8PC5IlfxGzIu1WGBvydm"; s.crossOrigin = "anonymous";
       s.onload = function () { res(window.acorn); };
       s.onerror = function () { acornPromise = null; rej(new Error("acorn load failed")); };
       document.head.appendChild(s);
