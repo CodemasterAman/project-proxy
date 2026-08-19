@@ -333,8 +333,6 @@
   .ci-controls { padding:16px 16px 4px; display:flex; flex-direction:column; gap:14px; }
   .ci-field { display:flex; flex-direction:column; gap:8px; }
   .ci-flabel { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
-  .ci-repo { font-family:'Space Mono',monospace; font-size:12.5px; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:7px; padding:8px 11px; width:100%; box-sizing:border-box; outline:none; transition:border-color .15s; }
-  .ci-repo:focus { border-color:var(--pink); }
   .ci-prov { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
   .ci-prov:hover { color:var(--text); border-color:var(--dim); }
   .ci-prov.is-active { background:var(--pink); color:#fff; border-color:var(--pink); }
@@ -481,6 +479,9 @@
               <button type="button" class="lang-btn" data-lang="rust">Rust</button>
               <button type="button" class="lang-btn" data-lang="c_sharp">C#</button>
               <button type="button" class="lang-btn" data-lang="typescript">TypeScript</button>
+              <button type="button" class="lang-btn" data-lang="php">PHP</button>
+              <button type="button" class="lang-btn" data-lang="kotlin">Kotlin</button>
+              <button type="button" class="lang-btn" data-lang="swift">Swift</button>
             </div>
           </div>
           <div class="tabs" id="cxTabs" role="tablist"></div>
@@ -573,10 +574,6 @@
       <div class="ci-grid reveal">
         <div class="card">
           <div class="ci-controls">
-            <div class="ci-field">
-              <span class="ci-flabel">Your repository</span>
-              <input type="text" class="ci-repo" id="ciRepo" value="CodemasterAman/SUSGRADE" spellcheck="false" autocomplete="off" placeholder="owner/repo" aria-label="GitHub repository, owner slash name">
-            </div>
             <div class="ci-field">
               <span class="ci-flabel">Where it runs</span>
               <div class="lang-switch" id="ciProviders">
@@ -1037,7 +1034,7 @@ def apply_discount(price, tier):
   }
 
   let lang = "py";
-  const TAB_LABEL = { py: { payments: "payments.py", router: "router.py", parser: "parser.py" }, js: { app: "app.js", router: "router.js", tokenizer: "tokenizer.js" }, java: { service: "Service.java", router: "Router.java" }, c: { checksum: "checksum.c", tokenizer: "tokenizer.c" }, cpp: { average: "average.cpp", lexer: "lexer.cpp" }, go: { handler: "handler.go", router: "router.go" }, rust: { classify: "classify.rs", lexer: "lexer.rs" }, c_sharp: { service: "Service.cs", router: "Router.cs" }, typescript: { validator: "validator.ts", router: "router.ts" } };
+  const TAB_LABEL = { py: { payments: "payments.py", router: "router.py", parser: "parser.py" }, js: { app: "app.js", router: "router.js", tokenizer: "tokenizer.js" }, java: { service: "Service.java", router: "Router.java" }, c: { checksum: "checksum.c", tokenizer: "tokenizer.c" }, cpp: { average: "average.cpp", lexer: "lexer.cpp" }, go: { handler: "handler.go", router: "router.go" }, rust: { classify: "classify.rs", lexer: "lexer.rs" }, c_sharp: { service: "Service.cs", router: "Router.cs" }, typescript: { validator: "validator.ts", router: "router.ts" }, php: { order: "order.php", router: "Router.php" }, kotlin: { grade: "Grade.kt", router: "Router.kt" }, swift: { classify: "classify.swift", router: "Router.swift" } };
   // susgrade — Tree-sitter complexity engine (Java, C, C++, extensible).
   // Operates on an already-parsed Tree-sitter root node, so the same walk runs in
   // Node (verification) and the browser. Returns the same result shape as the
@@ -1089,15 +1086,34 @@ def apply_discount(price, tier):
       funcNodes: new Set(["function_declaration", "function_expression", "arrow_function", "method_definition", "generator_function_declaration"]),
       classNodes: new Set(["class_declaration"]),
     },
+    php: {
+      branch: new Set(["if_statement", "else_if_clause", "foreach_statement", "for_statement", "while_statement", "do_statement", "catch_clause", "conditional_expression"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition", "method_declaration"]),
+      classNodes: new Set(["class_declaration", "interface_declaration", "trait_declaration"]),
+    },
+    kotlin: {
+      branch: new Set(["if_expression", "for_statement", "while_statement", "do_while_statement", "catch_block", "conjunction_expression", "disjunction_expression"]),
+      caseType: "when_entry",
+      funcNodes: new Set(["function_declaration"]),
+      classNodes: new Set(["class_declaration", "object_declaration"]),
+    },
+    swift: {
+      branch: new Set(["if_statement", "guard_statement", "for_statement", "while_statement", "repeat_while_statement", "catch_block", "ternary_expression", "conjunction_expression", "disjunction_expression"]),
+      caseType: "switch_entry",
+      funcNodes: new Set(["function_declaration"]),
+      classNodes: new Set(["class_declaration", "protocol_declaration"]),
+    },
   };
 
-  const TS_LOGICAL = { "&&": 1, "||": 1 };
+  const TS_LOGICAL = { "&&": 1, "||": 1, "and": 1, "or": 1, "xor": 1 };
 
   function tsRank(c) { if (c <= 5) return "simple"; if (c <= 10) return "moderate"; if (c <= 20) return "complex"; return "very complex"; }
 
   function isDefaultCase(n) {
     if (/^\s*default\b/.test(n.text)) return true;
     if (n.type === "match_arm") { var t = n.text.trim(); if (/^_\s*(=>|if\b)/.test(t)) return true; }
+    if (n.type === "when_entry") { for (var wi = 0; wi < n.childCount; wi++) if (n.child(wi).type === "when_condition") return false; return true; }
     return false;
   }
 
@@ -1117,19 +1133,25 @@ def apply_discount(price, tier):
     var decl = fnNode.childForFieldName ? fnNode.childForFieldName("declarator") : null;
     var nm = findDeclName(decl);
     if (nm) return nm.replace(/::/g, ".");
+    for (var fi = 0; fi < fnNode.childCount; fi++) { var fch = fnNode.child(fi); if (fch.type === "simple_identifier" || fch.type === "type_identifier") return fch.text; }
     return "anonymous@" + (fnNode.startPosition.row + 1);
   }
 
   function tsComplexity(fnNode, cfg) {
     var c = 1;
-    var body = (fnNode.childForFieldName && fnNode.childForFieldName("body")) || fnNode;
-    (function visit(n) {
+    function visit(n) {
       if (cfg.funcNodes.has(n.type)) return;
       if (cfg.branch.has(n.type)) c++;
       else if (cfg.caseType && n.type === cfg.caseType && !isDefaultCase(n)) c++;
       else if (n.type === "binary_expression") { var op = n.child(1); if (op && TS_LOGICAL[op.text]) c++; }
       for (var i = 0; i < n.childCount; i++) visit(n.child(i));
-    })(body);
+    }
+    var bf = fnNode.childForFieldName && fnNode.childForFieldName("body");
+    if (bf) { visit(bf); }
+    else {
+      var SKIP = new Set(["simple_identifier", "type_identifier", "function_value_parameters", "user_type", "modifiers", "type_parameters", "type_constraints"]);
+      for (var i = 0; i < fnNode.childCount; i++) { var ch = fnNode.child(i); if (!SKIP.has(ch.type)) visit(ch); }
+    }
     return c;
   }
 
@@ -1146,7 +1168,9 @@ def apply_discount(price, tier):
       }
       if (cfg.classNodes.has(node.type)) {
         var nm = node.childForFieldName ? node.childForFieldName("name") : null;
-        var cn = nm ? nm.text : (scope || "anon");
+        var cn = nm ? nm.text : null;
+        if (!cn) { for (var ci = 0; ci < node.childCount; ci++) { var cch = node.child(ci); if (cch.type === "type_identifier" || cch.type === "simple_identifier") { cn = cch.text; break; } } }
+        cn = cn || (scope || "anon");
         var cfull = scope ? scope + "." + cn : cn;
         for (var j = 0; j < node.childCount; j++) walk(node.child(j), cfull);
         return;
@@ -1162,8 +1186,8 @@ def apply_discount(price, tier):
     return { functions: out, total_complexity: total, average_complexity: Math.round((total / out.length) * 100) / 100, max_complexity: Math.max.apply(null, out.map(function (f) { return f.complexity; })) };
   }
 
-  var TS_LANGS = { java: 1, c: 1, cpp: 1, go: 1, rust: 1, c_sharp: 1, typescript: 1 };
-  var TS_FILE = { java: "tree-sitter-java", c: "tree-sitter-c", cpp: "tree-sitter-cpp", go: "tree-sitter-go", rust: "tree-sitter-rust", c_sharp: "tree-sitter-c_sharp", typescript: "tree-sitter-typescript" };
+  var TS_LANGS = { java: 1, c: 1, cpp: 1, go: 1, rust: 1, c_sharp: 1, typescript: 1, php: 1, kotlin: 1, swift: 1 };
+  var TS_FILE = { java: "tree-sitter-java", c: "tree-sitter-c", cpp: "tree-sitter-cpp", go: "tree-sitter-go", rust: "tree-sitter-rust", c_sharp: "tree-sitter-c_sharp", typescript: "tree-sitter-typescript", php: "tree-sitter-php", kotlin: "tree-sitter-kotlin", swift: "tree-sitter-swift" };
   var TS_URL = "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.20.8/";
   var GRAMMAR_URL = "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.13/out/";
   var tsRuntime = null, tsLangCache = {};
@@ -1171,7 +1195,7 @@ def apply_discount(price, tier):
     if (tsRuntime) return tsRuntime;
     tsRuntime = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = TS_URL + "tree-sitter.js"; s.integrity = "sha384-VSNUlp0XiZdJhmV1CPdCC5JHRB+IhWJmPCQCrCvDzMEWvyCgIhb8+c+560yaAQHC"; s.crossOrigin = "anonymous";
+      s.src = TS_URL + "tree-sitter.js";
       s.onload = function () {
         var TS = window.TreeSitter;
         if (!TS) { rej(new Error("tree-sitter global missing")); return; }
@@ -1193,7 +1217,7 @@ def apply_discount(price, tier):
     var tree = parser.parse(src);
     return analyzeTSTree(tree.rootNode, key);
   }
-  function labelFor(l) { return { py: "python", js: "javascript", java: "java", c: "c", cpp: "c++", go: "go", rust: "rust", c_sharp: "c#", typescript: "typescript" }[l] || l; }
+  function labelFor(l) { return { py: "python", js: "javascript", java: "java", c: "c", cpp: "c++", go: "go", rust: "rust", c_sharp: "c#", typescript: "typescript", php: "php", kotlin: "kotlin", swift: "swift" }[l] || l; }
   function loadingHTML(msg) { return '<div class="empty"><div class="empty-big">' + (msg || "Analysing\u2026") + '</div><p>Parsing your code\u2026</p></div>'; }
 
   Object.assign(SAMPLES, {
@@ -1208,12 +1232,18 @@ def apply_discount(price, tier):
     cpp: { average: { src: "#include <vector>\n\ndouble average(const std::vector<int>& xs) {\n    if (xs.empty()) {\n        return 0.0;\n    }\n    int sum = 0;\n    for (int x : xs) {\n        sum += x;\n    }\n    return sum / (double)xs.size();\n}" }, lexer: { src: "class Lexer {\npublic:\n    int scan(const std::string& src) {\n        int count = 0;\n        for (size_t i = 0; i < src.size(); i++) {\n            char ch = src[i];\n            if (ch == ' ' || ch == '\\t') {\n                continue;\n            } else if (ch >= '0' && ch <= '9') {\n                count++;\n            } else if (isalpha(ch) || ch == '_') {\n                count++;\n            } else {\n                throw std::runtime_error(\"bad char\");\n            }\n        }\n        return count;\n    }\n};" } }
   });
 
+  Object.assign(SAMPLES, {
+    php: { order: { src: "<?php\nfunction totalPrice($items, $coupon) {\n  $total = 0;\n  foreach ($items as $it) {\n    if ($it->qty > 0 && $it->price > 0) { $total += $it->qty * $it->price; }\n  }\n  if ($coupon === \"HALF\") { $total = $total / 2; }\n  elseif ($coupon === \"TEN\" || $coupon === \"PROMO\") { $total -= 10; }\n  return $total > 0 ? $total : 0;\n}" }, router: { src: "<?php\nclass Router {\n  public function dispatch($method, $path) {\n    switch ($method) {\n      case \"GET\": return $this->get($path);\n      case \"POST\": return $this->post($path);\n      default: return $this->notFound();\n    }\n  }\n  private function get($p) {\n    if ($p === \"/\") { return \"home\"; }\n    for ($i = 0; $i < 3; $i++) { if ($i == 1) { break; } }\n    return \"ok\";\n  }\n}" } },
+    kotlin: { grade: { src: "fun grade(score: Int): String {\n  return when {\n    score >= 90 -> \"A\"\n    score >= 80 -> \"B\"\n    score >= 70 -> \"C\"\n    else -> \"F\"\n  }\n}\n\nfun sumPositive(nums: List<Int>): Int {\n  var total = 0\n  for (n in nums) { if (n > 0 && n < 1000) total += n }\n  return total\n}" }, router: { src: "class Router {\n  fun dispatch(method: String, auth: Boolean): String {\n    if (method == \"GET\") {\n      return if (auth || method == \"HEAD\") \"ok\" else \"deny\"\n    } else if (method == \"POST\") {\n      var i = 0\n      while (i < 3) { i++ }\n      return \"created\"\n    }\n    return \"notfound\"\n  }\n}" } },
+    swift: { classify: { src: "func classify(_ n: Int) -> String {\n  guard n != 0 else { return \"zero\" }\n  if n > 0 && n < 10 { return \"small\" }\n  else if n >= 10 || n == -1 { return \"big\" }\n  return n > 0 ? \"pos\" : \"neg\"\n}\n\nfunc sumPositive(_ nums: [Int]) -> Int {\n  var total = 0\n  for n in nums { if n > 0 { total += n } }\n  return total\n}" }, router: { src: "struct Router {\n  func dispatch(_ method: String) -> String {\n    switch method {\n      case \"GET\": return get()\n      case \"POST\": return post()\n      default: return \"404\"\n    }\n  }\n  func get() -> String {\n    var i = 0\n    while i < 3 { i += 1 }\n    return \"ok\"\n  }\n}" } }
+  });
+
   let acornPromise = null;
   function ensureAcorn() {
     if (window.acorn) return Promise.resolve(window.acorn);
     if (!acornPromise) acornPromise = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/acorn@8.11.3/dist/acorn.js"; s.integrity = "sha384-ZzOQATwraE9ywaYqMdoWStSsI1G6qRnAvJpKgcT3mrvl8PC5IlfxGzIu1WGBvydm"; s.crossOrigin = "anonymous";
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/acorn/8.11.3/acorn.min.js";
       s.onload = function () { res(window.acorn); };
       s.onerror = function () { acornPromise = null; rej(new Error("acorn load failed")); };
       document.head.appendChild(s);
@@ -1230,8 +1260,8 @@ def apply_discount(price, tier):
     lang = l;
     document.querySelectorAll(".lang-btn").forEach(function (b) { b.classList.toggle("is-active", b.dataset.lang === l); });
     var cxLang = $("cxLang"); if (cxLang) cxLang.textContent = labelFor(l);
-    var pretty = { py: "Python", js: "JavaScript", java: "Java", c: "C", cpp: "C++", go: "Go", rust: "Rust", c_sharp: "C#", typescript: "TypeScript" }[l] || l;
-    var ext = { py: ".py", js: ".js", java: ".java", c: ".c", cpp: ".cpp", go: ".go", rust: ".rs", c_sharp: ".cs", typescript: ".ts" }[l] || "";
+    var pretty = { py: "Python", js: "JavaScript", java: "Java", c: "C", cpp: "C++", go: "Go", rust: "Rust", c_sharp: "C#", typescript: "TypeScript", php: "PHP", kotlin: "Kotlin", swift: "Swift" }[l] || l;
+    var ext = { py: ".py", js: ".js", java: ".java", c: ".c", cpp: ".cpp", go: ".go", rust: ".rs", c_sharp: ".cs", typescript: ".ts", php: ".php", kotlin: ".kt", swift: ".swift" }[l] || "";
     codeEl.setAttribute("placeholder", "Paste " + pretty + ", or upload a " + ext + " file, then hit Analyze\u2026");
     if (l === "js") {
       reportEl.innerHTML = loadingHTML("Loading the JavaScript parser\u2026");
@@ -1575,7 +1605,6 @@ def apply_discount(price, tier):
     var vMut = document.getElementById("ciMutVal");
     var copyBtn = document.getElementById("ciCopy");
     var runBtn = document.getElementById("ciRun");
-    var repoEl = document.getElementById("ciRepo");
     var generated = true;
     var PLACEHOLDER = "# Pick your provider and gates above,\n# then hit \u201cGenerate config\u201d to build a\n# ready-to-commit CI file for susgrade.";
 
@@ -1687,10 +1716,9 @@ def apply_discount(price, tier):
         out.classList.add("ci-placeholder");
         if (fname) fname.textContent = "your CI config";
       }
-      var R = (repoEl && repoEl.value.trim()) || REPO;
       if (badge) badge.textContent =
-        "[![CI](https://github.com/" + R + "/actions/workflows/ci.yml/badge.svg)]" +
-        "(https://github.com/" + R + "/actions/workflows/ci.yml)";
+        "[![CI](https://github.com/" + REPO + "/actions/workflows/ci.yml/badge.svg)]" +
+        "(https://github.com/" + REPO + "/actions/workflows/ci.yml)";
     }
     function generate() {
       generated = true;
@@ -1705,7 +1733,7 @@ def apply_discount(price, tier):
       provWrap.querySelectorAll(".ci-prov").forEach(function (x) { x.classList.toggle("is-active", x === btn); });
       render();
     });
-    [cTests, cCx, vCx, cMut, vMut, repoEl].forEach(function (el) {
+    [cTests, cCx, vCx, cMut, vMut].forEach(function (el) {
       if (!el) return;
       el.addEventListener("input", render);
       el.addEventListener("change", render);
