@@ -25,9 +25,9 @@
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
   :root, [data-theme="light"] {
-    --bg:#F2F1EA; --surface:#FBFAF5; --text:#14110D; --dim:#4A453C; --faint:#B7B3A6;
-    --border:#14110D; --hairline:#DAD8CD; --shadow:#14110D;
-    --panel:#14110D; --panel-text:#F2F1EA; --track:#E8E6DC;
+    --bg:#ECE5D6; --surface:#FBF9F3; --text:#14110D; --dim:#4A453C; --faint:#B2AC99;
+    --border:#1E1810; --hairline:#D6CEBB; --shadow:#1E1810;
+    --panel:#1E1810; --panel-text:#ECE5D6; --track:#DFD6C2;
     --nav-bg:rgba(242,241,234,.82); --pct-bg:rgba(251,250,245,.8);
     --hero-bg:#2E2AFF; --code-op:.16; --code-col:rgba(255,255,255,.85);
     --blue:#2E2AFF; --blue-lo:#E7E6FF; --coral:#FF4B2B; --pink:#FF3E9A; --violet:#7A3AFF;
@@ -172,8 +172,7 @@
   .feat-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
   .feat-grid > * { flex:0 1 100%; }
   @media (min-width:680px){ .feat-grid > * { flex:0 0 calc((100% - 20px) / 2); } }
-  .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; }
-  .feat:nth-child(3n+1){ box-shadow:6px 6px 0 var(--blue); } .feat:nth-child(3n+2){ box-shadow:6px 6px 0 var(--coral); } .feat:nth-child(3n){ box-shadow:6px 6px 0 var(--green); }
+  .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; box-shadow:6px 6px 0 var(--feat-accent, var(--blue)); }
   .feat:hover { box-shadow:10px 10px 0 var(--shadow); }
   .feat-ic { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; color:#fff; margin-bottom:18px; }
   .feat h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.35rem; letter-spacing:-.01em; color:var(--text); }
@@ -190,13 +189,13 @@
   .card-blue { box-shadow:6px 6px 0 var(--blue); }
   .tabs { display:flex; gap:6px; padding:12px 12px 0; flex-wrap:wrap; border-bottom:2px solid var(--border); background:var(--bg); }
   .tab { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--dim); background:transparent; border:none; cursor:pointer; padding:9px 14px; border-radius:10px 10px 0 0; transition:all .18s; }
-  .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--coral); }
+  .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--green); }
   .lang-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px 11px; background:var(--bg); border-bottom:2px solid var(--border); }
   .lang-bar-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
   .lang-switch { display:flex; gap:5px; flex-wrap:wrap; }
   .lang-btn { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
   .lang-btn:hover { color:var(--text); border-color:var(--dim); }
-  .lang-btn.is-active { background:var(--coral); color:#fff; border-color:var(--coral); }
+  .lang-btn.is-active { background:var(--green); color:#fff; border-color:var(--green); }
   .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); align-items:start; }
   .gutter { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
   .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; overflow:hidden; min-height:288px; box-sizing:border-box; }
@@ -206,7 +205,7 @@
   .toolbar-hint { font-family:'Space Mono',monospace; font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px; opacity:0; transition:opacity .2s; }
   .toolbar-hint.show { opacity:1; } .toolbar-hint kbd { background:var(--surface); border:1px solid var(--hairline); border-radius:5px; padding:1px 6px; }
   .btn-sm { font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.03em; border:2px solid var(--border); cursor:pointer; padding:10px 16px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; will-change:transform; transition:box-shadow .18s; }
-  .btn-analyze { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-analyze { background:var(--green); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
   .btn-analyze:hover { box-shadow:4px 4px 0 var(--shadow); }
   .btn-mut { background:var(--surface); color:var(--text); box-shadow:3px 3px 0 var(--violet); }
   .btn-mut:hover { box-shadow:4px 4px 0 var(--violet); }
@@ -215,7 +214,7 @@
   .report-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
   .badge { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:5px 12px; border-radius:999px; border:2px solid var(--border); display:inline-flex; align-items:center; gap:7px; }
   .badge .dot { width:7px; height:7px; border-radius:50%; }
-  .badge-engine { background:var(--blue); color:#fff; border-color:var(--blue); } .badge-engine .dot { background:#fff; }
+  .badge-engine { background:var(--green); color:#fff; border-color:var(--green); } .badge-engine .dot { background:#fff; }
   .badge-est { background:var(--bg); color:var(--dim); } .badge-est .dot { background:var(--dim); }
   .verdict { background:var(--panel); color:var(--panel-text); border-radius:16px; padding:20px; margin-bottom:20px; }
   .verdict-label { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
@@ -352,7 +351,7 @@
   .ci-h { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; margin-bottom:12px; }
   .ci-list { list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:18px; }
   .ci-list li { font-size:13.5px; line-height:1.55; color:var(--dim); padding-left:16px; position:relative; }
-  .ci-list li::before { content:"/"; position:absolute; left:0; color:var(--blue); font-family:'Space Mono',monospace; font-weight:700; }
+  .ci-list li::before { content:"/"; position:absolute; left:0; color:var(--pink); font-family:'Space Mono',monospace; font-weight:700; }
   .ci-list li b { color:var(--text); }
   .ci-codes { display:flex; flex-direction:column; gap:7px; padding:14px 0; border-top:1.5px solid var(--hairline); margin-bottom:16px; }
   .ci-code { display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--dim); }
@@ -365,6 +364,8 @@
   .ci-badge { font-family:'Space Mono',monospace; font-size:10.5px; line-height:1.5; color:var(--dim); background:var(--bg); border:1.5px solid var(--hairline); border-radius:8px; padding:9px 11px; word-break:break-all; display:block; }
   /* ---- RISK REPORT ---- */
   .card-coral { box-shadow:6px 6px 0 var(--coral); }
+  .card-green { box-shadow:6px 6px 0 var(--green); }
+  .card-pink { box-shadow:6px 6px 0 var(--pink); }
   .btn-runrisk { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
   .btn-runrisk:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
   .btn-runrisk:disabled { opacity:.6; cursor:default; }
@@ -390,6 +391,48 @@
   .lab-right { display:flex; align-items:center; gap:9px; }
   .ed-up { font-family:'Space Mono',monospace; font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--dim); background:var(--bg); border:1.5px solid var(--border); border-radius:6px; padding:2px 8px; cursor:pointer; transition:color .15s, border-color .15s; white-space:nowrap; }
   .ed-up:hover { color:var(--coral); border-color:var(--coral); }
+  /* ---- BATCH & REPO SCAN ---- */
+  .scan-modes { padding:16px 16px 0; }
+  #scanModes .ci-prov.is-active { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .scan-pane { padding:14px 16px 4px; }
+  .scan-drop { border:2px dashed var(--border); border-radius:14px; background:var(--bg); padding:34px 20px; text-align:center; cursor:pointer; transition:border-color .18s, background .18s; }
+  .scan-drop:hover, .scan-drop.is-drag { border-color:var(--blue); background:var(--blue-lo); }
+  .scan-drop-big { font-family:'Syne',sans-serif; font-weight:700; font-size:17px; color:var(--text); margin-bottom:4px; }
+  .scan-drop-in p { font-size:12.5px; color:var(--dim); font-family:'Space Mono',monospace; }
+  .scan-link { color:var(--blue); font:inherit; background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
+  .scan-repo-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .scan-input { flex:1; min-width:210px; font-family:'Space Mono',monospace; font-size:13px; padding:10px 13px; border:1.5px solid var(--border); border-radius:9px; background:var(--bg); color:var(--text); outline:none; transition:border-color .18s; }
+  .scan-input:focus { border-color:var(--blue); }
+  .btn-runscan { background:var(--blue); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runscan:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runscan:disabled { opacity:.6; cursor:default; }
+  .scan-hint { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:10px; line-height:1.5; }
+  .scan-out { padding:6px 16px 18px; }
+  .scan-empty { padding:34px 20px; text-align:center; color:var(--dim); font-family:'Space Mono',monospace; font-size:13px; }
+  .scan-loading { color:var(--blue); }
+  .scan-error .scan-drop-big { color:var(--coral); }
+  .scan-error p { font-family:'Space Mono',monospace; font-size:12px; color:var(--dim); margin-top:8px; }
+  .scan-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 2px 14px; }
+  .scan-eyebrow { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); }
+  .scan-stats { font-family:'Space Mono',monospace; font-size:12px; color:var(--dim); }
+  .scan-stats b { color:var(--text); }
+  .scan-tablewrap { overflow-x:auto; border:1.5px solid var(--hairline); border-radius:12px; }
+  .scan-table { width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; font-size:12.5px; }
+  .scan-table th { text-align:left; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); padding:11px 12px; border-bottom:1.5px solid var(--hairline); background:var(--bg); white-space:nowrap; }
+  .scan-table td { padding:11px 12px; border-bottom:1px solid var(--hairline); color:var(--text); vertical-align:middle; }
+  .scan-table tbody tr:last-child td { border-bottom:none; }
+  .scan-table tbody tr:hover { background:var(--blue-lo); }
+  .scan-num { text-align:right; white-space:nowrap; }
+  .scan-file { display:flex; align-items:center; gap:8px; word-break:break-all; min-width:180px; }
+  .scan-lang { font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; background:var(--dim); padding:2px 6px; border-radius:5px; flex:none; }
+  .scan-max, .scan-wc { font-weight:700; }
+  .scan-worst { color:var(--dim); white-space:nowrap; }
+  .scan-pill { display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#fff; padding:3px 8px; border-radius:999px; white-space:nowrap; }
+  .scan-errnote { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:10px; line-height:1.5; }
+  .exp-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1.5px solid var(--hairline); }
+  .exp-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
+  .exp-btn { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--dim); cursor:pointer; transition:color .15s, background-color .15s, border-color .15s, transform .15s; display:inline-flex; align-items:center; gap:5px; }
+  .exp-btn:hover { color:#fff; background:var(--exp-accent, var(--blue)); border-color:var(--exp-accent, var(--blue)); transform:translateY(-1px); }
 </style>
 </head>
 <body>
@@ -409,6 +452,7 @@
       <a href="#try" class="nav-link">Complexity</a>
       <a href="#mutation" class="nav-link">Mutation</a>
       <a href="#risk" class="nav-link">Risk reports</a>
+      <a href="#scan" class="nav-link">Scan</a>
       <a href="#ci" class="nav-link">CI</a>
     </div>
     <div class="nav-right">
@@ -498,7 +542,7 @@
             <button class="btn-sm btn-analyze magnetic" id="analyze">Analyze <span>✦</span></button>
           </div>
         </div>
-        <div class="card card-blue"><div class="report" id="report"></div></div>
+        <div class="card card-green"><div class="report" id="report"></div></div>
       </div>
     </div>
   </section>
@@ -562,11 +606,49 @@
     </div>
   </section>
 
+  <!-- BATCH & REPO SCAN -->
+  <section class="section" id="scan">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 04</span> &mdash; batch &amp; repo scan &middot; whole codebase</div>
+        <h2>Scan the <em>whole codebase</em>.</h2>
+        <p class="lead">One file is a spot check. Drop a folder of source files &mdash; or point susgrade at a public GitHub repo &mdash; and it ranks every function across every file, so the riskiest code in the whole project floats to the top. Same real parsers, twelve languages, still 100% in your browser.</p>
+      </div>
+      <div class="card card-blue reveal">
+        <div class="scan-modes">
+          <div class="lang-switch" id="scanModes">
+            <button type="button" class="ci-prov is-active" data-mode="files">Upload files</button>
+            <button type="button" class="ci-prov" data-mode="repo">GitHub repo</button>
+          </div>
+        </div>
+        <div class="scan-pane" id="scanFilesPane">
+          <div class="scan-drop" id="scanDrop">
+            <input type="file" id="scanFileInput" multiple hidden>
+            <div class="scan-drop-in">
+              <div class="scan-drop-big">Drop source files here</div>
+              <p>or <button type="button" class="scan-link" id="scanBrowse">browse</button> &mdash; .py .js .ts .java .c .cpp .go .rs .cs .php .kt .swift</p>
+            </div>
+          </div>
+        </div>
+        <div class="scan-pane" id="scanRepoPane" hidden>
+          <div class="scan-repo-row">
+            <input type="text" class="scan-input" id="scanRepoInput" placeholder="owner/repo  &middot;  or a github.com URL" spellcheck="false" autocomplete="off">
+            <button class="btn-sm btn-runscan magnetic" id="scanRepoRun">Scan repo <span>&#10022;</span></button>
+          </div>
+          <div class="scan-hint">Public repos only. Reads the GitHub API straight from your browser &mdash; no token, so it's limited to ~60 requests/hour and the first <span id="scanCap">40</span> source files.</div>
+        </div>
+        <div class="scan-out" id="scanOut">
+          <div class="scan-empty">Drop files or scan a repo to see a ranked, cross-file complexity report.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CI INTEGRATION -->
   <section class="section" id="ci">
     <div class="wrap">
       <div class="sec-head reveal">
-        <div class="eyebrow"><span class="slash">/ 04</span> &mdash; ci integration &middot; quality gate</div>
+        <div class="eyebrow"><span class="slash">/ 05</span> &mdash; ci integration &middot; quality gate</div>
         <h2>Make risk <em>fail the build</em>.</h2>
         <p class="lead">susgrade ships a command-line gate &mdash; the same three signals, wired to an exit code. Point it at your code in CI and the build turns red the moment a function gets too branchy, a suite stops catching mutants, or risk climbs past the line you drew. Pick your setup and copy a config that's ready to drop in.</p>
       </div>
@@ -596,7 +678,7 @@
             <button class="btn-sm btn-runci magnetic" id="ciRun">Generate config <span>✦</span></button>
           </div>
         </div>
-        <div class="card card-blue ci-side">
+        <div class="card card-pink ci-side">
           <div class="ci-side-in">
             <h3 class="ci-h">What the gate does</h3>
             <ul class="ci-list">
@@ -635,7 +717,7 @@
   <section class="section" id="how">
     <div class="wrap">
       <div class="sec-head reveal">
-        <div class="eyebrow"><span class="slash">/ 02</span> — read it</div>
+        <div class="eyebrow"><span class="slash">/</span> read it</div>
         <h2>Three numbers, no PhD required.</h2>
       </div>
       <div class="how-grid">
@@ -677,6 +759,7 @@
           <a href="#try">Complexity</a>
           <a href="#mutation">Mutation testing</a>
           <a href="#risk">Risk reports</a>
+          <a href="#scan">Batch &amp; repo scan</a>
           <a href="#ci">CI integration</a>
         </div>
         <div class="footer-col">
@@ -818,13 +901,14 @@
 
   /* FEATURES */
   const FEATURES = [
-    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from each language's real parser — Python, JavaScript, Java, C, C++, Go, Rust, C# and TypeScript. Ranked by risk, colour-coded at a glance." },
+    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--green)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from each language's real parser — Python, JavaScript, Java, C, C++, Go, Rust, C#, TypeScript, PHP, Kotlin and Swift. Ranked by risk, colour-coded at a glance." },
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
     { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
+    { ic: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5", c: "var(--blue)", title: "Batch &amp; repo scan", tag: "live", go: "scan", desc: "Point susgrade at a folder of files or a public GitHub repo and rank every function across the whole codebase in one pass." },
     { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "live", go: "ci", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. A command-line gate on complexity, mutation score and risk — quality gates without the busywork." }
   ];
   $("featGrid").innerHTML = FEATURES.map(f => `
-    <div class="feat" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
+    <div class="feat" style="--feat-accent:${f.c}" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
       <div class="feat-ic" style="background:${f.c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${f.ic}"/></svg></div>
       <h3>${f.title} <span class="tag ${f.tag === "live" ? "tag-live" : "tag-soon"}">${f.tag === "live" ? "live" : "soon"}</span></h3>
       <p>${f.desc}</p>
@@ -1284,9 +1368,21 @@ def apply_discount(price, tier):
     const ax = axisMax(result.max_complexity), sorted = [...fns].sort((a, b) => b.complexity - a.complexity), worst = sorted[0], wc = COLOR[worst.rank];
     const badge = (mode === "engine" || mode === "js" || mode === "ts") ? `<span class="badge badge-engine"><span class="dot"></span>${mode === "js" ? "Exact \u00b7 Acorn" : mode === "ts" ? "Exact \u00b7 Tree-sitter" : "Engine result"}</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
     const rows = sorted.map(f => { const c = COLOR[f.rank], w = Math.max(4, (f.complexity / ax) * 100); return `<div class="fnrow"><div class="fnrow-head"><span class="fnrow-name">${esc(f.name)}</span><span class="fnrow-score" style="color:${c}">${f.complexity}</span></div><div class="bar-wrap"><div class="bar-fill" data-w="${w}" style="background:${c}"></div></div><div class="fnrow-meta">lines ${f.lineno}–${f.end_lineno} &nbsp;·&nbsp; <span class="pill" style="background:${c};color:#fff">${f.rank}</span></div></div>`; }).join("");
-    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--coral)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces \u2014 same as the API." : mode === "js" ? "<b>Exact, parsed with Acorn.</b> Real cyclomatic complexity from JavaScript's own syntax tree." : mode === "ts" ? "<b>Exact, parsed with Tree-sitter.</b> Real cyclomatic complexity from the language's own grammar." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>`;
+    var cxTabEl = document.querySelector("#cxTabs .tab.is-active");
+    var cxSrc = cxTabEl ? cxTabEl.textContent.replace(/^\+\s*/, "").trim() : "";
+    var cxRep = {
+      title: "susgrade \u2014 complexity report",
+      subtitle: labelFor(lang) + (cxSrc ? " \u00b7 " + cxSrc : ""),
+      summaryText: fns.length + " function" + (fns.length !== 1 ? "s" : "") + " \u00b7 total complexity " + result.total_complexity + " \u00b7 max " + result.max_complexity + " (" + worst.name + ")",
+      summary: { functions: fns.length, total_complexity: result.total_complexity, average_complexity: result.average_complexity, max_complexity: result.max_complexity },
+      columns: [{ key: "function", label: "Function" }, { key: "complexity", label: "Cyclomatic complexity" }, { key: "rank", label: "Rank" }, { key: "lines", label: "Lines" }],
+      rows: sorted.map(function (f) { return { function: f.name, complexity: f.complexity, rank: f.rank, lines: f.lineno + "\u2013" + f.end_lineno }; }),
+      slug: "susgrade-complexity-" + lang
+    };
+    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--green)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces \u2014 same as the API." : mode === "js" ? "<b>Exact, parsed with Acorn.</b> Real cyclomatic complexity from JavaScript's own syntax tree." : mode === "ts" ? "<b>Exact, parsed with Tree-sitter.</b> Real cyclomatic complexity from the language's own grammar." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>${expBar("--green")}`;
     requestAnimationFrame(() => requestAnimationFrame(() => { reportEl.querySelectorAll(".bar-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }); }));
     updateStats(result); renderedSrc = codeEl.value; updateHint();
+    expWire(reportEl, cxRep);
   }
   function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some code on the left and hit Analyze to see where the risk hides."}</p></div>`; }
   function updateStats(r) { countUp($("st-fns"), r.functions.length, 0); countUp($("st-total"), r.total_complexity, 0); countUp($("st-avg"), r.average_complexity, 1); countUp($("st-max"), r.max_complexity, 0); }
@@ -1760,6 +1856,287 @@ def apply_discount(price, tier):
     });
 
     render();
+  })();
+
+
+
+  /* ---- Report export: JSON / CSV / Markdown / print-to-PDF. Shared by the complexity report and the codebase scan. ---- */
+  function expEsc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function expCsvCell(v) { v = String(v == null ? "" : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function expDownload(filename, text, mime) {
+    try {
+      var blob = new Blob([text], { type: mime + ";charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename; a.style.display = "none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    } catch (e) { toast("Couldn't export \u2014 " + (e && e.message ? e.message : "try another format")); }
+  }
+  function expJSON(rep) {
+    var obj = { tool: "susgrade", report: rep.title, source: rep.subtitle || null, generated: new Date().toISOString() };
+    if (rep.summary) obj.summary = rep.summary;
+    obj.rows = rep.rows.map(function (r) { var o = {}; rep.columns.forEach(function (c) { o[c.key] = r[c.key]; }); return o; });
+    return JSON.stringify(obj, null, 2);
+  }
+  function expCSV(rep) {
+    var lines = [rep.columns.map(function (c) { return expCsvCell(c.label); }).join(",")];
+    rep.rows.forEach(function (r) { lines.push(rep.columns.map(function (c) { return expCsvCell(r[c.key]); }).join(",")); });
+    return lines.join("\r\n") + "\r\n";
+  }
+  function expMD(rep) {
+    var out = ["# " + rep.title];
+    if (rep.subtitle) out.push("", "_" + rep.subtitle + "_");
+    if (rep.summaryText) out.push("", rep.summaryText);
+    out.push("", "| " + rep.columns.map(function (c) { return c.label; }).join(" | ") + " |",
+      "|" + rep.columns.map(function () { return " --- "; }).join("|") + "|");
+    rep.rows.forEach(function (r) { out.push("| " + rep.columns.map(function (c) { return String(r[c.key] == null ? "" : r[c.key]).replace(/\|/g, "\\|"); }).join(" | ") + " |"); });
+    out.push("", "_Generated by susgrade on " + new Date().toISOString().slice(0, 10) + "_");
+    return out.join("\n") + "\n";
+  }
+  function expPrintHTML(rep) {
+    var thead = "<tr>" + rep.columns.map(function (c) { return "<th>" + expEsc(c.label) + "</th>"; }).join("") + "</tr>";
+    var tbody = rep.rows.map(function (r) { return "<tr>" + rep.columns.map(function (c) { return "<td>" + expEsc(r[c.key]) + "</td>"; }).join("") + "</tr>"; }).join("");
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + expEsc(rep.title) + '</title>' +
+      '<style>*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#141414;margin:40px;line-height:1.5}' +
+      'h1{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}.sub{color:#555;font-size:13px;margin:0 0 2px}.stamp{color:#999;font-size:12px;margin:0 0 20px}' +
+      '.sum{background:#f4f4f2;border:1px solid #e6e6e3;border-radius:8px;padding:12px 16px;font-size:13px;margin:0 0 22px}' +
+      'table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#555;border-bottom:2px solid #141414;padding:9px 10px}' +
+      'td{padding:8px 10px;border-bottom:1px solid #e8e8e8}tr:nth-child(even) td{background:#fafafa}' +
+      '.foot{margin-top:26px;color:#aaa;font-size:11px}@media print{body{margin:0}@page{margin:14mm}}</style></head><body>' +
+      '<h1>' + expEsc(rep.title) + '</h1>' +
+      (rep.subtitle ? '<p class="sub">' + expEsc(rep.subtitle) + '</p>' : '') +
+      '<p class="stamp">Generated ' + expEsc(new Date().toLocaleString()) + '</p>' +
+      (rep.summaryText ? '<div class="sum">' + expEsc(rep.summaryText) + '</div>' : '') +
+      '<table><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>' +
+      '<p class="foot">susgrade \u00b7 test-effectiveness report \u00b7 generated 100% in your browser</p>' +
+      '<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script></body></html>';
+  }
+  function expReport(rep, fmt) {
+    var slug = rep.slug || "susgrade-report";
+    if (fmt === "json") expDownload(slug + ".json", expJSON(rep), "application/json");
+    else if (fmt === "csv") expDownload(slug + ".csv", expCSV(rep), "text/csv");
+    else if (fmt === "md") expDownload(slug + ".md", expMD(rep), "text/markdown");
+    else if (fmt === "pdf") {
+      var w = window.open("", "_blank");
+      if (!w) { expDownload(slug + ".html", expPrintHTML(rep), "text/html"); toast("Pop-up blocked \u2014 saved a printable HTML report instead"); return; }
+      w.document.open(); w.document.write(expPrintHTML(rep)); w.document.close();
+    }
+  }
+  function expBar(accentVar) {
+    return '<div class="exp-bar" style="--exp-accent:var(' + accentVar + ')"><span class="exp-label">Export</span>' +
+      '<button type="button" class="exp-btn" data-fmt="json">JSON</button>' +
+      '<button type="button" class="exp-btn" data-fmt="csv">CSV</button>' +
+      '<button type="button" class="exp-btn" data-fmt="md">Markdown</button>' +
+      '<button type="button" class="exp-btn" data-fmt="pdf">PDF</button></div>';
+  }
+  function expWire(containerEl, rep) {
+    var bar = containerEl.querySelector(".exp-bar");
+    if (!bar) return;
+    bar.querySelectorAll("[data-fmt]").forEach(function (btn) { btn.addEventListener("click", function () { expReport(rep, btn.dataset.fmt); }); });
+  }
+
+  /* ---- Batch & GitHub-repo scan (reuses the complexity engines above) ---- */
+  (function scanModule() {
+    if (!$("scanOut")) return;
+    var outEl = $("scanOut");
+    var filesPane = $("scanFilesPane"), repoPane = $("scanRepoPane");
+    var UPLOAD_CAP = 80, REPO_CAP = 40;
+
+    var EXT_LANG = {
+      py: "py", pyw: "py",
+      js: "js", mjs: "js", cjs: "js", jsx: "js",
+      ts: "typescript", tsx: "typescript",
+      java: "java", c: "c", h: "c",
+      cpp: "cpp", cc: "cpp", cxx: "cpp", hpp: "cpp", hh: "cpp",
+      cs: "c_sharp", go: "go", rs: "rust", php: "php",
+      kt: "kotlin", kts: "kotlin", swift: "swift"
+    };
+    function extOf(name) { var m = String(name).toLowerCase().match(/\.([a-z0-9+]+)$/); return m ? m[1] : ""; }
+    function langOf(name) { return EXT_LANG[extOf(name)] || null; }
+    function escH(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function baseName(p) { var a = String(p).split("/"); return a[a.length - 1]; }
+
+    // analyse one file with the right real parser; returns a result object, null (unsupported), or throws (parse error)
+    async function analyzeOne(name, src) {
+      var l = langOf(name);
+      if (!l) return null;
+      if (l === "js") { var ac = await ensureAcorn(); return analyzeJS(src, ac); }
+      if (TS_LANGS[l]) { return await analyzeWithTS(src, l); }
+      return toResult(estimate(src)); // python
+    }
+
+    // ---- mode toggle ----
+    var modeBtns = document.querySelectorAll("#scanModes .ci-prov");
+    modeBtns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        modeBtns.forEach(function (x) { x.classList.toggle("is-active", x === b); });
+        var m = b.dataset.mode;
+        filesPane.hidden = m !== "files";
+        repoPane.hidden = m !== "repo";
+      });
+    });
+
+    // ---- file upload / drag-drop ----
+    var fileInput = $("scanFileInput"), drop = $("scanDrop"), browse = $("scanBrowse");
+    browse.addEventListener("click", function (e) { e.stopPropagation(); fileInput.click(); });
+    drop.addEventListener("click", function () { fileInput.click(); });
+    fileInput.addEventListener("change", function () { var fs = [].slice.call(fileInput.files); fileInput.value = ""; handleFiles(fs); });
+    ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-drag"); }); });
+    drop.addEventListener("dragleave", function (e) { if (!drop.contains(e.relatedTarget)) drop.classList.remove("is-drag"); });
+    drop.addEventListener("drop", function (e) {
+      e.preventDefault(); drop.classList.remove("is-drag");
+      var fs = e.dataTransfer && e.dataTransfer.files ? [].slice.call(e.dataTransfer.files) : [];
+      handleFiles(fs);
+    });
+
+    function readFile(f) {
+      return new Promise(function (res) {
+        var rd = new FileReader();
+        rd.onload = function () { res({ name: f.name, src: String(rd.result) }); };
+        rd.onerror = function () { res({ name: f.name, src: null }); };
+        rd.readAsText(f);
+      });
+    }
+
+    async function handleFiles(files) {
+      if (!files.length) return;
+      var supported = files.filter(function (f) { return langOf(f.name); });
+      var skipped = files.length - supported.length;
+      if (!supported.length) { renderError("None of those files are in a supported language.", "Supported: .py .js .ts .java .c .cpp .go .rs .cs .php .kt .swift"); return; }
+      var capped = supported.length > UPLOAD_CAP;
+      supported = supported.slice(0, UPLOAD_CAP);
+      renderLoading("Reading " + supported.length + " file" + (supported.length > 1 ? "s" : "") + "\u2026");
+      var contents = await Promise.all(supported.map(readFile));
+      await analyzeAll(contents, { skipped: skipped, source: "upload", truncated: capped, totalFound: files.length });
+    }
+
+    // ---- GitHub repo ----
+    var repoInput = $("scanRepoInput");
+    $("scanRepoRun").addEventListener("click", scanRepo);
+    repoInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); scanRepo(); } });
+
+    function parseRepo(v) {
+      v = String(v || "").trim().replace(/^https?:\/\/(www\.)?github\.com\//i, "").replace(/\.git$/i, "").replace(/\/+$/, "");
+      var parts = v.split("/").filter(Boolean);
+      if (parts.length < 2) return null;
+      return { owner: parts[0], repo: parts[1] };
+    }
+
+    async function ghJson(url) {
+      var r;
+      try { r = await fetch(url, { headers: { "Accept": "application/vnd.github+json" } }); }
+      catch (e) { throw { msg: "Couldn't reach GitHub \u2014 check your connection." }; }
+      if (r.status === 403 || r.status === 429) {
+        var rem = r.headers.get("x-ratelimit-remaining");
+        throw { msg: "GitHub's unauthenticated API limit (60/hour) is reached." + (rem === "0" ? " Try again later, or scan uploaded files instead." : "") };
+      }
+      if (r.status === 404) throw { msg: "Repo not found \u2014 check the owner/name, and that it's public." };
+      if (!r.ok) throw { msg: "GitHub API error (" + r.status + ")." };
+      return r.json();
+    }
+
+    async function scanRepo() {
+      var pr = parseRepo(repoInput.value);
+      if (!pr) { renderError("Enter a repo as owner/name, or paste a github.com URL.", ""); return; }
+      renderLoading("Fetching " + pr.owner + "/" + pr.repo + "\u2026");
+      try {
+        var meta = await ghJson("https://api.github.com/repos/" + enc(pr.owner) + "/" + enc(pr.repo));
+        var branch = meta.default_branch || "main";
+        var tree = await ghJson("https://api.github.com/repos/" + enc(pr.owner) + "/" + enc(pr.repo) + "/git/trees/" + encodeURIComponent(branch) + "?recursive=1");
+        var blobs = (tree.tree || []).filter(function (n) { return n.type === "blob" && langOf(n.path); });
+        if (!blobs.length) { renderError("No source files in a supported language were found in " + pr.owner + "/" + pr.repo + ".", ""); return; }
+        var truncated = blobs.length > REPO_CAP || tree.truncated;
+        var pick = blobs.slice(0, REPO_CAP);
+        renderLoading("Fetching " + pick.length + " file" + (pick.length > 1 ? "s" : "") + " from " + pr.owner + "/" + pr.repo + "\u2026");
+        var contents = await fetchRaw(pr, branch, pick);
+        await analyzeAll(contents, { skipped: 0, source: "repo", repo: pr.owner + "/" + pr.repo, truncated: truncated, totalFound: blobs.length });
+      } catch (err) {
+        renderError(err && err.msg ? err.msg : "Couldn't scan that repo.", "");
+      }
+    }
+    function enc(s) { return encodeURIComponent(s); }
+
+    // fetch raw file contents with limited concurrency (raw.githubusercontent.com is CORS-open and not API-rate-limited)
+    async function fetchRaw(pr, branch, blobs) {
+      var out = [], idx = 0, CONC = Math.min(6, blobs.length);
+      var base = "https://raw.githubusercontent.com/" + enc(pr.owner) + "/" + enc(pr.repo) + "/" + encodeURIComponent(branch) + "/";
+      async function worker() {
+        while (idx < blobs.length) {
+          var i = idx++, b = blobs[i];
+          var url = base + b.path.split("/").map(encodeURIComponent).join("/");
+          try { var r = await fetch(url); out[i] = { name: b.path, src: r.ok ? await r.text() : null }; }
+          catch (e) { out[i] = { name: b.path, src: null }; }
+        }
+      }
+      var ws = []; for (var k = 0; k < CONC; k++) ws.push(worker());
+      await Promise.all(ws);
+      return out;
+    }
+
+    // ---- analyse everything + render the table ----
+    async function analyzeAll(contents, meta) {
+      renderLoading("Analysing " + contents.length + " file" + (contents.length > 1 ? "s" : "") + "\u2026");
+      var rows = [];
+      for (var i = 0; i < contents.length; i++) {
+        var c = contents[i];
+        if (c.src == null) { rows.push({ name: c.name, lang: langOf(c.name), error: "couldn't read" }); continue; }
+        try {
+          var res = await analyzeOne(c.name, c.src);
+          if (!res) continue;
+          var worst = res.functions.slice().sort(function (a, b) { return b.complexity - a.complexity; })[0] || null;
+          rows.push({ name: c.name, lang: langOf(c.name), fns: res.functions.length, total: res.total_complexity, avg: res.average_complexity, max: res.max_complexity, worst: worst });
+        } catch (e) { rows.push({ name: c.name, lang: langOf(c.name), error: "parse error" }); }
+      }
+      renderTable(rows, meta);
+    }
+
+    function renderTable(rows, meta) {
+      var ok = rows.filter(function (r) { return !r.error && r.fns != null; });
+      var errored = rows.filter(function (r) { return r.error; });
+      if (!ok.length && !errored.length) { renderError("No functions found to score.", ""); return; }
+      if (!ok.length) { renderError("Couldn't parse any of those files.", errored.slice(0, 4).map(function (e) { return baseName(e.name) + " \u2014 " + e.error; }).join("; ")); return; }
+      ok.sort(function (a, b) { return (b.max || 0) - (a.max || 0); });
+      var totFns = ok.reduce(function (s, r) { return s + r.fns; }, 0);
+      var riskiest = ok[0];
+      var scanRep = {
+        title: "susgrade \u2014 codebase scan",
+        subtitle: meta.source === "repo" ? "GitHub repo: " + meta.repo : "uploaded files (" + ok.length + ")",
+        summaryText: ok.length + " file" + (ok.length !== 1 ? "s" : "") + " \u00b7 " + totFns + " function" + (totFns !== 1 ? "s" : "") + " \u00b7 riskiest " + baseName(riskiest.name) + (riskiest.worst ? " (" + riskiest.worst.name + " = " + riskiest.worst.complexity + ")" : ""),
+        summary: { files: ok.length, functions: totFns, riskiest_file: riskiest ? riskiest.name : null },
+        columns: [{ key: "file", label: "File" }, { key: "language", label: "Language" }, { key: "functions", label: "Functions" }, { key: "total", label: "Total complexity" }, { key: "avg", label: "Avg complexity" }, { key: "max", label: "Max complexity" }, { key: "worst_function", label: "Worst function" }, { key: "worst_complexity", label: "Worst complexity" }, { key: "rank", label: "Rank" }],
+        rows: ok.map(function (r) { return { file: r.name, language: labelFor(r.lang), functions: r.fns, total: r.total, avg: (r.avg != null ? r.avg : ""), max: r.max, worst_function: r.worst ? r.worst.name : "", worst_complexity: r.worst ? r.worst.complexity : "", rank: tsRank(r.max || 1) }; }),
+        slug: "susgrade-scan" + (meta.source === "repo" ? "-" + meta.repo.replace(/[^\w.-]+/g, "-") : "")
+      };
+      var head = meta.source === "repo" ? "scanned <b>" + escH(meta.repo) + "</b>" : "scanned " + ok.length + " file" + (ok.length !== 1 ? "s" : "");
+      var stats = "<b>" + ok.length + "</b> file" + (ok.length !== 1 ? "s" : "") + " &nbsp;&middot;&nbsp; <b>" + totFns + "</b> function" + (totFns !== 1 ? "s" : "") +
+        " &nbsp;&middot;&nbsp; riskiest <b>" + (riskiest ? escH(baseName(riskiest.name)) : "\u2014") + "</b>" + (riskiest && riskiest.worst ? " (" + escH(riskiest.worst.name) + " = " + riskiest.worst.complexity + ")" : "");
+      var body = ok.map(function (r) {
+        var rk = tsRank(r.max || 1), col = COLOR[rk];
+        var wn = r.worst ? escH(r.worst.name) + " <span class=\"scan-wc\" style=\"color:" + col + "\">" + r.worst.complexity + "</span>" : "\u2014";
+        return "<tr>" +
+          "<td class=\"scan-file\"><span class=\"scan-lang\">" + escH(labelFor(r.lang)) + "</span><span>" + escH(r.name) + "</span></td>" +
+          "<td class=\"scan-num\">" + r.fns + "</td>" +
+          "<td class=\"scan-num\">" + r.total + "</td>" +
+          "<td class=\"scan-num\">" + (r.avg != null ? r.avg : "\u2014") + "</td>" +
+          "<td class=\"scan-num\"><span class=\"scan-max\" style=\"color:" + col + "\">" + r.max + "</span></td>" +
+          "<td class=\"scan-worst\">" + wn + "</td>" +
+          "<td><span class=\"scan-pill\" style=\"background:" + col + "\">" + rk + "</span></td>" +
+          "</tr>";
+      }).join("");
+      var notes = "";
+      if (meta.truncated) notes += "<div class=\"scan-errnote\">Showing the first " + ok.length + " of " + (meta.totalFound || ok.length) + " source files \u2014 scan a subfolder for the rest.</div>";
+      else if (meta.skipped) notes += "<div class=\"scan-errnote\">" + meta.skipped + " unsupported file" + (meta.skipped !== 1 ? "s" : "") + " skipped.</div>";
+      if (errored.length) notes += "<div class=\"scan-errnote\">" + errored.length + " file" + (errored.length !== 1 ? "s" : "") + " skipped (" + errored.slice(0, 4).map(function (e) { return escH(baseName(e.name)) + " \u2014 " + e.error; }).join("; ") + (errored.length > 4 ? "; \u2026" : "") + ")</div>";
+      outEl.innerHTML =
+        "<div class=\"scan-summary\"><span class=\"scan-eyebrow\"><span class=\"slash\" style=\"color:var(--blue)\">/</span> " + head + "</span><span class=\"scan-stats\">" + stats + "</span></div>" +
+        "<div class=\"scan-tablewrap\"><table class=\"scan-table\"><thead><tr><th>File</th><th>Fns</th><th>Total</th><th>Avg</th><th>Max</th><th>Worst function</th><th>Rank</th></tr></thead><tbody>" + body + "</tbody></table></div>" +
+        notes + expBar("--blue");
+      expWire(outEl, scanRep);
+    }
+
+    function renderLoading(msg) { outEl.innerHTML = '<div class="scan-empty scan-loading">' + escH(msg) + '</div>'; }
+    function renderError(msg, sub) { outEl.innerHTML = '<div class="scan-empty scan-error"><div class="scan-drop-big">' + escH(msg) + '</div>' + (sub ? '<p>' + escH(sub) + '</p>' : '') + '</div>'; }
   })();
 
 })();
