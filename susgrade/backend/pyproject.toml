@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "susgrade"
+version = "0.1.0"
+description = "Test-effectiveness analysis for Python: cyclomatic complexity, mutation testing, and a fused risk gate for CI."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Aman Behera" },
+    { name = "Bhomik Jain" },
+]
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "pydantic==2.10.4",
+]
+
+# Everything needed to run the test suite (pytest's TestClient pulls in httpx).
+# Install with:  pip install -e ".[dev]"
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+]
+
+# The console command CI (and your terminal) calls: `susgrade check ...`
+[project.scripts]
+susgrade = "app.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

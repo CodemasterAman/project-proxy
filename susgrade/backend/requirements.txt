@@ -1,4 +1,9 @@
+# Runtime
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.10.4
+
+# Testing — pytest and the dependency FastAPI's TestClient needs (httpx).
+# Without httpx the mutation/endpoint tests error on import.
 pytest==8.3.4
+httpx==0.28.1

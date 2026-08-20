@@ -141,6 +141,88 @@ def _apply(node: ast.AST, kind: str, sub: int | None, new: Any) -> None:
         node.value = new         # type: ignore[attr-defined]
 
 
+# Per-node recipes. Each helper takes one AST node and returns every mutation
+# that applies to it as a tuple ``(kind, sub_index, replacement, operator,
+# description)`` -- one change per tuple. Keeping the dispatch split this way
+# means every function stays small and independently testable; the walker in
+# ``generate_mutants`` just collects whatever these return.
+_Recipe = tuple[str, "int | None", Any, str, str]
+
+
+def _binop_recipes(node: ast.BinOp) -> list[_Recipe]:
+    if type(node.op) not in _BINOP_SWAPS:
+        return []
+    sym = _BINOP_SYM[type(node.op)]
+    return [("binop", None, rep, "AOR", f"'{sym}' -> '{_BINOP_SYM[rep]}'")
+            for rep in _BINOP_SWAPS[type(node.op)]]
+
+
+def _augassign_recipes(node: ast.AugAssign) -> list[_Recipe]:
+    if type(node.op) not in _BINOP_SWAPS:
+        return []
+    sym = _BINOP_SYM[type(node.op)]
+    return [("binop", None, rep, "AOR", f"'{sym}=' -> '{_BINOP_SYM[rep]}='")
+            for rep in _BINOP_SWAPS[type(node.op)]]
+
+
+def _compare_recipes(node: ast.Compare) -> list[_Recipe]:
+    out: list[_Recipe] = []
+    for k, op in enumerate(node.ops):
+        if type(op) in _CMP_SWAPS:
+            sym = _CMP_SYM[type(op)]
+            for rep in _CMP_SWAPS[type(op)]:
+                out.append(("compare", k, rep, "ROR", f"'{sym}' -> '{_CMP_SYM[rep]}'"))
+    return out
+
+
+def _boolop_recipes(node: ast.BoolOp) -> list[_Recipe]:
+    if type(node.op) not in _BOOL_SWAP:
+        return []
+    rep = _BOOL_SWAP[type(node.op)]
+    return [("boolop", None, rep, "LOR",
+             f"'{_BOOL_SYM[type(node.op)]}' -> '{_BOOL_SYM[rep]}'")]
+
+
+def _unaryop_recipes(node: ast.UnaryOp) -> list[_Recipe]:
+    if type(node.op) not in _UNARY_SWAP:
+        return []
+    rep = _UNARY_SWAP[type(node.op)]
+    return [("unaryop", None, rep, "UOR",
+             f"unary '{_UNARY_SYM[type(node.op)]}' -> '{_UNARY_SYM[rep]}'")]
+
+
+def _const_recipes(node: ast.Constant) -> list[_Recipe]:
+    v = node.value
+    if isinstance(v, bool):                       # bool before int!
+        return [("const", None, (not v), "BCR", f"{v} -> {not v}")]
+    if isinstance(v, (int, float)):
+        out: list[_Recipe] = [("const", None, v + 1, "NCR", f"{v} -> {v + 1}")]
+        if v != 0:
+            out.append(("const", None, 0, "NCR", f"{v} -> 0"))
+        return out
+    return []
+
+
+# Dispatch table, checked in order (AST types are mutually exclusive, but the
+# order is kept stable so mutant ids never shift between runs).
+_NODE_RECIPES = [
+    (ast.BinOp, _binop_recipes),
+    (ast.AugAssign, _augassign_recipes),
+    (ast.Compare, _compare_recipes),
+    (ast.BoolOp, _boolop_recipes),
+    (ast.UnaryOp, _unaryop_recipes),
+    (ast.Constant, _const_recipes),
+]
+
+
+def _recipes_for_node(node: ast.AST) -> list[_Recipe]:
+    """Return every mutation recipe that applies to *node* (possibly none)."""
+    for node_type, builder in _NODE_RECIPES:
+        if isinstance(node, node_type):
+            return builder(node)  # type: ignore[arg-type]
+    return []
+
+
 def generate_mutants(source: str) -> list[Mutant]:
     """Parse *source* and return one Mutant per possible single mutation.
 
@@ -148,53 +230,14 @@ def generate_mutants(source: str) -> list[Mutant]:
     """
     tree = ast.parse(source)
 
-    # Each recipe: (walk_index, kind, sub_index, replacement, operator, desc, line)
+    # Walk once, collecting the recipes each node yields. We remember the walk
+    # index and line so the node can be located and labelled when we build the
+    # mutated tree below.
     recipes: list[tuple[int, str, int | None, Any, str, str, int]] = []
-
     for wi, node in enumerate(ast.walk(tree)):
         ln = getattr(node, "lineno", 0)
-
-        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:
-            sym = _BINOP_SYM[type(node.op)]
-            for rep in _BINOP_SWAPS[type(node.op)]:
-                recipes.append((wi, "binop", None, rep, "AOR",
-                                f"'{sym}' -> '{_BINOP_SYM[rep]}'", ln))
-
-        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:
-            sym = _BINOP_SYM[type(node.op)]
-            for rep in _BINOP_SWAPS[type(node.op)]:
-                recipes.append((wi, "binop", None, rep, "AOR",
-                                f"'{sym}=' -> '{_BINOP_SYM[rep]}='", ln))
-
-        elif isinstance(node, ast.Compare):
-            for k, op in enumerate(node.ops):
-                if type(op) in _CMP_SWAPS:
-                    sym = _CMP_SYM[type(op)]
-                    for rep in _CMP_SWAPS[type(op)]:
-                        recipes.append((wi, "compare", k, rep, "ROR",
-                                        f"'{sym}' -> '{_CMP_SYM[rep]}'", ln))
-
-        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:
-            rep = _BOOL_SWAP[type(node.op)]
-            recipes.append((wi, "boolop", None, rep, "LOR",
-                            f"'{_BOOL_SYM[type(node.op)]}' -> '{_BOOL_SYM[rep]}'", ln))
-
-        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:
-            rep = _UNARY_SWAP[type(node.op)]
-            recipes.append((wi, "unaryop", None, rep, "UOR",
-                            f"unary '{_UNARY_SYM[type(node.op)]}' -> '{_UNARY_SYM[rep]}'", ln))
-
-        elif isinstance(node, ast.Constant):
-            v = node.value
-            if isinstance(v, bool):                       # bool before int!
-                recipes.append((wi, "const", None, (not v), "BCR",
-                                f"{v} -> {not v}", ln))
-            elif isinstance(v, (int, float)):
-                recipes.append((wi, "const", None, v + 1, "NCR",
-                                f"{v} -> {v + 1}", ln))
-                if v != 0:
-                    recipes.append((wi, "const", None, 0, "NCR",
-                                    f"{v} -> 0", ln))
+        for kind, sub, new, operator, desc in _recipes_for_node(node):
+            recipes.append((wi, kind, sub, new, operator, desc, ln))
 
     mutants: list[Mutant] = []
     for i, (wi, kind, sub, new, operator, desc, ln) in enumerate(recipes):

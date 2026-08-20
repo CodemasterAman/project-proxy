@@ -25,9 +25,9 @@
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
   :root, [data-theme="light"] {
-    --bg:#F2F1EA; --surface:#FBFAF5; --text:#14110D; --dim:#4A453C; --faint:#B7B3A6;
-    --border:#14110D; --hairline:#DAD8CD; --shadow:#14110D;
-    --panel:#14110D; --panel-text:#F2F1EA; --track:#E8E6DC;
+    --bg:#ECE5D6; --surface:#FBF9F3; --text:#14110D; --dim:#4A453C; --faint:#B2AC99;
+    --border:#1E1810; --hairline:#D6CEBB; --shadow:#1E1810;
+    --panel:#1E1810; --panel-text:#ECE5D6; --track:#DFD6C2;
     --nav-bg:rgba(242,241,234,.82); --pct-bg:rgba(251,250,245,.8);
     --hero-bg:#2E2AFF; --code-op:.16; --code-col:rgba(255,255,255,.85);
     --blue:#2E2AFF; --blue-lo:#E7E6FF; --coral:#FF4B2B; --pink:#FF3E9A; --violet:#7A3AFF;
@@ -169,10 +169,10 @@
   .reveal-2.in { transition-delay:.08s; } .reveal-3.in { transition-delay:.16s; }
 
   /* FEATURES */
-  .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-  @media (max-width:860px){ .feat-grid{ grid-template-columns:1fr; } }
-  .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; }
-  .feat:nth-child(3n+1){ box-shadow:6px 6px 0 var(--blue); } .feat:nth-child(3n+2){ box-shadow:6px 6px 0 var(--coral); } .feat:nth-child(3n){ box-shadow:6px 6px 0 var(--green); }
+  .feat-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+  .feat-grid > * { flex:0 1 100%; }
+  @media (min-width:680px){ .feat-grid > * { flex:0 0 calc((100% - 20px) / 2); } }
+  .feat { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; will-change:transform; transition:box-shadow .25s, background-color .4s ease, border-color .4s ease; cursor:pointer; box-shadow:6px 6px 0 var(--feat-accent, var(--blue)); }
   .feat:hover { box-shadow:10px 10px 0 var(--shadow); }
   .feat-ic { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; color:#fff; margin-bottom:18px; }
   .feat h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.35rem; letter-spacing:-.01em; color:var(--text); }
@@ -189,17 +189,23 @@
   .card-blue { box-shadow:6px 6px 0 var(--blue); }
   .tabs { display:flex; gap:6px; padding:12px 12px 0; flex-wrap:wrap; border-bottom:2px solid var(--border); background:var(--bg); }
   .tab { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--dim); background:transparent; border:none; cursor:pointer; padding:9px 14px; border-radius:10px 10px 0 0; transition:all .18s; }
-  .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--coral); }
-  .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); }
-  .gutter { font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
-  .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; }
+  .tab:hover { background:var(--blue-lo); color:var(--text); } .tab.is-active { background:var(--text); color:var(--bg); } .tab.tab-custom { color:var(--green); }
+  .lang-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px 11px; background:var(--bg); border-bottom:2px solid var(--border); }
+  .lang-bar-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
+  .lang-switch { display:flex; gap:5px; flex-wrap:wrap; }
+  .lang-btn { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
+  .lang-btn:hover { color:var(--text); border-color:var(--dim); }
+  .lang-btn.is-active { background:var(--green); color:#fff; border-color:var(--green); }
+  .editor { display:grid; grid-template-columns:40px 1fr; min-height:320px; max-height:320px; overflow:auto; background:var(--surface); align-items:start; }
+  .gutter { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; text-align:right; color:var(--faint); padding:16px 8px 16px 0; user-select:none; white-space:pre; border-right:2px solid var(--hairline); }
+  .code { font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.7; color:var(--text); background:transparent; border:none; outline:none; resize:none; padding:16px; white-space:pre; width:100%; tab-size:4; overflow:hidden; min-height:288px; box-sizing:border-box; }
   .code::placeholder { color:var(--faint); }
   .toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-top:2px solid var(--border); background:var(--bg); flex-wrap:wrap; }
   .toolbar-left { display:flex; align-items:center; gap:10px; }
   .toolbar-hint { font-family:'Space Mono',monospace; font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px; opacity:0; transition:opacity .2s; }
   .toolbar-hint.show { opacity:1; } .toolbar-hint kbd { background:var(--surface); border:1px solid var(--hairline); border-radius:5px; padding:1px 6px; }
   .btn-sm { font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.03em; border:2px solid var(--border); cursor:pointer; padding:10px 16px; border-radius:999px; display:inline-flex; align-items:center; gap:8px; will-change:transform; transition:box-shadow .18s; }
-  .btn-analyze { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-analyze { background:var(--green); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
   .btn-analyze:hover { box-shadow:4px 4px 0 var(--shadow); }
   .btn-mut { background:var(--surface); color:var(--text); box-shadow:3px 3px 0 var(--violet); }
   .btn-mut:hover { box-shadow:4px 4px 0 var(--violet); }
@@ -208,7 +214,7 @@
   .report-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
   .badge { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:5px 12px; border-radius:999px; border:2px solid var(--border); display:inline-flex; align-items:center; gap:7px; }
   .badge .dot { width:7px; height:7px; border-radius:50%; }
-  .badge-engine { background:var(--blue); color:#fff; border-color:var(--blue); } .badge-engine .dot { background:#fff; }
+  .badge-engine { background:var(--green); color:#fff; border-color:var(--green); } .badge-engine .dot { background:#fff; }
   .badge-est { background:var(--bg); color:var(--dim); } .badge-est .dot { background:var(--dim); }
   .verdict { background:var(--panel); color:var(--panel-text); border-radius:16px; padding:20px; margin-bottom:20px; }
   .verdict-label { font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6); }
@@ -320,6 +326,113 @@
   .mut-down code { background:var(--blue-lo); color:var(--text); padding:1px 6px; border-radius:5px; font-size:11.5px; }
   .mut-fine { font-size:12px !important; color:var(--faint) !important; margin-top:10px !important; }
   @media (max-width:900px){ .mut-grid { grid-template-columns:1fr; } }
+  /* ---- CI INTEGRATION ---- */
+  .ci-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:24px; align-items:start; }
+  @media (max-width:900px){ .ci-grid { grid-template-columns:1fr; } }
+  .ci-controls { padding:16px 16px 4px; display:flex; flex-direction:column; gap:14px; }
+  .ci-field { display:flex; flex-direction:column; gap:8px; }
+  .ci-flabel { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); }
+  .ci-prov { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; letter-spacing:.02em; padding:5px 11px; border:1.5px solid var(--border); background:var(--surface); color:var(--dim); border-radius:7px; cursor:pointer; transition:color .15s, background .15s, border-color .15s; }
+  .ci-prov:hover { color:var(--text); border-color:var(--dim); }
+  .ci-prov.is-active { background:var(--pink); color:#fff; border-color:var(--pink); }
+  .ci-checks { display:flex; flex-direction:column; gap:9px; padding-top:2px; }
+  .ci-check { display:flex; align-items:center; gap:9px; font-family:'Space Mono',monospace; font-size:12.5px; color:var(--text); cursor:pointer; flex-wrap:wrap; }
+  .ci-check input[type=checkbox] { width:15px; height:15px; accent-color:var(--pink); cursor:pointer; flex:none; }
+  .ci-num { width:58px; font-family:'Space Mono',monospace; font-size:12px; padding:3px 7px; border:1.5px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); }
+  .ci-suffix { font-size:11px; color:var(--faint); }
+  .ci-out { min-height:auto; max-height:380px; overflow:auto; display:block; background:var(--bg); white-space:pre-wrap; overflow-wrap:anywhere; }
+  .ci-out.ci-flash { animation:ciFlash .6s ease; }
+  @keyframes ciFlash { 0% { background:rgba(255,62,154,.16); } 100% { background:var(--bg); } }
+  .btn-runci { background:var(--pink); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runci:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runci:disabled { opacity:.6; cursor:default; }
+  .ci-placeholder { color:var(--faint); }
+  .ci-side-in { padding:20px; }
+  .ci-h { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; margin-bottom:12px; }
+  .ci-list { list-style:none; display:flex; flex-direction:column; gap:11px; margin-bottom:18px; }
+  .ci-list li { font-size:13.5px; line-height:1.55; color:var(--dim); padding-left:16px; position:relative; }
+  .ci-list li::before { content:"/"; position:absolute; left:0; color:var(--pink); font-family:'Space Mono',monospace; font-weight:700; }
+  .ci-list li b { color:var(--text); }
+  .ci-codes { display:flex; flex-direction:column; gap:7px; padding:14px 0; border-top:1.5px solid var(--hairline); margin-bottom:16px; }
+  .ci-code { display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--dim); }
+  .ci-code .mono { color:var(--text); }
+  .ci-dot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .ci-dot-ok { background:var(--green); }
+  .ci-dot-bad { background:var(--red); }
+  .ci-dot-warn { background:var(--amber); }
+  .ci-badge-wrap { display:flex; flex-direction:column; gap:7px; }
+  .ci-badge { font-family:'Space Mono',monospace; font-size:10.5px; line-height:1.5; color:var(--dim); background:var(--bg); border:1.5px solid var(--hairline); border-radius:8px; padding:9px 11px; word-break:break-all; display:block; }
+  /* ---- RISK REPORT ---- */
+  .card-coral { box-shadow:6px 6px 0 var(--coral); }
+  .card-green { box-shadow:6px 6px 0 var(--green); }
+  .card-pink { box-shadow:6px 6px 0 var(--pink); }
+  .btn-runrisk { background:var(--coral); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runrisk:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runrisk:disabled { opacity:.6; cursor:default; }
+  .risk-report { padding:0; }
+  .risk-result { padding:20px 22px; }
+  .risk-lead { font-size:15px; color:var(--text); margin-bottom:16px; line-height:1.5; }
+  .risk-lead b { color:var(--coral); }
+  .risk-clear b { color:var(--green); }
+  .risk-table { width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; }
+  .risk-table th { text-align:left; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:700; padding:6px 8px; border-bottom:1.5px solid var(--border); }
+  .risk-table td { padding:11px 8px; border-bottom:1px solid var(--hairline); font-size:13px; color:var(--text); }
+  .risk-table tbody tr:first-child td { background:var(--surface); }
+  .risk-fn { font-weight:700; }
+  .risk-rank { color:var(--faint); font-size:11px; }
+  .cx-band { display:inline-block; min-width:20px; text-align:center; padding:1px 6px; border-radius:5px; color:#fff; font-size:11px; font-weight:700; }
+  .cx-simple { background:var(--green); } .cx-moderate { background:var(--blue); } .cx-complex { background:var(--amber); color:#3a2d00; } .cx-verycomplex { background:var(--coral); }
+  .risk-mut { color:var(--dim); }
+  .risk-pill { display:inline-block; min-width:44px; text-align:center; padding:3px 8px; border-radius:7px; font-weight:700; font-size:13px; color:#fff; }
+  .risk-pill.band-hi { background:var(--coral); } .risk-pill.band-mid { background:var(--amber); color:#3a2d00; } .risk-pill.band-lo { background:var(--blue); } .risk-pill.band-none { background:var(--surface); color:var(--faint); border:1.5px solid var(--hairline); }
+  .risk-na { color:var(--faint); }
+  .risk-formula { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:14px; line-height:1.6; }
+  .risk-mod { font-size:11px; color:var(--faint); margin-top:6px; }
+  .lab-right { display:flex; align-items:center; gap:9px; }
+  .ed-up { font-family:'Space Mono',monospace; font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--dim); background:var(--bg); border:1.5px solid var(--border); border-radius:6px; padding:2px 8px; cursor:pointer; transition:color .15s, border-color .15s; white-space:nowrap; }
+  .ed-up:hover { color:var(--coral); border-color:var(--coral); }
+  /* ---- BATCH & REPO SCAN ---- */
+  .scan-modes { padding:16px 16px 0; }
+  #scanModes .ci-prov.is-active { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .scan-pane { padding:14px 16px 4px; }
+  .scan-drop { border:2px dashed var(--border); border-radius:14px; background:var(--bg); padding:34px 20px; text-align:center; cursor:pointer; transition:border-color .18s, background .18s; }
+  .scan-drop:hover, .scan-drop.is-drag { border-color:var(--blue); background:var(--blue-lo); }
+  .scan-drop-big { font-family:'Syne',sans-serif; font-weight:700; font-size:17px; color:var(--text); margin-bottom:4px; }
+  .scan-drop-in p { font-size:12.5px; color:var(--dim); font-family:'Space Mono',monospace; }
+  .scan-link { color:var(--blue); font:inherit; background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
+  .scan-repo-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .scan-input { flex:1; min-width:210px; font-family:'Space Mono',monospace; font-size:13px; padding:10px 13px; border:1.5px solid var(--border); border-radius:9px; background:var(--bg); color:var(--text); outline:none; transition:border-color .18s; }
+  .scan-input:focus { border-color:var(--blue); }
+  .btn-runscan { background:var(--blue); color:#fff; box-shadow:3px 3px 0 var(--shadow); }
+  .btn-runscan:hover { box-shadow:4px 4px 0 var(--shadow); transform:translate(-1px,-1px); }
+  .btn-runscan:disabled { opacity:.6; cursor:default; }
+  .scan-hint { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:10px; line-height:1.5; }
+  .scan-out { padding:6px 16px 18px; }
+  .scan-empty { padding:34px 20px; text-align:center; color:var(--dim); font-family:'Space Mono',monospace; font-size:13px; }
+  .scan-loading { color:var(--blue); }
+  .scan-error .scan-drop-big { color:var(--coral); }
+  .scan-error p { font-family:'Space Mono',monospace; font-size:12px; color:var(--dim); margin-top:8px; }
+  .scan-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 2px 14px; }
+  .scan-eyebrow { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); }
+  .scan-stats { font-family:'Space Mono',monospace; font-size:12px; color:var(--dim); }
+  .scan-stats b { color:var(--text); }
+  .scan-tablewrap { overflow-x:auto; border:1.5px solid var(--hairline); border-radius:12px; }
+  .scan-table { width:100%; border-collapse:collapse; font-family:'Space Mono',monospace; font-size:12.5px; }
+  .scan-table th { text-align:left; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); padding:11px 12px; border-bottom:1.5px solid var(--hairline); background:var(--bg); white-space:nowrap; }
+  .scan-table td { padding:11px 12px; border-bottom:1px solid var(--hairline); color:var(--text); vertical-align:middle; }
+  .scan-table tbody tr:last-child td { border-bottom:none; }
+  .scan-table tbody tr:hover { background:var(--blue-lo); }
+  .scan-num { text-align:right; white-space:nowrap; }
+  .scan-file { display:flex; align-items:center; gap:8px; word-break:break-all; min-width:180px; }
+  .scan-lang { font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; background:var(--dim); padding:2px 6px; border-radius:5px; flex:none; }
+  .scan-max, .scan-wc { font-weight:700; }
+  .scan-worst { color:var(--dim); white-space:nowrap; }
+  .scan-pill { display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#fff; padding:3px 8px; border-radius:999px; white-space:nowrap; }
+  .scan-errnote { font-family:'Space Mono',monospace; font-size:11px; color:var(--faint); margin-top:10px; line-height:1.5; }
+  .exp-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1.5px solid var(--hairline); }
+  .exp-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
+  .exp-btn { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--dim); cursor:pointer; transition:color .15s, background-color .15s, border-color .15s, transform .15s; display:inline-flex; align-items:center; gap:5px; }
+  .exp-btn:hover { color:#fff; background:var(--exp-accent, var(--blue)); border-color:var(--exp-accent, var(--blue)); transform:translateY(-1px); }
 </style>
 </head>
 <body>
@@ -338,7 +451,9 @@
       <a href="#features" class="nav-link">Features</a>
       <a href="#try" class="nav-link">Complexity</a>
       <a href="#mutation" class="nav-link">Mutation</a>
-      <a href="#" class="nav-link" data-soon="Risk reports are on the way">Risk reports<span class="soon">soon</span></a>
+      <a href="#risk" class="nav-link">Risk reports</a>
+      <a href="#scan" class="nav-link">Scan</a>
+      <a href="#ci" class="nav-link">CI</a>
     </div>
     <div class="nav-right">
       <a href="https://github.com/CodemasterAman/SUSGRADE" target="_blank" rel="noopener" class="nav-signin">GitHub</a>
@@ -390,31 +505,44 @@
   <section class="section" id="try">
     <div class="wrap">
       <div class="sec-head reveal">
-        <div class="eyebrow"><span class="slash">/ 01</span> — complexity, live · python</div>
-        <h2>Paste Python. Watch the risk light up.</h2>
-        <p class="lead">Right now susgrade analyses <b>Python</b>, straight from its own syntax tree. Every function gets an exact path-count — the bigger and hotter the bar, the more branches hide inside, and the more tests it takes to cover them.</p>
+        <div class="eyebrow"><span class="slash">/ 01</span> — complexity, live · <span id="cxLang">python</span></div>
+        <h2>Paste code. Watch the risk light up.</h2>
+        <p class="lead">susgrade analyses <b>Python</b> and <b>JavaScript</b>, straight from each language's own syntax tree. Every function gets an exact path-count — the bigger and hotter the bar, the more branches hide inside, and the more tests it takes to cover them.</p>
       </div>
       <div class="analyzer reveal">
         <div class="card">
-          <div class="tabs" role="tablist">
-            <button class="tab is-active" data-tab="router">router.py</button>
-            <button class="tab" data-tab="payments">payments.py</button>
-            <button class="tab" data-tab="parser">parser.py</button>
-            <button class="tab tab-custom" data-tab="custom">+ your code</button>
+          <div class="lang-bar">
+            <span class="lang-bar-label">Language</span>
+            <div class="lang-switch">
+              <button type="button" class="lang-btn is-active" data-lang="py">Python</button>
+              <button type="button" class="lang-btn" data-lang="js">JavaScript</button>
+              <button type="button" class="lang-btn" data-lang="java">Java</button>
+              <button type="button" class="lang-btn" data-lang="c">C</button>
+              <button type="button" class="lang-btn" data-lang="cpp">C++</button>
+              <button type="button" class="lang-btn" data-lang="go">Go</button>
+              <button type="button" class="lang-btn" data-lang="rust">Rust</button>
+              <button type="button" class="lang-btn" data-lang="c_sharp">C#</button>
+              <button type="button" class="lang-btn" data-lang="typescript">TypeScript</button>
+              <button type="button" class="lang-btn" data-lang="php">PHP</button>
+              <button type="button" class="lang-btn" data-lang="kotlin">Kotlin</button>
+              <button type="button" class="lang-btn" data-lang="swift">Swift</button>
+            </div>
           </div>
+          <div class="tabs" id="cxTabs" role="tablist"></div>
           <div class="editor">
             <div class="gutter" id="gutter">1</div>
-            <textarea class="code" id="code" spellcheck="false" placeholder="Paste a Python function or module, then hit Analyze…"></textarea>
+            <textarea class="code" id="code" spellcheck="false" placeholder="Paste Python, or upload a .py file, then hit Analyze…"></textarea>
           </div>
           <div class="toolbar">
             <div class="toolbar-left">
               <button class="btn-sm btn-mut magnetic" id="goMut">Run mutation scan <span>→</span></button>
+              <button type="button" class="ed-up" data-target="code">↑ file</button>
               <div class="toolbar-hint" id="hint"><span>edits</span><kbd>⌘</kbd><kbd>↵</kbd></div>
             </div>
             <button class="btn-sm btn-analyze magnetic" id="analyze">Analyze <span>✦</span></button>
           </div>
         </div>
-        <div class="card card-blue"><div class="report" id="report"></div></div>
+        <div class="card card-green"><div class="report" id="report"></div></div>
       </div>
     </div>
   </section>
@@ -432,11 +560,11 @@
       <div class="mut-grid reveal">
         <div class="card">
           <div class="mut-pane">
-            <div class="mut-label">your code <span class="mut-modname">subject.py</span></div>
+            <div class="mut-label"><span>your code</span><span class="lab-right"><button type="button" class="ed-up" data-target="mutCode">↑ file</button><span class="mut-modname">subject.py</span></span></div>
             <textarea class="code mut-ta" id="mutCode" spellcheck="false"></textarea>
           </div>
           <div class="mut-pane">
-            <div class="mut-label">your tests <span class="mut-modname">test_subject.py</span></div>
+            <div class="mut-label"><span>your tests</span><span class="lab-right"><button type="button" class="ed-up" data-target="mutTests">↑ file</button><span class="mut-modname">test_subject.py</span></span></div>
             <textarea class="code mut-ta" id="mutTests" spellcheck="false"></textarea>
           </div>
           <div class="toolbar">
@@ -445,6 +573,130 @@
           </div>
         </div>
         <div class="card card-violet"><div class="report mut-report" id="mutReport"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISK REPORT -->
+  <section class="section" id="risk">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 03</span> &mdash; risk report &middot; python</div>
+        <h2>The one number: what to <em>test next</em>.</h2>
+        <p class="lead">This is the whole point of susgrade. It fuses the two signals &mdash; how complex each function is, and how well your tests actually cover it &mdash; into a single score per function: <b>risk = complexity &times; (1 &minus; mutation score)</b>. The function that's both complex and weakly tested rises to the top, so you always know where your next test belongs.</p>
+      </div>
+      <div class="mut-note reveal">Runs entirely in your browser &mdash; no backend. It measures complexity and runs mutation testing together, then ranks every function by risk.</div>
+      <div class="mut-grid reveal">
+        <div class="card">
+          <div class="mut-pane">
+            <div class="mut-label"><span>your code</span><span class="lab-right"><button type="button" class="ed-up" data-target="riskCode">↑ file</button><span class="mut-modname">subject.py</span></span></div>
+            <textarea class="code mut-ta" id="riskCode" spellcheck="false"></textarea>
+          </div>
+          <div class="mut-pane">
+            <div class="mut-label"><span>your tests</span><span class="lab-right"><button type="button" class="ed-up" data-target="riskTests">↑ file</button><span class="mut-modname">test_subject.py</span></span></div>
+            <textarea class="code mut-ta" id="riskTests" spellcheck="false"></textarea>
+          </div>
+          <div class="toolbar">
+            <div class="toolbar-left"><div class="mut-endpoint">complexity &times; mutation</div></div>
+            <button class="btn-sm btn-runrisk magnetic" id="riskRun">Generate risk report ✦</button>
+          </div>
+        </div>
+        <div class="card card-coral"><div class="report risk-report" id="riskReport"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BATCH & REPO SCAN -->
+  <section class="section" id="scan">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 04</span> &mdash; batch &amp; repo scan &middot; whole codebase</div>
+        <h2>Scan the <em>whole codebase</em>.</h2>
+        <p class="lead">One file is a spot check. Drop a folder of source files &mdash; or point susgrade at a public GitHub repo &mdash; and it ranks every function across every file, so the riskiest code in the whole project floats to the top. Same real parsers, twelve languages, still 100% in your browser.</p>
+      </div>
+      <div class="card card-blue reveal">
+        <div class="scan-modes">
+          <div class="lang-switch" id="scanModes">
+            <button type="button" class="ci-prov is-active" data-mode="files">Upload files</button>
+            <button type="button" class="ci-prov" data-mode="repo">GitHub repo</button>
+          </div>
+        </div>
+        <div class="scan-pane" id="scanFilesPane">
+          <div class="scan-drop" id="scanDrop">
+            <input type="file" id="scanFileInput" multiple hidden>
+            <div class="scan-drop-in">
+              <div class="scan-drop-big">Drop source files here</div>
+              <p>or <button type="button" class="scan-link" id="scanBrowse">browse</button> &mdash; .py .js .ts .java .c .cpp .go .rs .cs .php .kt .swift</p>
+            </div>
+          </div>
+        </div>
+        <div class="scan-pane" id="scanRepoPane" hidden>
+          <div class="scan-repo-row">
+            <input type="text" class="scan-input" id="scanRepoInput" placeholder="owner/repo  &middot;  or a github.com URL" spellcheck="false" autocomplete="off">
+            <button class="btn-sm btn-runscan magnetic" id="scanRepoRun">Scan repo <span>&#10022;</span></button>
+          </div>
+          <div class="scan-hint">Public repos only. Reads the GitHub API straight from your browser &mdash; no token, so it's limited to ~60 requests/hour and the first <span id="scanCap">40</span> source files.</div>
+        </div>
+        <div class="scan-out" id="scanOut">
+          <div class="scan-empty">Drop files or scan a repo to see a ranked, cross-file complexity report.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CI INTEGRATION -->
+  <section class="section" id="ci">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/ 05</span> &mdash; ci integration &middot; quality gate</div>
+        <h2>Make risk <em>fail the build</em>.</h2>
+        <p class="lead">susgrade ships a command-line gate &mdash; the same three signals, wired to an exit code. Point it at your code in CI and the build turns red the moment a function gets too branchy, a suite stops catching mutants, or risk climbs past the line you drew. Pick your setup and copy a config that's ready to drop in.</p>
+      </div>
+      <div class="mut-note reveal">The config is generated right here, on this page &mdash; nothing to install just to look. The gate itself runs the <span class="mono">susgrade</span> command from the <span class="mono">backend/</span> package inside your pipeline.</div>
+      <div class="ci-grid reveal">
+        <div class="card">
+          <div class="ci-controls">
+            <div class="ci-field">
+              <span class="ci-flabel">Where it runs</span>
+              <div class="lang-switch" id="ciProviders">
+                <button type="button" class="ci-prov is-active" data-prov="gha">GitHub Actions</button>
+                <button type="button" class="ci-prov" data-prov="gitlab">GitLab CI</button>
+                <button type="button" class="ci-prov" data-prov="precommit">pre-commit</button>
+                <button type="button" class="ci-prov" data-prov="make">Makefile</button>
+              </div>
+            </div>
+            <div class="ci-checks">
+              <label class="ci-check"><input type="checkbox" id="ciTests" checked> <span>Run the test suite</span></label>
+              <label class="ci-check"><input type="checkbox" id="ciCx" checked> <span>Complexity gate</span> <input type="number" class="ci-num" id="ciCxVal" min="1" max="50" value="10" aria-label="max complexity"></label>
+              <label class="ci-check"><input type="checkbox" id="ciMut"> <span>Mutation gate</span> <input type="number" class="ci-num" id="ciMutVal" min="0" max="100" value="80" aria-label="min mutation score percent"><span class="ci-suffix">% min</span></label>
+            </div>
+          </div>
+          <div class="mut-label"><span id="ciFilename">your CI config</span><span class="lab-right"><button type="button" class="ed-up" id="ciCopy">⧉ copy</button></span></div>
+          <pre class="code ci-out" id="ciOut"></pre>
+          <div class="toolbar">
+            <div class="toolbar-left"><div class="mut-endpoint">runs in CI &middot; exits non-zero on failure</div></div>
+            <button class="btn-sm btn-runci magnetic" id="ciRun">Generate config <span>✦</span></button>
+          </div>
+        </div>
+        <div class="card card-pink ci-side">
+          <div class="ci-side-in">
+            <h3 class="ci-h">What the gate does</h3>
+            <ul class="ci-list">
+              <li><b>Complexity</b> &mdash; scans every function and fails if any climbs past your limit. No tests required, so it runs over the whole repo.</li>
+              <li><b>Mutation</b> &mdash; injects faults into a module and fails if your tests don't catch enough of them.</li>
+              <li><b>Risk</b> &mdash; fuses the two per function (<span class="mono">complexity &times; (1 &minus; mutation score)</span>) and fails on the hotspots.</li>
+            </ul>
+            <div class="ci-codes">
+              <div class="ci-code"><span class="ci-dot ci-dot-ok"></span><span class="mono">exit 0</span> &mdash; every gate passed</div>
+              <div class="ci-code"><span class="ci-dot ci-dot-bad"></span><span class="mono">exit 1</span> &mdash; a threshold was crossed</div>
+              <div class="ci-code"><span class="ci-dot ci-dot-warn"></span><span class="mono">exit 2</span> &mdash; bad usage or unparseable file</div>
+            </div>
+            <div class="ci-badge-wrap">
+              <span class="ci-flabel">Add a status badge</span>
+              <code class="ci-badge" id="ciBadge"></code>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -465,7 +717,7 @@
   <section class="section" id="how">
     <div class="wrap">
       <div class="sec-head reveal">
-        <div class="eyebrow"><span class="slash">/ 02</span> — read it</div>
+        <div class="eyebrow"><span class="slash">/</span> read it</div>
         <h2>Three numbers, no PhD required.</h2>
       </div>
       <div class="how-grid">
@@ -506,8 +758,9 @@
           <h4>Product</h4>
           <a href="#try">Complexity</a>
           <a href="#mutation">Mutation testing</a>
-          <a href="#" data-soon="Risk reports are on the way">Risk reports</a>
-          <a href="#" data-soon="Multi-language support is coming">Languages</a>
+          <a href="#risk">Risk reports</a>
+          <a href="#scan">Batch &amp; repo scan</a>
+          <a href="#ci">CI integration</a>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>
@@ -641,22 +894,21 @@
   document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 
   /* MARQUEE CONTENT */
-  const items = ["CYCLOMATIC COMPLEXITY", "MUTATION TESTING", "RISK SCORING", "PYTHON", "SANDBOXED", "ZERO CONFIG"];
+  const items = ["CYCLOMATIC COMPLEXITY", "MUTATION TESTING", "RISK SCORING", "CI QUALITY GATES", "PYTHON", "SANDBOXED", "ZERO CONFIG"];
   function marqHTML() { const one = items.map(t => `<span>${t}</span><span class="sl">/</span>`).join(""); return `<div class="mitem">${one}</div><div class="mitem">${one}</div>`; }
   $("m1").innerHTML = marqHTML();
   $("m2").innerHTML = marqHTML();
 
   /* FEATURES */
   const FEATURES = [
-    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--blue)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from Python's AST. Ranked by risk, colour-coded at a glance." },
+    { ic: "M4 6h16M4 12h10M4 18h7", c: "var(--green)", title: "Complexity analysis", tag: "live", go: "try", desc: "Exact cyclomatic complexity for every function, straight from each language's real parser — Python, JavaScript, Java, C, C++, Go, Rust, C#, TypeScript, PHP, Kotlin and Swift. Ranked by risk, colour-coded at a glance." },
     { ic: "M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5", c: "var(--violet)", title: "Mutation testing", tag: "live", go: "mutation", desc: "Inject tiny faults into your code and see how many your tests actually catch. The real measure of test quality." },
-    { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "soon", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
-    { ic: "M4 4h16v16H4zM9 9h6v6H9", c: "var(--green)", title: "Multi-language", tag: "soon", desc: "Today it's Python. Next: complexity across JavaScript, Java and more via Tree-sitter — one dashboard for a polyglot codebase." },
-    { ic: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", c: "var(--amber)", title: "Sandboxed runs", tag: "soon", desc: "Every mutant executes in an isolated sandbox, so untrusted code is analysed safely and never touches your machine." },
-    { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "soon", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. Quality gates without the busywork." }
+    { ic: "M12 2l3 7h7l-5.5 4 2 7L12 17l-6.5 3 2-7L2 9h7z", c: "var(--coral)", title: "Risk reports", tag: "live", go: "risk", desc: "Complexity combined with mutation score, fused into one number per function so you know exactly where to spend effort." },
+    { ic: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5", c: "var(--blue)", title: "Batch &amp; repo scan", tag: "live", go: "scan", desc: "Point susgrade at a folder of files or a public GitHub repo and rank every function across the whole codebase in one pass." },
+    { ic: "M4 12a8 8 0 018-8M20 12a8 8 0 01-8 8M12 8v4l3 2", c: "var(--pink)", title: "CI integration", tag: "live", go: "ci", desc: "Drop susgrade into your pipeline and fail the build when risk climbs. A command-line gate on complexity, mutation score and risk — quality gates without the busywork." }
   ];
   $("featGrid").innerHTML = FEATURES.map(f => `
-    <div class="feat" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
+    <div class="feat" style="--feat-accent:${f.c}" ${f.tag === "live" ? 'data-go="' + f.go + '"' : 'data-soon="' + f.title + ' is rolling out soon"'}>
       <div class="feat-ic" style="background:${f.c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${f.ic}"/></svg></div>
       <h3>${f.title} <span class="tag ${f.tag === "live" ? "tag-live" : "tag-soon"}">${f.tag === "live" ? "live" : "soon"}</span></h3>
       <p>${f.desc}</p>
@@ -669,6 +921,7 @@
 
   /* ANALYZER (live, Python) */
   const SAMPLES = {
+   py: {
     payments: { src: `def format_currency(amount, symbol="$"):
     return f"{symbol}{amount:,.2f}"
 
@@ -729,12 +982,383 @@ def apply_discount(price, tier):
         else:
             raise SyntaxError(f"unexpected char {ch!r}")
     return tokens`, result: { functions: [{ name: "tokenize", lineno: 1, end_lineno: 27, complexity: 13, rank: "complex" }], total_complexity: 13, average_complexity: 13.0, max_complexity: 13 } }
+   },
+   js: {
+    app: { src: "function formatCurrency(amount, symbol = \"$\") {\n  return symbol + amount.toFixed(2);\n}\n\nfunction isValidCard(number) {\n  let checksum = 0;\n  for (const ch of String(number)) {\n    if (ch >= \"0\" && ch <= \"9\") checksum += Number(ch);\n  }\n  return checksum % 10 === 0;\n}\n\nfunction applyDiscount(price, tier) {\n  if (tier === \"gold\") return price * 0.8;\n  return price;\n}" },
+    router: { src: "class RequestRouter {\n  dispatch(req, user) {\n    if (req.method === \"GET\") {\n      if (req.path === \"/health\") {\n        return this.health();\n      } else if (req.path.startsWith(\"/api\") && user.isAuthenticated) {\n        return this.api(req);\n      } else if (user.isAdmin || user.hasScope(\"read\")) {\n        return this.read(req);\n      }\n    } else if (req.method === \"POST\") {\n      if (!user.isAuthenticated) {\n        return this.deny();\n      }\n      for (const field of req.requiredFields) {\n        if (!(field in req.body)) {\n          return this.error(field);\n        }\n      }\n    }\n    return this.notFound();\n  }\n  health() {\n    return { ok: true };\n  }\n}" },
+    tokenizer: { src: "function tokenize(source) {\n  const tokens = [];\n  let i = 0;\n  while (i < source.length) {\n    const ch = source[i];\n    if (ch === \" \" || ch === \"\\n\") {\n      i += 1;\n      continue;\n    } else if (ch >= \"0\" && ch <= \"9\") {\n      let num = \"\";\n      while (i < source.length && source[i] >= \"0\" && source[i] <= \"9\") {\n        num += source[i];\n        i += 1;\n      }\n      tokens.push([\"NUM\", num]);\n    } else if (/[a-z_]/i.test(ch)) {\n      let name = \"\";\n      while (i < source.length && /[a-z0-9_]/i.test(source[i])) {\n        name += source[i];\n        i += 1;\n      }\n      const kind = name === \"if\" || name === \"for\" ? \"KEYWORD\" : \"NAME\";\n      tokens.push([kind, name]);\n    } else {\n      throw new Error(\"unexpected char \" + ch);\n    }\n  }\n  return tokens;\n}" }
+   }
   };
   const COLOR = { simple: "var(--green)", moderate: "var(--amber)", complex: "var(--orange)", "very complex": "var(--red)" };
   const SAY = { simple: "Healthy — easy to test", moderate: "Manageable, a few branches to watch", complex: "Getting complex — worth a refactor", "very complex": "High risk — hard to cover fully" };
-  const codeEl = $("code"), gutterEl = $("gutter"), reportEl = $("report"), hintEl = $("hint");
+  const codeEl = $("code"), gutterEl = $("gutter"), reportEl = $("report"), hintEl = $("hint"), cxTabsEl = $("cxTabs");
   let renderedSrc = "";
-  function syncGutter() { const n = codeEl.value.split("\n").length || 1; let s = ""; for (let i = 1; i <= n; i++) s += i + (i < n ? "\n" : ""); gutterEl.textContent = s; }
+  // susgrade — JavaScript complexity engine.
+  // Per-function cyclomatic complexity from a real Acorn AST. Same decision-point
+  // model as the Python engine (base 1 + each branch), same result shape, so the
+  // existing report renderer works unchanged. `acorn` is passed in (window.acorn
+  // in the browser, require('acorn') in Node).
+
+  function jsRank(c) {
+    if (c <= 5) return "simple";
+    if (c <= 10) return "moderate";
+    if (c <= 20) return "complex";
+    return "very complex";
+  }
+
+  function jsToResult(fns) {
+    if (!fns.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 };
+    const total = fns.reduce((s, f) => s + f.complexity, 0);
+    return {
+      functions: fns,
+      total_complexity: total,
+      average_complexity: Math.round((total / fns.length) * 100) / 100,
+      max_complexity: Math.max.apply(null, fns.map(f => f.complexity)),
+    };
+  }
+
+  function isFn(n) {
+    return n && (n.type === "FunctionDeclaration" || n.type === "FunctionExpression" || n.type === "ArrowFunctionExpression");
+  }
+
+  // complexity of one function's own body, NOT descending into nested functions
+  function jsBodyComplexity(fnNode) {
+    let c = 1;
+    function visit(node) {
+      if (!node || typeof node.type !== "string") return;
+      if (isFn(node)) return; // nested function -> counted separately, skip its internals
+      switch (node.type) {
+        case "IfStatement":
+        case "ForStatement": case "ForInStatement": case "ForOfStatement":
+        case "WhileStatement": case "DoWhileStatement":
+        case "ConditionalExpression":
+        case "CatchClause":
+          c++; break;
+        case "LogicalExpression":
+          if (node.operator === "&&" || node.operator === "||" || node.operator === "??") c++; break;
+        case "SwitchCase":
+          if (node.test) c++; break; // 'default' has test === null
+      }
+      for (const key in node) {
+        if (key === "type" || key === "loc" || key === "start" || key === "end") continue;
+        const v = node[key];
+        if (Array.isArray(v)) { for (const ch of v) visit(ch); }
+        else if (v && typeof v.type === "string") visit(v);
+      }
+    }
+    const b = fnNode.body;
+    if (b.type === "BlockStatement") { for (const st of b.body) visit(st); }
+    else visit(b); // arrow with an expression body
+    return c;
+  }
+
+  function exprName(n) {
+    if (!n) return null;
+    if (n.type === "Identifier") return n.name;
+    if (n.type === "MemberExpression") { const p = n.property && (n.property.name || n.property.value); return p != null ? String(p) : null; }
+    return null;
+  }
+
+  function jsCollect(node, scope, nameHint, out) {
+    if (!node || typeof node.type !== "string") return;
+
+    if (isFn(node)) {
+      const local = node.id ? node.id.name : (nameHint || "anonymous@" + node.loc.start.line);
+      const full = scope ? scope + "." + local : local;
+      out.push({ name: full, lineno: node.loc.start.line, end_lineno: node.loc.end.line, complexity: jsBodyComplexity(node) });
+      jsChildren(node, full, out); // nested functions get this function's name as their scope
+      return;
+    }
+    if (node.type === "ClassDeclaration" || node.type === "ClassExpression") {
+      const cn = node.id ? node.id.name : (nameHint || "Class@" + node.loc.start.line);
+      const full = scope ? scope + "." + cn : cn;
+      jsChildren(node, full, out); // methods get the class name as scope
+      return;
+    }
+    if (node.type === "VariableDeclarator" && node.init) {
+      jsCollect(node.init, scope, node.id && node.id.name ? node.id.name : null, out);
+      return;
+    }
+    if (node.type === "Property" || node.type === "MethodDefinition" || node.type === "PropertyDefinition") {
+      const k = node.key && (node.key.name || node.key.value);
+      if (node.value) jsCollect(node.value, scope, k != null ? String(k) : null, out);
+      return;
+    }
+    if (node.type === "AssignmentExpression") {
+      jsCollect(node.right, scope, exprName(node.left), out);
+      return;
+    }
+    jsChildren(node, scope, out);
+  }
+
+  function jsChildren(node, scope, out) {
+    for (const key in node) {
+      if (key === "type" || key === "loc" || key === "start" || key === "end") continue;
+      const v = node[key];
+      if (Array.isArray(v)) { for (const ch of v) if (ch && typeof ch.type === "string") jsCollect(ch, scope, null, out); }
+      else if (v && typeof v.type === "string") jsCollect(v, scope, null, out);
+    }
+  }
+
+  function jsParse(source, acorn) {
+    const opts = { ecmaVersion: 2022, locations: true, allowReturnOutsideFunction: true, allowAwaitOutsideFunction: true, allowHashBang: true, allowImportExportEverywhere: true };
+    try { return acorn.parse(source, Object.assign({ sourceType: "module" }, opts)); }
+    catch (e) { return acorn.parse(source, Object.assign({ sourceType: "script" }, opts)); }
+  }
+
+  function analyzeJS(source, acorn) {
+    const ast = jsParse(source, acorn);
+    let out = [];
+    jsCollect(ast, "", null, out);
+    // Hide trivial anonymous callbacks (e.g. `x => x+1`); keep any with real branching.
+    out = out.filter(f => !(f.name.indexOf("anonymous@") === 0 && f.complexity === 1));
+    out.sort((a, b) => a.lineno - b.lineno);
+    for (const f of out) f.rank = jsRank(f.complexity);
+    return jsToResult(out);
+  }
+
+  let lang = "py";
+  const TAB_LABEL = { py: { payments: "payments.py", router: "router.py", parser: "parser.py" }, js: { app: "app.js", router: "router.js", tokenizer: "tokenizer.js" }, java: { service: "Service.java", router: "Router.java" }, c: { checksum: "checksum.c", tokenizer: "tokenizer.c" }, cpp: { average: "average.cpp", lexer: "lexer.cpp" }, go: { handler: "handler.go", router: "router.go" }, rust: { classify: "classify.rs", lexer: "lexer.rs" }, c_sharp: { service: "Service.cs", router: "Router.cs" }, typescript: { validator: "validator.ts", router: "router.ts" }, php: { order: "order.php", router: "Router.php" }, kotlin: { grade: "Grade.kt", router: "Router.kt" }, swift: { classify: "classify.swift", router: "Router.swift" } };
+  // susgrade — Tree-sitter complexity engine (Java, C, C++, extensible).
+  // Operates on an already-parsed Tree-sitter root node, so the same walk runs in
+  // Node (verification) and the browser. Returns the same result shape as the
+  // Python and Acorn engines, so the existing report renderer is reused.
+
+  // susgrade — Tree-sitter complexity engine (Java, C, C++, Go, Rust, C#, TypeScript).
+  // Shared walk on an already-parsed Tree-sitter root node (same in Node + browser).
+
+  const TS_CONFIG = {
+    java: {
+      branch: new Set(["if_statement", "for_statement", "enhanced_for_statement", "while_statement", "do_statement", "catch_clause", "ternary_expression"]),
+      caseType: "switch_label",
+      funcNodes: new Set(["method_declaration", "constructor_declaration"]),
+      classNodes: new Set(["class_declaration", "interface_declaration", "enum_declaration", "record_declaration"]),
+    },
+    c: {
+      branch: new Set(["if_statement", "for_statement", "while_statement", "do_statement", "conditional_expression"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition"]),
+      classNodes: new Set(),
+    },
+    cpp: {
+      branch: new Set(["if_statement", "for_statement", "for_range_loop", "while_statement", "do_statement", "conditional_expression", "catch_clause"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition"]),
+      classNodes: new Set(["class_specifier", "struct_specifier"]),
+    },
+    go: {
+      branch: new Set(["if_statement", "for_statement", "expression_case", "type_case", "communication_case"]),
+      caseType: null,
+      funcNodes: new Set(["function_declaration", "method_declaration"]),
+      classNodes: new Set(),
+    },
+    rust: {
+      branch: new Set(["if_expression", "for_expression", "while_expression", "loop_expression"]),
+      caseType: "match_arm",
+      funcNodes: new Set(["function_item"]),
+      classNodes: new Set(),
+    },
+    c_sharp: {
+      branch: new Set(["if_statement", "for_statement", "for_each_statement", "while_statement", "do_statement", "catch_clause", "conditional_expression"]),
+      caseType: "case_switch_label",
+      funcNodes: new Set(["method_declaration", "constructor_declaration", "local_function_statement", "destructor_declaration", "operator_declaration"]),
+      classNodes: new Set(["class_declaration", "struct_declaration", "interface_declaration", "record_declaration", "enum_declaration"]),
+    },
+    typescript: {
+      branch: new Set(["if_statement", "for_statement", "for_in_statement", "while_statement", "do_statement", "catch_clause", "ternary_expression"]),
+      caseType: "switch_case",
+      funcNodes: new Set(["function_declaration", "function_expression", "arrow_function", "method_definition", "generator_function_declaration"]),
+      classNodes: new Set(["class_declaration"]),
+    },
+    php: {
+      branch: new Set(["if_statement", "else_if_clause", "foreach_statement", "for_statement", "while_statement", "do_statement", "catch_clause", "conditional_expression"]),
+      caseType: "case_statement",
+      funcNodes: new Set(["function_definition", "method_declaration"]),
+      classNodes: new Set(["class_declaration", "interface_declaration", "trait_declaration"]),
+    },
+    kotlin: {
+      branch: new Set(["if_expression", "for_statement", "while_statement", "do_while_statement", "catch_block", "conjunction_expression", "disjunction_expression"]),
+      caseType: "when_entry",
+      funcNodes: new Set(["function_declaration"]),
+      classNodes: new Set(["class_declaration", "object_declaration"]),
+    },
+    swift: {
+      branch: new Set(["if_statement", "guard_statement", "for_statement", "while_statement", "repeat_while_statement", "catch_block", "ternary_expression", "conjunction_expression", "disjunction_expression"]),
+      caseType: "switch_entry",
+      funcNodes: new Set(["function_declaration"]),
+      classNodes: new Set(["class_declaration", "protocol_declaration"]),
+    },
+  };
+
+  const TS_LOGICAL = { "&&": 1, "||": 1, "and": 1, "or": 1, "xor": 1 };
+
+  function tsRank(c) { if (c <= 5) return "simple"; if (c <= 10) return "moderate"; if (c <= 20) return "complex"; return "very complex"; }
+
+  function isDefaultCase(n) {
+    if (/^\s*default\b/.test(n.text)) return true;
+    if (n.type === "match_arm") { var t = n.text.trim(); if (/^_\s*(=>|if\b)/.test(t)) return true; }
+    if (n.type === "when_entry") { for (var wi = 0; wi < n.childCount; wi++) if (n.child(wi).type === "when_condition") return false; return true; }
+    return false;
+  }
+
+  function findDeclName(node) {
+    if (!node) return null;
+    var t = node.type;
+    if (t === "identifier" || t === "field_identifier" || t === "qualified_identifier" || t === "operator_name" || t === "destructor_name") return node.text;
+    var d = node.childForFieldName ? node.childForFieldName("declarator") : null;
+    if (d) { var r = findDeclName(d); if (r) return r; }
+    for (var i = 0; i < node.childCount; i++) { var rr = findDeclName(node.child(i)); if (rr) return rr; }
+    return null;
+  }
+
+  function tsFuncName(fnNode) {
+    var nameField = fnNode.childForFieldName ? fnNode.childForFieldName("name") : null;
+    if (nameField) return nameField.text.replace(/::/g, ".");
+    var decl = fnNode.childForFieldName ? fnNode.childForFieldName("declarator") : null;
+    var nm = findDeclName(decl);
+    if (nm) return nm.replace(/::/g, ".");
+    for (var fi = 0; fi < fnNode.childCount; fi++) { var fch = fnNode.child(fi); if (fch.type === "simple_identifier" || fch.type === "type_identifier") return fch.text; }
+    return "anonymous@" + (fnNode.startPosition.row + 1);
+  }
+
+  function tsComplexity(fnNode, cfg) {
+    var c = 1;
+    function visit(n) {
+      if (cfg.funcNodes.has(n.type)) return;
+      if (cfg.branch.has(n.type)) c++;
+      else if (cfg.caseType && n.type === cfg.caseType && !isDefaultCase(n)) c++;
+      else if (n.type === "binary_expression") { var op = n.child(1); if (op && TS_LOGICAL[op.text]) c++; }
+      for (var i = 0; i < n.childCount; i++) visit(n.child(i));
+    }
+    var bf = fnNode.childForFieldName && fnNode.childForFieldName("body");
+    if (bf) { visit(bf); }
+    else {
+      var SKIP = new Set(["simple_identifier", "type_identifier", "function_value_parameters", "user_type", "modifiers", "type_parameters", "type_constraints"]);
+      for (var i = 0; i < fnNode.childCount; i++) { var ch = fnNode.child(i); if (!SKIP.has(ch.type)) visit(ch); }
+    }
+    return c;
+  }
+
+  function analyzeTSTree(root, langKey) {
+    var cfg = TS_CONFIG[langKey];
+    var out = [];
+    (function walk(node, scope) {
+      if (cfg.funcNodes.has(node.type)) {
+        var local = tsFuncName(node);
+        var full = scope ? scope + "." + local : local;
+        out.push({ name: full, lineno: node.startPosition.row + 1, end_lineno: node.endPosition.row + 1, complexity: tsComplexity(node, cfg) });
+        for (var i = 0; i < node.childCount; i++) walk(node.child(i), full);
+        return;
+      }
+      if (cfg.classNodes.has(node.type)) {
+        var nm = node.childForFieldName ? node.childForFieldName("name") : null;
+        var cn = nm ? nm.text : null;
+        if (!cn) { for (var ci = 0; ci < node.childCount; ci++) { var cch = node.child(ci); if (cch.type === "type_identifier" || cch.type === "simple_identifier") { cn = cch.text; break; } } }
+        cn = cn || (scope || "anon");
+        var cfull = scope ? scope + "." + cn : cn;
+        for (var j = 0; j < node.childCount; j++) walk(node.child(j), cfull);
+        return;
+      }
+      for (var k = 0; k < node.childCount; k++) walk(node.child(k), scope);
+    })(root, "");
+
+    out = out.filter(function (f) { return !(f.name.indexOf("anonymous@") === 0 && f.complexity === 1); });
+    out.sort(function (a, b) { return a.lineno - b.lineno; });
+    for (var m = 0; m < out.length; m++) out[m].rank = tsRank(out[m].complexity);
+    if (!out.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 };
+    var total = out.reduce(function (s, f) { return s + f.complexity; }, 0);
+    return { functions: out, total_complexity: total, average_complexity: Math.round((total / out.length) * 100) / 100, max_complexity: Math.max.apply(null, out.map(function (f) { return f.complexity; })) };
+  }
+
+  var TS_LANGS = { java: 1, c: 1, cpp: 1, go: 1, rust: 1, c_sharp: 1, typescript: 1, php: 1, kotlin: 1, swift: 1 };
+  var TS_FILE = { java: "tree-sitter-java", c: "tree-sitter-c", cpp: "tree-sitter-cpp", go: "tree-sitter-go", rust: "tree-sitter-rust", c_sharp: "tree-sitter-c_sharp", typescript: "tree-sitter-typescript", php: "tree-sitter-php", kotlin: "tree-sitter-kotlin", swift: "tree-sitter-swift" };
+  var TS_URL = "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.20.8/";
+  var GRAMMAR_URL = "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.13/out/";
+  var tsRuntime = null, tsLangCache = {};
+  function ensureTreeSitter() {
+    if (tsRuntime) return tsRuntime;
+    tsRuntime = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = TS_URL + "tree-sitter.js";
+      s.onload = function () {
+        var TS = window.TreeSitter;
+        if (!TS) { rej(new Error("tree-sitter global missing")); return; }
+        TS.init({ locateFile: function (p) { return TS_URL + p; } }).then(function () { res(TS); }).catch(rej);
+      };
+      s.onerror = function () { tsRuntime = null; rej(new Error("tree-sitter load failed")); };
+      document.head.appendChild(s);
+    });
+    return tsRuntime;
+  }
+  function ensureGrammar(TS, key) {
+    if (tsLangCache[key]) return Promise.resolve(tsLangCache[key]);
+    return TS.Language.load(GRAMMAR_URL + TS_FILE[key] + ".wasm").then(function (L) { tsLangCache[key] = L; return L; });
+  }
+  async function analyzeWithTS(src, key) {
+    var TS = await ensureTreeSitter();
+    var L = await ensureGrammar(TS, key);
+    var parser = new TS(); parser.setLanguage(L);
+    var tree = parser.parse(src);
+    return analyzeTSTree(tree.rootNode, key);
+  }
+  function labelFor(l) { return { py: "python", js: "javascript", java: "java", c: "c", cpp: "c++", go: "go", rust: "rust", c_sharp: "c#", typescript: "typescript", php: "php", kotlin: "kotlin", swift: "swift" }[l] || l; }
+  function loadingHTML(msg) { return '<div class="empty"><div class="empty-big">' + (msg || "Analysing\u2026") + '</div><p>Parsing your code\u2026</p></div>'; }
+
+  Object.assign(SAMPLES, {
+    go: { handler: { src: "package main\n\nfunc ApplyDiscount(price float64, tier string) float64 {\n\tif tier == \"gold\" {\n\t\treturn price * 0.8\n\t}\n\treturn price\n}\n\nfunc Checksum(nums []int) int {\n\tsum := 0\n\tfor _, n := range nums {\n\t\tif n < 0 {\n\t\t\treturn -1\n\t\t}\n\t\tsum += n\n\t}\n\treturn sum % 10\n}" }, router: { src: "package router\n\nfunc (r *Router) Dispatch(req *Request, user *User) *Response {\n\tif req.Method == \"GET\" {\n\t\tif req.Path == \"/health\" {\n\t\t\treturn r.health()\n\t\t} else if strings.HasPrefix(req.Path, \"/api\") && user.Authenticated {\n\t\t\treturn r.api(req)\n\t\t} else if user.IsAdmin || user.HasScope(\"read\") {\n\t\t\treturn r.read(req)\n\t\t}\n\t} else if req.Method == \"POST\" {\n\t\tif !user.Authenticated {\n\t\t\treturn r.deny()\n\t\t}\n\t\tfor _, field := range req.RequiredFields {\n\t\t\tif _, ok := req.Body[field]; !ok {\n\t\t\t\treturn r.error(field)\n\t\t\t}\n\t\t}\n\t}\n\treturn r.notFound()\n}\n\nfunc (r *Router) health() *Response {\n\treturn OK()\n}" } },
+    rust: { classify: { src: "pub fn classify(n: i32) -> &'static str {\n    match n {\n        0 => \"zero\",\n        n if n < 0 => \"negative\",\n        _ => \"positive\",\n    }\n}\n\npub fn sum_positive(nums: &[i32]) -> i32 {\n    let mut total = 0;\n    for &n in nums {\n        if n > 0 {\n            total += n;\n        }\n    }\n    total\n}" }, lexer: { src: "pub fn tokenize(src: &str) -> Vec<Token> {\n    let mut tokens = Vec::new();\n    let chars: Vec<char> = src.chars().collect();\n    let mut i = 0;\n    while i < chars.len() {\n        let ch = chars[i];\n        if ch == ' ' || ch == '\\n' {\n            i += 1;\n        } else if ch.is_ascii_digit() {\n            while i < chars.len() && chars[i].is_ascii_digit() {\n                i += 1;\n            }\n            tokens.push(Token::Num);\n        } else if ch.is_alphabetic() || ch == '_' {\n            while i < chars.len() && chars[i].is_alphanumeric() {\n                i += 1;\n            }\n            tokens.push(Token::Name);\n        } else {\n            i += 1;\n        }\n    }\n    tokens\n}" } },
+    c_sharp: { service: { src: "public class Service {\n    public double ApplyDiscount(double price, string tier) {\n        if (tier == \"gold\") {\n            return price * 0.8;\n        }\n        return price;\n    }\n\n    public bool IsValid(int[] nums) {\n        int sum = 0;\n        foreach (int n in nums) {\n            if (n < 0) return false;\n            sum += n;\n        }\n        return sum % 10 == 0;\n    }\n}" }, router: { src: "public class Router {\n    public Response Dispatch(Request req, User user) {\n        if (req.Method == \"GET\") {\n            if (req.Path == \"/health\") {\n                return Health();\n            } else if (req.Path.StartsWith(\"/api\") && user.Authenticated) {\n                return Api(req);\n            } else if (user.IsAdmin || user.HasScope(\"read\")) {\n                return Read(req);\n            }\n        } else if (req.Method == \"POST\") {\n            if (!user.Authenticated) {\n                return Deny();\n            }\n            foreach (var field in req.RequiredFields) {\n                if (!req.Body.ContainsKey(field)) {\n                    return Error(field);\n                }\n            }\n        }\n        return NotFound();\n    }\n\n    public Response Health() {\n        return Response.Ok();\n    }\n}" } },
+    typescript: { validator: { src: "function applyDiscount(price: number, tier: string): number {\n    if (tier === \"gold\") {\n        return price * 0.8;\n    }\n    return price;\n}\n\nfunction isValid(nums: number[]): boolean {\n    let sum = 0;\n    for (const n of nums) {\n        if (n < 0) return false;\n        sum += n;\n    }\n    return sum % 10 === 0;\n}" }, router: { src: "class Router {\n    dispatch(req: Request, user: User): Response {\n        if (req.method === \"GET\") {\n            if (req.path === \"/health\") {\n                return this.health();\n            } else if (req.path.startsWith(\"/api\") && user.authenticated) {\n                return this.api(req);\n            } else if (user.isAdmin || user.hasScope(\"read\")) {\n                return this.read(req);\n            }\n        } else if (req.method === \"POST\") {\n            if (!user.authenticated) {\n                return this.deny();\n            }\n            for (const field of req.requiredFields) {\n                if (!(field in req.body)) {\n                    return this.error(field);\n                }\n            }\n        }\n        return this.notFound();\n    }\n\n    health(): Response {\n        return Response.ok();\n    }\n}" } }
+  });
+  Object.assign(SAMPLES, {
+    java: { service: { src: "public class Service {\n    public double applyDiscount(double price, String tier) {\n        if (tier.equals(\"gold\")) {\n            return price * 0.8;\n        }\n        return price;\n    }\n    public boolean isValid(int[] nums) {\n        int sum = 0;\n        for (int n : nums) {\n            if (n < 0) return false;\n            sum += n;\n        }\n        return sum % 10 == 0;\n    }\n}" }, router: { src: "public class Router {\n    public Response dispatch(Request req, User user) {\n        if (req.method.equals(\"GET\")) {\n            if (req.path.equals(\"/health\")) {\n                return health();\n            } else if (req.path.startsWith(\"/api\") && user.isAuthenticated) {\n                return api(req);\n            } else if (user.isAdmin || user.hasScope(\"read\")) {\n                return read(req);\n            }\n        } else if (req.method.equals(\"POST\")) {\n            if (!user.isAuthenticated) {\n                return deny();\n            }\n            for (String field : req.requiredFields) {\n                if (!req.body.containsKey(field)) {\n                    return error(field);\n                }\n            }\n        }\n        return notFound();\n    }\n    public Response health() { return Response.ok(); }\n}" } },
+    c: { checksum: { src: "double apply_discount(double price, const char *tier) {\n    if (strcmp(tier, \"gold\") == 0) {\n        return price * 0.8;\n    }\n    return price;\n}\n\nint checksum(const int *nums, int len) {\n    int sum = 0;\n    for (int i = 0; i < len; i++) {\n        if (nums[i] < 0) return -1;\n        sum += nums[i];\n    }\n    return sum % 10;\n}" }, tokenizer: { src: "int tokenize(const char *src, Token *out) {\n    int i = 0, count = 0;\n    while (src[i] != '\\0') {\n        char ch = src[i];\n        if (ch == ' ' || ch == '\\n') {\n            i++;\n        } else if (ch >= '0' && ch <= '9') {\n            while (src[i] >= '0' && src[i] <= '9') i++;\n            out[count++] = make_num();\n        } else if ((ch >= 'a' && ch <= 'z') || ch == '_') {\n            while (src[i] != '\\0' && src[i] != ' ') i++;\n            out[count++] = make_name();\n        } else {\n            return -1;\n        }\n    }\n    return count;\n}" } },
+    cpp: { average: { src: "#include <vector>\n\ndouble average(const std::vector<int>& xs) {\n    if (xs.empty()) {\n        return 0.0;\n    }\n    int sum = 0;\n    for (int x : xs) {\n        sum += x;\n    }\n    return sum / (double)xs.size();\n}" }, lexer: { src: "class Lexer {\npublic:\n    int scan(const std::string& src) {\n        int count = 0;\n        for (size_t i = 0; i < src.size(); i++) {\n            char ch = src[i];\n            if (ch == ' ' || ch == '\\t') {\n                continue;\n            } else if (ch >= '0' && ch <= '9') {\n                count++;\n            } else if (isalpha(ch) || ch == '_') {\n                count++;\n            } else {\n                throw std::runtime_error(\"bad char\");\n            }\n        }\n        return count;\n    }\n};" } }
+  });
+
+  Object.assign(SAMPLES, {
+    php: { order: { src: "<?php\nfunction totalPrice($items, $coupon) {\n  $total = 0;\n  foreach ($items as $it) {\n    if ($it->qty > 0 && $it->price > 0) { $total += $it->qty * $it->price; }\n  }\n  if ($coupon === \"HALF\") { $total = $total / 2; }\n  elseif ($coupon === \"TEN\" || $coupon === \"PROMO\") { $total -= 10; }\n  return $total > 0 ? $total : 0;\n}" }, router: { src: "<?php\nclass Router {\n  public function dispatch($method, $path) {\n    switch ($method) {\n      case \"GET\": return $this->get($path);\n      case \"POST\": return $this->post($path);\n      default: return $this->notFound();\n    }\n  }\n  private function get($p) {\n    if ($p === \"/\") { return \"home\"; }\n    for ($i = 0; $i < 3; $i++) { if ($i == 1) { break; } }\n    return \"ok\";\n  }\n}" } },
+    kotlin: { grade: { src: "fun grade(score: Int): String {\n  return when {\n    score >= 90 -> \"A\"\n    score >= 80 -> \"B\"\n    score >= 70 -> \"C\"\n    else -> \"F\"\n  }\n}\n\nfun sumPositive(nums: List<Int>): Int {\n  var total = 0\n  for (n in nums) { if (n > 0 && n < 1000) total += n }\n  return total\n}" }, router: { src: "class Router {\n  fun dispatch(method: String, auth: Boolean): String {\n    if (method == \"GET\") {\n      return if (auth || method == \"HEAD\") \"ok\" else \"deny\"\n    } else if (method == \"POST\") {\n      var i = 0\n      while (i < 3) { i++ }\n      return \"created\"\n    }\n    return \"notfound\"\n  }\n}" } },
+    swift: { classify: { src: "func classify(_ n: Int) -> String {\n  guard n != 0 else { return \"zero\" }\n  if n > 0 && n < 10 { return \"small\" }\n  else if n >= 10 || n == -1 { return \"big\" }\n  return n > 0 ? \"pos\" : \"neg\"\n}\n\nfunc sumPositive(_ nums: [Int]) -> Int {\n  var total = 0\n  for n in nums { if n > 0 { total += n } }\n  return total\n}" }, router: { src: "struct Router {\n  func dispatch(_ method: String) -> String {\n    switch method {\n      case \"GET\": return get()\n      case \"POST\": return post()\n      default: return \"404\"\n    }\n  }\n  func get() -> String {\n    var i = 0\n    while i < 3 { i += 1 }\n    return \"ok\"\n  }\n}" } }
+  });
+
+  let acornPromise = null;
+  function ensureAcorn() {
+    if (window.acorn) return Promise.resolve(window.acorn);
+    if (!acornPromise) acornPromise = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/acorn/8.11.3/acorn.min.js";
+      s.onload = function () { res(window.acorn); };
+      s.onerror = function () { acornPromise = null; rej(new Error("acorn load failed")); };
+      document.head.appendChild(s);
+    });
+    return acornPromise;
+  }
+  function renderTabs() {
+    var labels = TAB_LABEL[lang];
+    cxTabsEl.innerHTML = Object.keys(labels).map(function (k, i) { return '<button class="tab' + (i === 0 ? ' is-active' : '') + '" data-tab="' + k + '">' + labels[k] + '</button>'; }).join('') + '<button class="tab tab-custom" data-tab="custom">+ your code</button>';
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.addEventListener("click", function () { setTab(t.dataset.tab); }); });
+  }
+  async function setLang(l) {
+    if (l === lang && cxTabsEl.children.length) return;
+    lang = l;
+    document.querySelectorAll(".lang-btn").forEach(function (b) { b.classList.toggle("is-active", b.dataset.lang === l); });
+    var cxLang = $("cxLang"); if (cxLang) cxLang.textContent = labelFor(l);
+    var pretty = { py: "Python", js: "JavaScript", java: "Java", c: "C", cpp: "C++", go: "Go", rust: "Rust", c_sharp: "C#", typescript: "TypeScript", php: "PHP", kotlin: "Kotlin", swift: "Swift" }[l] || l;
+    var ext = { py: ".py", js: ".js", java: ".java", c: ".c", cpp: ".cpp", go: ".go", rust: ".rs", c_sharp: ".cs", typescript: ".ts", php: ".php", kotlin: ".kt", swift: ".swift" }[l] || "";
+    codeEl.setAttribute("placeholder", "Paste " + pretty + ", or upload a " + ext + " file, then hit Analyze\u2026");
+    if (l === "js") {
+      reportEl.innerHTML = loadingHTML("Loading the JavaScript parser\u2026");
+      try { await ensureAcorn(); } catch (e) { toast("Couldn\u2019t load the JavaScript parser \u2014 check your connection."); }
+    } else if (TS_LANGS[l]) {
+      reportEl.innerHTML = loadingHTML("Loading the " + pretty + " parser\u2026");
+      try { var TS = await ensureTreeSitter(); await ensureGrammar(TS, l); } catch (e) { toast("Couldn\u2019t load the " + pretty + " parser \u2014 check your connection."); }
+    }
+    renderTabs();
+    setTab(Object.keys(TAB_LABEL[lang])[0]);
+  }
+
+  function syncGutter() { const n = codeEl.value.split("\n").length || 1; let s = ""; for (let i = 1; i <= n; i++) s += i + (i < n ? "\n" : ""); gutterEl.textContent = s; codeEl.style.height = "auto"; codeEl.style.height = codeEl.scrollHeight + "px"; }
   function axisMax(m) { return Math.max(20, Math.ceil((m * 1.2) / 5) * 5); }
   function countUp(el, to, dec) { if (reduce) { el.textContent = to.toFixed(dec); return; } const dur = 900, t0 = performance.now(); (function s(now) { const t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3); el.textContent = (to * e).toFixed(dec); if (t < 1) requestAnimationFrame(s); else el.textContent = to.toFixed(dec); })(performance.now()); }
   function esc(name) { const s = name.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); return s + '<span class="mut">()</span>'; }
@@ -742,13 +1366,25 @@ def apply_discount(price, tier):
     const fns = result.functions;
     if (!fns.length) { renderEmpty(mode); updateStats(result); return; }
     const ax = axisMax(result.max_complexity), sorted = [...fns].sort((a, b) => b.complexity - a.complexity), worst = sorted[0], wc = COLOR[worst.rank];
-    const badge = mode === "engine" ? `<span class="badge badge-engine"><span class="dot"></span>Engine result</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
+    const badge = (mode === "engine" || mode === "js" || mode === "ts") ? `<span class="badge badge-engine"><span class="dot"></span>${mode === "js" ? "Exact \u00b7 Acorn" : mode === "ts" ? "Exact \u00b7 Tree-sitter" : "Engine result"}</span>` : `<span class="badge badge-est"><span class="dot"></span>Quick estimate</span>`;
     const rows = sorted.map(f => { const c = COLOR[f.rank], w = Math.max(4, (f.complexity / ax) * 100); return `<div class="fnrow"><div class="fnrow-head"><span class="fnrow-name">${esc(f.name)}</span><span class="fnrow-score" style="color:${c}">${f.complexity}</span></div><div class="bar-wrap"><div class="bar-fill" data-w="${w}" style="background:${c}"></div></div><div class="fnrow-meta">lines ${f.lineno}–${f.end_lineno} &nbsp;·&nbsp; <span class="pill" style="background:${c};color:#fff">${f.rank}</span></div></div>`; }).join("");
-    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--coral)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces — same as the API." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>`;
+    var cxTabEl = document.querySelector("#cxTabs .tab.is-active");
+    var cxSrc = cxTabEl ? cxTabEl.textContent.replace(/^\+\s*/, "").trim() : "";
+    var cxRep = {
+      title: "susgrade \u2014 complexity report",
+      subtitle: labelFor(lang) + (cxSrc ? " \u00b7 " + cxSrc : ""),
+      summaryText: fns.length + " function" + (fns.length !== 1 ? "s" : "") + " \u00b7 total complexity " + result.total_complexity + " \u00b7 max " + result.max_complexity + " (" + worst.name + ")",
+      summary: { functions: fns.length, total_complexity: result.total_complexity, average_complexity: result.average_complexity, max_complexity: result.max_complexity },
+      columns: [{ key: "function", label: "Function" }, { key: "complexity", label: "Cyclomatic complexity" }, { key: "rank", label: "Rank" }, { key: "lines", label: "Lines" }],
+      rows: sorted.map(function (f) { return { function: f.name, complexity: f.complexity, rank: f.rank, lines: f.lineno + "\u2013" + f.end_lineno }; }),
+      slug: "susgrade-complexity-" + lang
+    };
+    reportEl.innerHTML = `<div class="report-top"><div class="eyebrow"><span class="slash" style="color:var(--green)">/</span> complexity report</div>${badge}</div><div class="verdict"><div class="verdict-label">Gnarliest function</div><div class="verdict-fn">${esc(worst.name)}</div><div class="verdict-row"><div class="verdict-num" style="color:${wc}">${worst.complexity}</div><div class="verdict-say">${SAY[worst.rank]}</div></div></div>${rows}<div class="footnote"><span>${mode === "engine" ? "<b>Straight from the engine.</b> The exact numbers Python's AST produces \u2014 same as the API." : mode === "js" ? "<b>Exact, parsed with Acorn.</b> Real cyclomatic complexity from JavaScript's own syntax tree." : mode === "ts" ? "<b>Exact, parsed with Tree-sitter.</b> Real cyclomatic complexity from the language's own grammar." : "<b>Quick in-browser estimate.</b> Great for a live peek; the API uses Python's AST for exact scores."}</span></div>${expBar("--green")}`;
     requestAnimationFrame(() => requestAnimationFrame(() => { reportEl.querySelectorAll(".bar-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }); }));
     updateStats(result); renderedSrc = codeEl.value; updateHint();
+    expWire(reportEl, cxRep);
   }
-  function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some Python on the left and hit Analyze to see where the risk hides."}</p></div>`; }
+  function renderEmpty(mode) { reportEl.innerHTML = `<div class="empty"><div class="empty-big">${mode === "syntax" ? "Hmm, that won't parse" : "Nothing scored yet"}</div><p>${mode === "syntax" ? "Looks like a syntax slip — fix it and hit Analyze again." : "Drop some code on the left and hit Analyze to see where the risk hides."}</p></div>`; }
   function updateStats(r) { countUp($("st-fns"), r.functions.length, 0); countUp($("st-total"), r.total_complexity, 0); countUp($("st-avg"), r.average_complexity, 1); countUp($("st-max"), r.max_complexity, 0); }
   function estimate(source) {
     const raw = source.replace(/\r\n/g, "\n").split("\n"), clean = raw.map(stripSC), ind = (s) => s.length - s.replace(/^\s+/, "").length;
@@ -769,16 +1405,122 @@ def apply_discount(price, tier):
   }
   function stripSC(line) { let o = "", i = 0, q = null; while (i < line.length) { const c = line[i]; if (q) { if (c === q) q = null; i++; continue; } if (c === "#") break; if (c === '"' || c === "'") { q = c; i++; continue; } o += c; i++; } return o; }
   function toResult(fns) { if (!fns.length) return { functions: [], total_complexity: 0, average_complexity: 0, max_complexity: 0 }; const total = fns.reduce((s, f) => s + f.complexity, 0); return { functions: fns, total_complexity: total, average_complexity: Math.round((total / fns.length) * 100) / 100, max_complexity: Math.max(...fns.map(f => f.complexity)) }; }
-  function setTab(key) { document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === key)); if (key === "custom") { codeEl.value = ""; syncGutter(); renderEmpty("initial"); renderedSrc = ""; updateHint(); codeEl.focus(); } else { codeEl.value = SAMPLES[key].src; syncGutter(); render(SAMPLES[key].result, "engine"); } }
-  function runAnalyze() { const src = codeEl.value; if (!src.trim()) { renderEmpty("initial"); return; } render(toResult(estimate(src)), "estimate"); document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === "custom")); }
+  function setTab(key) {
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("is-active", t.dataset.tab === key); });
+    if (key === "custom") { codeEl.value = ""; syncGutter(); renderEmpty("initial"); renderedSrc = ""; updateHint(); codeEl.focus(); return; }
+    var sample = SAMPLES[lang][key];
+    codeEl.value = sample.src; syncGutter();
+    renderedSrc = codeEl.value; updateHint();
+    if (lang === "js") { try { render(analyzeJS(sample.src, window.acorn), "js"); } catch (e) { renderEmpty("syntax"); } }
+    else if (TS_LANGS[lang]) { reportEl.innerHTML = loadingHTML(); analyzeWithTS(sample.src, lang).then(function (r) { render(r, "ts"); }).catch(function () { renderEmpty("syntax"); }); }
+    else { render(sample.result, "engine"); }
+  }
+  async function runAnalyze() {
+    var src = codeEl.value;
+    if (!src.trim()) { renderEmpty("initial"); return; }
+    cxTabsEl.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("is-active", t.dataset.tab === "custom"); });
+    if (lang === "js") {
+      var acorn;
+      try { acorn = await ensureAcorn(); } catch (e) { toast("Couldn\u2019t load the JavaScript parser \u2014 check your connection."); renderEmpty("initial"); return; }
+      var resj; try { resj = analyzeJS(src, acorn); } catch (e) { renderEmpty("syntax"); return; }
+      render(resj, "js");
+    } else if (TS_LANGS[lang]) {
+      reportEl.innerHTML = loadingHTML();
+      var rest;
+      try { rest = await analyzeWithTS(src, lang); }
+      catch (e) { if (String(e && e.message).indexOf("load") >= 0) { toast("Couldn\u2019t load the parser \u2014 check your connection."); renderEmpty("initial"); } else { renderEmpty("syntax"); } return; }
+      render(rest, "ts");
+    } else {
+      render(toResult(estimate(src)), "estimate");
+    }
+  }
   function updateHint() { hintEl.classList.toggle("show", codeEl.value !== renderedSrc && codeEl.value.trim() !== ""); }
-  document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
   $("analyze").addEventListener("click", runAnalyze);
   codeEl.addEventListener("input", () => { syncGutter(); updateHint(); });
   codeEl.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); runAnalyze(); } });
+  document.querySelectorAll(".lang-btn").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  renderTabs();
   setTab("router");
 
-  /* ---- MUTATION TESTING (runs in your browser via Pyodide — no backend) ---- */
+  /* ---- susgrade in-browser engine (shared by mutation + risk) ---- */
+  /* Prefers a Web Worker so a hung mutant can be killed by terminating it. If
+     the page's CSP blocks Blob-URL Workers (e.g. some sandboxes), it falls back
+     to running Pyodide on the main thread — works everywhere, but a runaway
+     mutant can't be force-interrupted in that mode. */
+  const SUS = (function () {
+    const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+    const PY = "\"\"\"susgrade mutation engine \u2014 browser build (runs inside Pyodide).\n\nMutant GENERATION is byte-for-byte the same logic as the backend\n(backend/app/analysis/mutation.py). Only EXECUTION differs: instead of\nwriting files and spawning pytest subprocesses, tests run in-process inside\nthis single Pyodide interpreter. The operators, scoring, and survivor output\nare identical.\n\"\"\"\n\nimport ast\nimport copy\nimport sys\nimport types\nimport json\n\n# ---- operator tables (identical to the backend) ----\n_BINOP_SYM = {ast.Add: \"+\", ast.Sub: \"-\", ast.Mult: \"*\",\n              ast.Div: \"/\", ast.FloorDiv: \"//\", ast.Mod: \"%\", ast.Pow: \"**\"}\n_BINOP_SWAPS = {ast.Add: [ast.Sub], ast.Sub: [ast.Add],\n                ast.Mult: [ast.Div], ast.Div: [ast.Mult],\n                ast.FloorDiv: [ast.Div], ast.Mod: [ast.Mult], ast.Pow: [ast.Mult]}\n_CMP_SYM = {ast.Lt: \"<\", ast.LtE: \"<=\", ast.Gt: \">\", ast.GtE: \">=\",\n            ast.Eq: \"==\", ast.NotEq: \"!=\", ast.Is: \"is\", ast.IsNot: \"is not\",\n            ast.In: \"in\", ast.NotIn: \"not in\"}\n_CMP_SWAPS = {ast.Lt: [ast.LtE, ast.Gt], ast.Gt: [ast.GtE, ast.Lt],\n              ast.LtE: [ast.Lt, ast.GtE], ast.GtE: [ast.Gt, ast.LtE],\n              ast.Eq: [ast.NotEq], ast.NotEq: [ast.Eq],\n              ast.Is: [ast.IsNot], ast.IsNot: [ast.Is],\n              ast.In: [ast.NotIn], ast.NotIn: [ast.In]}\n_BOOL_SYM = {ast.And: \"and\", ast.Or: \"or\"}\n_BOOL_SWAP = {ast.And: ast.Or, ast.Or: ast.And}\n_UNARY_SYM = {ast.USub: \"-\", ast.UAdd: \"+\"}\n_UNARY_SWAP = {ast.USub: ast.UAdd, ast.UAdd: ast.USub}\n\n_MAX_MUTANTS = 150\n\n\ndef _apply(node, kind, sub, new):\n    if kind == \"binop\":\n        node.op = new()\n    elif kind == \"compare\":\n        node.ops[sub] = new()\n    elif kind == \"boolop\":\n        node.op = new()\n    elif kind == \"unaryop\":\n        node.op = new()\n    elif kind == \"const\":\n        node.value = new\n\n\ndef generate_mutants(source):\n    tree = ast.parse(source)\n    recipes = []\n    for wi, node in enumerate(ast.walk(tree)):\n        ln = getattr(node, \"lineno\", 0)\n        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:\n            sym = _BINOP_SYM[type(node.op)]\n            for rep in _BINOP_SWAPS[type(node.op)]:\n                recipes.append((wi, \"binop\", None, rep, \"AOR\",\n                                \"'%s' -> '%s'\" % (sym, _BINOP_SYM[rep]), ln))\n        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:\n            sym = _BINOP_SYM[type(node.op)]\n            for rep in _BINOP_SWAPS[type(node.op)]:\n                recipes.append((wi, \"binop\", None, rep, \"AOR\",\n                                \"'%s=' -> '%s='\" % (sym, _BINOP_SYM[rep]), ln))\n        elif isinstance(node, ast.Compare):\n            for k, op in enumerate(node.ops):\n                if type(op) in _CMP_SWAPS:\n                    sym = _CMP_SYM[type(op)]\n                    for rep in _CMP_SWAPS[type(op)]:\n                        recipes.append((wi, \"compare\", k, rep, \"ROR\",\n                                        \"'%s' -> '%s'\" % (sym, _CMP_SYM[rep]), ln))\n        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:\n            rep = _BOOL_SWAP[type(node.op)]\n            recipes.append((wi, \"boolop\", None, rep, \"LOR\",\n                            \"'%s' -> '%s'\" % (_BOOL_SYM[type(node.op)], _BOOL_SYM[rep]), ln))\n        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:\n            rep = _UNARY_SWAP[type(node.op)]\n            recipes.append((wi, \"unaryop\", None, rep, \"UOR\",\n                            \"unary '%s' -> '%s'\" % (_UNARY_SYM[type(node.op)], _UNARY_SYM[rep]), ln))\n        elif isinstance(node, ast.Constant):\n            v = node.value\n            if isinstance(v, bool):\n                recipes.append((wi, \"const\", None, (not v), \"BCR\", \"%s -> %s\" % (v, not v), ln))\n            elif isinstance(v, (int, float)):\n                recipes.append((wi, \"const\", None, v + 1, \"NCR\", \"%s -> %s\" % (v, v + 1), ln))\n                if v != 0:\n                    recipes.append((wi, \"const\", None, 0, \"NCR\", \"%s -> 0\" % (v,), ln))\n\n    mutants = []\n    for wi, kind, sub, new, operator, desc, ln in recipes:\n        mtree = copy.deepcopy(tree)\n        for j, node in enumerate(ast.walk(mtree)):\n            if j == wi:\n                _apply(node, kind, sub, new)\n                break\n        ast.fix_missing_locations(mtree)\n        mutants.append({\"operator\": operator, \"description\": desc,\n                        \"lineno\": ln, \"source\": ast.unparse(mtree)})\n    return mutants\n\n\ndef _run_tests_against(subject_src, tests_src):\n    \"\"\"Run tests_src against subject_src in-process. Returns (all_passed, num_ran).\n\n    Same classification as the backend's pytest run: any failing/erroring test,\n    or code that won't import, means (False, ...). The subject is exposed as a\n    module named ``subject`` so tests can ``from subject import ...``.\n    \"\"\"\n    import io\n    import unittest\n\n    subj = types.ModuleType(\"subject\")\n    sys.modules[\"subject\"] = subj\n    try:\n        exec(compile(subject_src, \"subject.py\", \"exec\"), subj.__dict__)\n    except Exception:\n        return (False, 0)\n\n    ns = {\"__name__\": \"test_subject\"}\n    try:\n        exec(compile(tests_src, \"test_subject.py\", \"exec\"), ns)\n    except Exception:\n        return (False, 0)\n\n    ran = 0\n    # unittest.TestCase classes\n    suite = unittest.TestSuite()\n    loader = unittest.TestLoader()\n    found_case = False\n    for v in list(ns.values()):\n        if isinstance(v, type) and issubclass(v, unittest.TestCase):\n            suite.addTests(loader.loadTestsFromTestCase(v))\n            found_case = True\n    if found_case:\n        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)\n        ran += res.testsRun\n        if not res.wasSuccessful():\n            return (False, ran)\n\n    # plain test_* functions\n    for k, v in list(ns.items()):\n        if k.startswith(\"test\") and callable(v) and not isinstance(v, type):\n            ran += 1\n            try:\n                v()\n            except Exception:\n                return (False, ran)\n\n    return (True, ran)\n\n\n# ---- cyclomatic complexity (McCabe, per-function) \u2014 identical to the backend ----\n\ndef _rank(c):\n    if c <= 5:\n        return \"simple\"\n    if c <= 10:\n        return \"moderate\"\n    if c <= 20:\n        return \"complex\"\n    return \"very complex\"\n\n\nclass _CxVisitor(ast.NodeVisitor):\n    def __init__(self):\n        self.complexity = 1\n\n    def visit_If(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_For(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_AsyncFor(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_While(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_ExceptHandler(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_BoolOp(self, n):\n        self.complexity += len(n.values) - 1; self.generic_visit(n)\n\n    def visit_IfExp(self, n):\n        self.complexity += 1; self.generic_visit(n)\n\n    def visit_comprehension(self, n):\n        self.complexity += len(n.ifs); self.generic_visit(n)\n\n    def visit_Match(self, n):\n        for case in n.cases:\n            is_wild = isinstance(case.pattern, ast.MatchAs) and case.pattern.pattern is None\n            if not (is_wild and case.guard is None):\n                self.complexity += 1\n        self.generic_visit(n)\n\n    def visit_FunctionDef(self, n):\n        pass\n\n    def visit_AsyncFunctionDef(self, n):\n        pass\n\n    def visit_ClassDef(self, n):\n        pass\n\n\ndef _func_complexity(node):\n    v = _CxVisitor()\n    for stmt in node.body:\n        v.visit(stmt)\n    return v.complexity\n\n\nclass _FuncCollector(ast.NodeVisitor):\n    def __init__(self):\n        self.results = []\n        self._scope = []\n\n    def _fn(self, node):\n        name = \".\".join(self._scope + [node.name])\n        self.results.append({\n            \"name\": name,\n            \"lineno\": node.lineno,\n            \"end_lineno\": getattr(node, \"end_lineno\", node.lineno),\n            \"complexity\": _func_complexity(node),\n        })\n        self._scope.append(node.name)\n        self.generic_visit(node)\n        self._scope.pop()\n\n    def visit_FunctionDef(self, n):\n        self._fn(n)\n\n    def visit_AsyncFunctionDef(self, n):\n        self._fn(n)\n\n    def visit_ClassDef(self, n):\n        self._scope.append(n.name)\n        self.generic_visit(n)\n        self._scope.pop()\n\n\ndef analyze_complexity(source):\n    tree = ast.parse(source)\n    c = _FuncCollector()\n    c.visit(tree)\n    fns = sorted(c.results, key=lambda f: f[\"lineno\"])\n    for f in fns:\n        f[\"rank\"] = _rank(f[\"complexity\"])\n    return fns\n\n\ndef _attribute(functions, lineno):\n    \"\"\"Innermost function whose line range contains `lineno`, else None.\"\"\"\n    best = None\n    for f in functions:\n        if f[\"lineno\"] <= lineno <= f[\"end_lineno\"]:\n            if best is None or f[\"lineno\"] > best[\"lineno\"]:\n                best = f\n    return best[\"name\"] if best else None\n\n\ndef prepare(source, tests):\n    \"\"\"Generate mutants, per-function complexity, and run the baseline.\n\n    Each mutant is tagged with the innermost function it belongs to (``func``),\n    so the caller can compute a per-function mutation score and the fused risk\n    score. Returns a JSON string.\n    \"\"\"\n    try:\n        mutants = generate_mutants(source)\n    except SyntaxError as e:\n        return json.dumps({\"error\": \"source\", \"detail\": \"Line %s: %s\" % (e.lineno, e.msg)})\n    try:\n        ast.parse(tests)\n    except SyntaxError as e:\n        return json.dumps({\"error\": \"tests\", \"detail\": \"Line %s: %s\" % (e.lineno, e.msg)})\n\n    functions = analyze_complexity(source)\n    for m in mutants:\n        m[\"func\"] = _attribute(functions, m[\"lineno\"])\n\n    passed, ran = _run_tests_against(source, tests)\n    capped = len(mutants) > _MAX_MUTANTS\n    run_list = mutants[:_MAX_MUTANTS]\n    return json.dumps({\n        \"error\": None,\n        \"no_tests\": ran == 0,\n        \"baseline_passed\": bool(passed and ran > 0),\n        \"total_generated\": len(mutants),\n        \"capped\": capped,\n        \"functions\": functions,\n        \"mutants\": run_list,\n    })\n\n\ndef run_mutant(mutant_src, tests_src):\n    \"\"\"True if the mutant is killed (tests fail on it), False if it survives.\"\"\"\n    passed, _ = _run_tests_against(mutant_src, tests_src)\n    return not passed\n";
+    const WORKER_SRC = "const PYODIDE_URL = \"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/\";\nimportScripts(PYODIDE_URL + \"pyodide.js\");\nlet pyodide = null, engineCode = \"\";\nasync function ensure() {\n  if (!pyodide) {\n    pyodide = await loadPyodide({ indexURL: PYODIDE_URL });\n    pyodide.runPython(engineCode);\n  }\n}\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    if (m.type === \"init\") { engineCode = m.py; self.postMessage({ id: m.id, ok: true, data: {} }); return; }\n    await ensure();\n    if (m.type === \"prepare\") {\n      const f = pyodide.globals.get(\"prepare\");\n      const out = f(m.source, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: JSON.parse(out) });\n    } else if (m.type === \"runMutant\") {\n      const f = pyodide.globals.get(\"run_mutant\");\n      const killed = f(m.mutantSource, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: { killed: !!killed } });\n    }\n  } catch (err) {\n    self.postMessage({ id: m.id, ok: false, error: String(err && err.message ? err.message : err) });\n  }\n};\n";
+    let mode = null;                        // "worker" | "main"
+    let worker = null, seq = 0; const pending = {};
+    let mainPy = null;
+
+    function attach(w) {
+      w.onmessage = (e) => { const d = e.data; const p = pending[d.id]; if (!p) return; delete pending[d.id]; if (p.t) clearTimeout(p.t); d.ok ? p.res(d.data) : p.rej(new Error(d.error || "worker error")); };
+      w.onerror = (ev) => { for (const k in pending) { const p = pending[k]; delete pending[k]; if (p.t) clearTimeout(p.t); p.rej(new Error(ev.message || "worker failed to load")); } };
+    }
+    function spawn() { worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "application/javascript" }))); attach(worker); }
+    function callWorker(type, payload, timeoutMs) {
+      return new Promise((res, rej) => {
+        const id = ++seq; const p = { res, rej, t: null }; pending[id] = p;
+        if (timeoutMs) p.t = setTimeout(() => { if (pending[id]) { delete pending[id]; const e = new Error("timeout"); e.__timeout = true; rej(e); } }, timeoutMs);
+        worker.postMessage(Object.assign({ id: id, type: type }, payload));
+      });
+    }
+    function killWorker() { if (worker) { try { worker.terminate(); } catch (e) {} worker = null; } }
+
+    function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("script load failed")); document.head.appendChild(s); }); }
+    function withTimeout(promise, ms) {
+      let t; const timer = new Promise((_, rej) => { t = setTimeout(() => { const e = new Error("timeout"); e.__timeout = true; rej(e); }, ms); });
+      return Promise.race([Promise.resolve(promise).finally(() => clearTimeout(t)), timer]);
+    }
+    function ensureMain() {
+      if (!mainPy) mainPy = withTimeout((async () => { await loadScript(PYODIDE_URL + "pyodide.js"); const py = await loadPyodide({ indexURL: PYODIDE_URL }); py.runPython(PY); return py; })(), 60000);
+      return mainPy;
+    }
+
+    async function ensureMode() {
+      if (mode) return;
+      try { spawn(); await callWorker("init", { py: PY }); mode = "worker"; }
+      catch (e) { killWorker(); mode = "main"; }
+    }
+
+    async function analyze(source, tests, onProgress) {
+      await ensureMode();
+      if (mode === "worker") {
+        let prep;
+        try { prep = await callWorker("prepare", { source: source, tests: tests }, 60000); }
+        catch (e) { killWorker(); if (e && e.__timeout) throw new Error("Couldn\u2019t load the Python runtime here (WebAssembly may be blocked). It runs on your deployed page \u2014 open that URL and try there."); throw e; }
+        if (prep.error || prep.no_tests || !prep.baseline_passed) return { prep: prep };
+        const mutants = prep.mutants; const results = [];
+        for (let i = 0; i < mutants.length; i++) {
+          if (onProgress) onProgress(i, mutants.length);
+          try { const r = await callWorker("runMutant", { mutantSource: mutants[i].source, tests: tests }, 5000); results.push({ m: mutants[i], killed: r.killed, timedOut: false }); }
+          catch (e) { if (e && e.__timeout) { results.push({ m: mutants[i], killed: true, timedOut: true }); killWorker(); spawn(); await callWorker("init", { py: PY }); } else throw e; }
+        }
+        return { prep: prep, results: results };
+      }
+      // main-thread fallback (no per-mutant interrupt)
+      let py;
+      try { py = await ensureMain(); }
+      catch (e) { mainPy = null; throw new Error("Couldn\u2019t load the Python runtime in this environment \u2014 it needs WebAssembly, which some preview sandboxes block. This runs on your deployed page (GitHub Pages); open that URL and try there."); }
+      const pf = py.globals.get("prepare"); const prep = JSON.parse(pf(source, tests)); pf.destroy();
+      if (prep.error || prep.no_tests || !prep.baseline_passed) return { prep: prep };
+      const mutants = prep.mutants; const results = []; const rf = py.globals.get("run_mutant");
+      for (let i = 0; i < mutants.length; i++) {
+        if (onProgress) onProgress(i, mutants.length);
+        await new Promise(r => setTimeout(r, 0));
+        let killed = false;
+        try { killed = rf(mutants[i].source, tests); } catch (e) { killed = true; }
+        results.push({ m: mutants[i], killed: !!killed, timedOut: false });
+      }
+      rf.destroy();
+      return { prep: prep, results: results };
+    }
+    return { analyze: analyze };
+  })();
+
+  /* ---- MUTATION TESTING (in your browser via Pyodide) ---- */
   (function mutationTesting() {
     const codeTa = $("mutCode"), testsTa = $("mutTests"), runBtn = $("mutRun"), report = $("mutReport");
     if (!codeTa || !testsTa || !runBtn || !report) return;
@@ -790,46 +1532,28 @@ def apply_discount(price, tier):
     const msg = (html) => { report.innerHTML = '<div class="mut-msg">' + html + '</div>'; };
     const loading = (label) => { report.innerHTML = '<div class="mut-loading"><div class="mut-spin"></div><div>' + label + '</div></div>'; };
 
-    const WORKER_SRC = "const PYODIDE_URL = \"https://cdn.jsdelivr.net/pyodide/v0.26.4/full/\";\nimportScripts(PYODIDE_URL + \"pyodide.js\");\nlet pyodide = null;\nconst PY = \"\\\"\\\"\\\"susgrade mutation engine \\u2014 browser build (runs inside Pyodide).\\n\\nMutant GENERATION is byte-for-byte the same logic as the backend\\n(backend/app/analysis/mutation.py). Only EXECUTION differs: instead of\\nwriting files and spawning pytest subprocesses, tests run in-process inside\\nthis single Pyodide interpreter. The operators, scoring, and survivor output\\nare identical.\\n\\\"\\\"\\\"\\n\\nimport ast\\nimport copy\\nimport sys\\nimport types\\nimport json\\n\\n# ---- operator tables (identical to the backend) ----\\n_BINOP_SYM = {ast.Add: \\\"+\\\", ast.Sub: \\\"-\\\", ast.Mult: \\\"*\\\",\\n              ast.Div: \\\"/\\\", ast.FloorDiv: \\\"//\\\", ast.Mod: \\\"%\\\", ast.Pow: \\\"**\\\"}\\n_BINOP_SWAPS = {ast.Add: [ast.Sub], ast.Sub: [ast.Add],\\n                ast.Mult: [ast.Div], ast.Div: [ast.Mult],\\n                ast.FloorDiv: [ast.Div], ast.Mod: [ast.Mult], ast.Pow: [ast.Mult]}\\n_CMP_SYM = {ast.Lt: \\\"<\\\", ast.LtE: \\\"<=\\\", ast.Gt: \\\">\\\", ast.GtE: \\\">=\\\",\\n            ast.Eq: \\\"==\\\", ast.NotEq: \\\"!=\\\", ast.Is: \\\"is\\\", ast.IsNot: \\\"is not\\\",\\n            ast.In: \\\"in\\\", ast.NotIn: \\\"not in\\\"}\\n_CMP_SWAPS = {ast.Lt: [ast.LtE, ast.Gt], ast.Gt: [ast.GtE, ast.Lt],\\n              ast.LtE: [ast.Lt, ast.GtE], ast.GtE: [ast.Gt, ast.LtE],\\n              ast.Eq: [ast.NotEq], ast.NotEq: [ast.Eq],\\n              ast.Is: [ast.IsNot], ast.IsNot: [ast.Is],\\n              ast.In: [ast.NotIn], ast.NotIn: [ast.In]}\\n_BOOL_SYM = {ast.And: \\\"and\\\", ast.Or: \\\"or\\\"}\\n_BOOL_SWAP = {ast.And: ast.Or, ast.Or: ast.And}\\n_UNARY_SYM = {ast.USub: \\\"-\\\", ast.UAdd: \\\"+\\\"}\\n_UNARY_SWAP = {ast.USub: ast.UAdd, ast.UAdd: ast.USub}\\n\\n_MAX_MUTANTS = 150\\n\\n\\ndef _apply(node, kind, sub, new):\\n    if kind == \\\"binop\\\":\\n        node.op = new()\\n    elif kind == \\\"compare\\\":\\n        node.ops[sub] = new()\\n    elif kind == \\\"boolop\\\":\\n        node.op = new()\\n    elif kind == \\\"unaryop\\\":\\n        node.op = new()\\n    elif kind == \\\"const\\\":\\n        node.value = new\\n\\n\\ndef generate_mutants(source):\\n    tree = ast.parse(source)\\n    recipes = []\\n    for wi, node in enumerate(ast.walk(tree)):\\n        ln = getattr(node, \\\"lineno\\\", 0)\\n        if isinstance(node, ast.BinOp) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s' -> '%s'\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.AugAssign) and type(node.op) in _BINOP_SWAPS:\\n            sym = _BINOP_SYM[type(node.op)]\\n            for rep in _BINOP_SWAPS[type(node.op)]:\\n                recipes.append((wi, \\\"binop\\\", None, rep, \\\"AOR\\\",\\n                                \\\"'%s=' -> '%s='\\\" % (sym, _BINOP_SYM[rep]), ln))\\n        elif isinstance(node, ast.Compare):\\n            for k, op in enumerate(node.ops):\\n                if type(op) in _CMP_SWAPS:\\n                    sym = _CMP_SYM[type(op)]\\n                    for rep in _CMP_SWAPS[type(op)]:\\n                        recipes.append((wi, \\\"compare\\\", k, rep, \\\"ROR\\\",\\n                                        \\\"'%s' -> '%s'\\\" % (sym, _CMP_SYM[rep]), ln))\\n        elif isinstance(node, ast.BoolOp) and type(node.op) in _BOOL_SWAP:\\n            rep = _BOOL_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"boolop\\\", None, rep, \\\"LOR\\\",\\n                            \\\"'%s' -> '%s'\\\" % (_BOOL_SYM[type(node.op)], _BOOL_SYM[rep]), ln))\\n        elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY_SWAP:\\n            rep = _UNARY_SWAP[type(node.op)]\\n            recipes.append((wi, \\\"unaryop\\\", None, rep, \\\"UOR\\\",\\n                            \\\"unary '%s' -> '%s'\\\" % (_UNARY_SYM[type(node.op)], _UNARY_SYM[rep]), ln))\\n        elif isinstance(node, ast.Constant):\\n            v = node.value\\n            if isinstance(v, bool):\\n                recipes.append((wi, \\\"const\\\", None, (not v), \\\"BCR\\\", \\\"%s -> %s\\\" % (v, not v), ln))\\n            elif isinstance(v, (int, float)):\\n                recipes.append((wi, \\\"const\\\", None, v + 1, \\\"NCR\\\", \\\"%s -> %s\\\" % (v, v + 1), ln))\\n                if v != 0:\\n                    recipes.append((wi, \\\"const\\\", None, 0, \\\"NCR\\\", \\\"%s -> 0\\\" % (v,), ln))\\n\\n    mutants = []\\n    for wi, kind, sub, new, operator, desc, ln in recipes:\\n        mtree = copy.deepcopy(tree)\\n        for j, node in enumerate(ast.walk(mtree)):\\n            if j == wi:\\n                _apply(node, kind, sub, new)\\n                break\\n        ast.fix_missing_locations(mtree)\\n        mutants.append({\\\"operator\\\": operator, \\\"description\\\": desc,\\n                        \\\"lineno\\\": ln, \\\"source\\\": ast.unparse(mtree)})\\n    return mutants\\n\\n\\ndef _run_tests_against(subject_src, tests_src):\\n    \\\"\\\"\\\"Run tests_src against subject_src in-process. Returns (all_passed, num_ran).\\n\\n    Same classification as the backend's pytest run: any failing/erroring test,\\n    or code that won't import, means (False, ...). The subject is exposed as a\\n    module named ``subject`` so tests can ``from subject import ...``.\\n    \\\"\\\"\\\"\\n    import io\\n    import unittest\\n\\n    subj = types.ModuleType(\\\"subject\\\")\\n    sys.modules[\\\"subject\\\"] = subj\\n    try:\\n        exec(compile(subject_src, \\\"subject.py\\\", \\\"exec\\\"), subj.__dict__)\\n    except Exception:\\n        return (False, 0)\\n\\n    ns = {\\\"__name__\\\": \\\"test_subject\\\"}\\n    try:\\n        exec(compile(tests_src, \\\"test_subject.py\\\", \\\"exec\\\"), ns)\\n    except Exception:\\n        return (False, 0)\\n\\n    ran = 0\\n    # unittest.TestCase classes\\n    suite = unittest.TestSuite()\\n    loader = unittest.TestLoader()\\n    found_case = False\\n    for v in list(ns.values()):\\n        if isinstance(v, type) and issubclass(v, unittest.TestCase):\\n            suite.addTests(loader.loadTestsFromTestCase(v))\\n            found_case = True\\n    if found_case:\\n        res = unittest.TextTestRunner(stream=io.StringIO(), verbosity=0).run(suite)\\n        ran += res.testsRun\\n        if not res.wasSuccessful():\\n            return (False, ran)\\n\\n    # plain test_* functions\\n    for k, v in list(ns.items()):\\n        if k.startswith(\\\"test\\\") and callable(v) and not isinstance(v, type):\\n            ran += 1\\n            try:\\n                v()\\n            except Exception:\\n                return (False, ran)\\n\\n    return (True, ran)\\n\\n\\ndef prepare(source, tests):\\n    \\\"\\\"\\\"Generate mutants and run the baseline. Returns a JSON string.\\\"\\\"\\\"\\n    try:\\n        mutants = generate_mutants(source)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"source\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n    try:\\n        ast.parse(tests)\\n    except SyntaxError as e:\\n        return json.dumps({\\\"error\\\": \\\"tests\\\", \\\"detail\\\": \\\"Line %s: %s\\\" % (e.lineno, e.msg)})\\n\\n    passed, ran = _run_tests_against(source, tests)\\n    capped = len(mutants) > _MAX_MUTANTS\\n    run_list = mutants[:_MAX_MUTANTS]\\n    return json.dumps({\\n        \\\"error\\\": None,\\n        \\\"no_tests\\\": ran == 0,\\n        \\\"baseline_passed\\\": bool(passed and ran > 0),\\n        \\\"total_generated\\\": len(mutants),\\n        \\\"capped\\\": capped,\\n        \\\"mutants\\\": run_list,\\n    })\\n\\n\\ndef run_mutant(mutant_src, tests_src):\\n    \\\"\\\"\\\"True if the mutant is killed (tests fail on it), False if it survives.\\\"\\\"\\\"\\n    passed, _ = _run_tests_against(mutant_src, tests_src)\\n    return not passed\\n\";\nasync function ensure() {\n  if (!pyodide) {\n    pyodide = await loadPyodide({ indexURL: PYODIDE_URL });\n    pyodide.runPython(PY);\n  }\n}\nself.onmessage = async (e) => {\n  const m = e.data;\n  try {\n    await ensure();\n    if (m.type === \"prepare\") {\n      const f = pyodide.globals.get(\"prepare\");\n      const out = f(m.source, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: JSON.parse(out) });\n    } else if (m.type === \"runMutant\") {\n      const f = pyodide.globals.get(\"run_mutant\");\n      const killed = f(m.mutantSource, m.tests);\n      f.destroy();\n      self.postMessage({ id: m.id, ok: true, data: { killed: !!killed } });\n    }\n  } catch (err) {\n    self.postMessage({ id: m.id, ok: false, error: String(err && err.message ? err.message : err) });\n  }\n};\n";
-    let worker = null, seq = 0; const pending = {};
-    function spawn() {
-      worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "application/javascript" })));
-      worker.onmessage = (e) => {
-        const d = e.data; const p = pending[d.id]; if (!p) return;
-        delete pending[d.id]; if (p.t) clearTimeout(p.t);
-        d.ok ? p.res(d.data) : p.rej(new Error(d.error || "worker error"));
-      };
-      worker.onerror = (ev) => {
-        for (const k in pending) { const p = pending[k]; delete pending[k]; if (p.t) clearTimeout(p.t); p.rej(new Error(ev.message || "worker failed to load")); }
-      };
+    function showPrep(prep) {
+      if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return true; }
+      if (!prep.baseline_passed) { msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>Mutation testing needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>'); return true; }
+      return false;
     }
-    function callWorker(type, payload, timeoutMs) {
-      return new Promise((res, rej) => {
-        const id = ++seq; const p = { res, rej, t: null }; pending[id] = p;
-        if (timeoutMs) p.t = setTimeout(() => { if (pending[id]) { delete pending[id]; const e = new Error("timeout"); e.__timeout = true; rej(e); } }, timeoutMs);
-        worker.postMessage(Object.assign({ id: id, type: type }, payload));
-      });
-    }
-    function kill() { if (worker) { try { worker.terminate(); } catch (e) {} worker = null; } }
 
-    function render(d) {
-      if (!d.baseline_passed) {
-        msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>Mutation testing needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>');
-        return;
-      }
-      const pct = Math.round(d.mutation_score * 100);
-      const band = pct >= 80 ? "hi" : pct >= 50 ? "mid" : "lo";
-      const survHTML = d.survivors.length
-        ? d.survivors.map(s => '<div class="mut-surv"><span class="mut-op op-' + s.operator + '">' + s.operator + '</span><span class="mut-line">line ' + s.lineno + '</span><span class="mut-desc">' + escHtml(s.description) + '</span></div>').join("")
+    function render(total, killed, survived, timedOut, survivors) {
+      const pct = total ? Math.round((killed / total) * 100) : 100;
+      const b = pct >= 80 ? "hi" : pct >= 50 ? "mid" : "lo";
+      const survHTML = survivors.length
+        ? survivors.map(m => '<div class="mut-surv"><span class="mut-op op-' + m.operator + '">' + m.operator + '</span><span class="mut-line">line ' + m.lineno + '</span><span class="mut-desc">' + escHtml(m.description) + '</span></div>').join("")
         : '<div class="mut-allkilled">Every mutant was killed \u2014 your tests caught all of them. \uD83C\uDFAF</div>';
-      const verdict = d.survived === 0
-        ? "All " + d.total_run + " mutants killed. That's a thorough suite."
-        : d.survived + " of " + d.total_run + " mutants survived \u2014 each is a change your tests don't catch.";
-      const timed = d.timed_out ? ' \u00b7 <span class="mut-stat"><b>timed out</b> ' + d.timed_out + '</span>' : "";
+      const verdict = survived === 0
+        ? "All " + total + " mutants killed. That's a thorough suite."
+        : survived + " of " + total + " mutants survived \u2014 each is a change your tests don't catch.";
+      const timed = timedOut ? ' \u00b7 <span class="mut-stat"><b>timed out</b> ' + timedOut + '</span>' : "";
       report.innerHTML =
         '<div class="mut-result">' +
-          '<div class="mut-score band-' + band + '"><div class="mut-score-num">' + pct + '<span>%</span></div><div class="mut-score-lab">mutation score</div></div>' +
-          '<div class="mut-stats"><span class="mut-stat"><b>killed</b> ' + d.killed + '</span><span class="mut-stat"><b>survived</b> ' + d.survived + '</span><span class="mut-stat"><b>total</b> ' + d.total_run + '</span>' + timed + '</div>' +
+          '<div class="mut-score band-' + b + '"><div class="mut-score-num">' + pct + '<span>%</span></div><div class="mut-score-lab">mutation score</div></div>' +
+          '<div class="mut-stats"><span class="mut-stat"><b>killed</b> ' + killed + '</span><span class="mut-stat"><b>survived</b> ' + survived + '</span><span class="mut-stat"><b>total</b> ' + total + '</span>' + timed + '</div>' +
           '<p class="mut-verdict">' + verdict + '</p>' +
           '<div class="mut-survivors">' + survHTML + '</div>' +
         '</div>';
@@ -843,29 +1567,11 @@ def apply_discount(price, tier):
       busy = true; runBtn.disabled = true;
       loading('Loading Python\u2026 first run fetches the runtime (a few MB), then it\u2019s cached and instant.');
       try {
-        if (!worker) spawn();
-        let prep;
-        try { prep = await callWorker("prepare", { source: source, tests: tests }, 120000); }
-        catch (e) { kill(); if (e && e.__timeout) throw new Error("Timed out loading the Python runtime \u2014 check your connection and try again."); throw e; }
-        if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
-        if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return; }
-        if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return; }
-        if (!prep.baseline_passed) { render({ baseline_passed: false }); return; }
-        const mutants = prep.mutants; const total = mutants.length;
+        const out = await SUS.analyze(source, tests, (i, total) => loading('Running mutants\u2026 ' + (i + 1) + '/' + total));
+        if (showPrep(out.prep)) return;
         let killed = 0, survived = 0, timedOut = 0; const survivors = [];
-        for (let i = 0; i < total; i++) {
-          const m = mutants[i];
-          loading('Running mutants\u2026 ' + (i + 1) + '/' + total);
-          try {
-            const r = await callWorker("runMutant", { mutantSource: m.source, tests: tests }, 5000);
-            if (r.killed) killed++; else { survived++; survivors.push({ operator: m.operator, description: m.description, lineno: m.lineno }); }
-          } catch (e) {
-            if (e && e.__timeout) { timedOut++; killed++; kill(); spawn(); }
-            else throw e;
-          }
-        }
-        const score = total ? Math.round((killed / total) * 1000) / 1000 : 1;
-        render({ baseline_passed: true, total_run: total, killed: killed, survived: survived, timed_out: timedOut, mutation_score: score, survivors: survivors });
+        for (const r of out.results) { if (r.timedOut) timedOut++; if (r.killed) killed++; else { survived++; survivors.push(r.m); } }
+        render(out.results.length, killed, survived, timedOut, survivors);
       } catch (err) {
         msg('<b>Something went wrong running mutation testing.</b><p>' + escHtml(err && err.message ? err.message : String(err)) + '</p>');
       } finally {
@@ -877,6 +1583,562 @@ def apply_discount(price, tier):
     if (goMut) goMut.addEventListener("click", () => { const el = document.getElementById("mutation"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
     msg("Your code and a deliberately weak test suite are loaded. Hit <b>Run mutation analysis</b> \u2014 it runs entirely in your browser (first run loads Python, then it\u2019s instant).");
   })();
+
+  /* ---- RISK REPORT (complexity \u00d7 mutation, ranked per function) ---- */
+  (function riskReport() {
+    const codeTa = $("riskCode"), testsTa = $("riskTests"), runBtn = $("riskRun"), report = $("riskReport");
+    if (!codeTa || !testsTa || !runBtn || !report) return;
+
+    codeTa.value = "def categorize(score):\n    if score < 0:\n        return \"invalid\"\n    if score >= 90:\n        return \"A\"\n    elif score >= 80:\n        return \"B\"\n    elif score >= 70:\n        return \"C\"\n    elif score >= 60:\n        return \"D\"\n    return \"F\"\n\ndef is_even(n):\n    return n % 2 == 0\n\ndef apply_discount(price, pct):\n    if pct < 0 or pct > 100:\n        raise ValueError(\"bad pct\")\n    return price * (1 - pct / 100)\n";
+    testsTa.value = "# Two functions well tested, one barely \u2014 watch which ranks highest.\nfrom subject import categorize, is_even, apply_discount\n\ndef test_discount_basic(): assert apply_discount(100, 10) == 90\ndef test_discount_zero(): assert apply_discount(100, 0) == 100\ndef test_discount_full(): assert apply_discount(100, 100) == 0\ndef test_discount_neg():\n    try:\n        apply_discount(100, -5); assert False\n    except ValueError:\n        pass\ndef test_discount_over():\n    try:\n        apply_discount(100, 150); assert False\n    except ValueError:\n        pass\ndef test_even(): assert is_even(4) == True\ndef test_odd(): assert is_even(3) == False\ndef test_cat_a(): assert categorize(95) == \"A\"\n";
+
+    const escHtml = (s) => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const msg = (html) => { report.innerHTML = '<div class="mut-msg">' + html + '</div>'; };
+    const loading = (label) => { report.innerHTML = '<div class="mut-loading"><div class="mut-spin"></div><div>' + label + '</div></div>'; };
+
+    function showPrep(prep) {
+      if (prep.error === "source") { msg('<b>That Python didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.error === "tests") { msg('<b>Your test code didn\'t parse.</b><p>' + escHtml(prep.detail) + '</p>'); return true; }
+      if (prep.no_tests) { msg('<b>No tests found.</b><p>Add at least one <code>def test_...()</code> that imports from <code>subject</code>, then run.</p>'); return true; }
+      if (!prep.baseline_passed) { msg('<div class="mut-badbase"><b>Your tests don\'t pass on the original code.</b><p>A risk report needs a green baseline. Make your tests pass on the unmodified code first, then run again.</p></div>'); return true; }
+      return false;
+    }
+
+    function render(rows, module) {
+      if (!rows.length) { msg("No functions found in your code \u2014 add some <code>def</code>s and try again."); return; }
+      const top = rows.find(r => r.risk !== null && r.risk > 0);
+      const lead = top
+        ? '<div class="risk-lead">Test <b>' + escHtml(top.name) + '()</b> next \u2014 it\u2019s the most complex code your tests cover least.</div>'
+        : '<div class="risk-lead risk-clear"><b>Nothing stands out</b> \u2014 your tests cover the complex code well. \uD83C\uDF89</div>';
+      const body = rows.map(r => {
+        const b = r.risk === null ? "none" : (r.risk >= 4 ? "hi" : r.risk >= 2 ? "mid" : r.risk > 0 ? "lo" : "none");
+        const tested = r.mutscore === null ? '<span class="risk-na">no mutants</span>' : (Math.round(r.mutscore * 100) + '%');
+        const risk = r.risk === null ? '<span class="risk-na">\u2014</span>' : r.risk.toFixed(2);
+        const cxcls = "cx-" + r.rank.replace(/\s+/g, "");
+        return '<tr>' +
+          '<td class="risk-fn">' + escHtml(r.name) + '</td>' +
+          '<td><span class="cx-band ' + cxcls + '">' + r.cx + '</span> <span class="risk-rank">' + r.rank + '</span></td>' +
+          '<td class="risk-mut">' + tested + '</td>' +
+          '<td><span class="risk-pill band-' + b + '">' + risk + '</span></td>' +
+        '</tr>';
+      }).join("");
+      const modNote = module.total ? '<p class="risk-mod">Plus ' + module.killed + '/' + module.total + ' module-level mutants (outside any function), not ranked here.</p>' : '';
+      report.innerHTML =
+        '<div class="risk-result">' + lead +
+        '<table class="risk-table"><thead><tr><th>Function</th><th>Complexity</th><th>Tested</th><th>Risk</th></tr></thead><tbody>' + body + '</tbody></table>' +
+        '<p class="risk-formula">Risk = complexity \u00d7 (1 \u2212 mutation score). Higher means more untested complexity \u2014 that\u2019s where your next test belongs.</p>' + modNote +
+        '</div>';
+    }
+
+    let busy = false;
+    async function run() {
+      if (busy) return;
+      const source = codeTa.value, tests = testsTa.value;
+      if (!source.trim() || !tests.trim()) { msg("Add both your code and your tests, then run."); return; }
+      busy = true; runBtn.disabled = true;
+      loading('Loading Python\u2026 first run fetches the runtime (a few MB), then it\u2019s cached and instant.');
+      try {
+        const out = await SUS.analyze(source, tests, (i, total) => loading('Analysing\u2026 mutant ' + (i + 1) + '/' + total));
+        if (showPrep(out.prep)) return;
+        const fmap = {};
+        for (const f of out.prep.functions) fmap[f.name] = { name: f.name, cx: f.complexity, rank: f.rank, killed: 0, total: 0 };
+        let modK = 0, modT = 0;
+        for (const r of out.results) {
+          const fn = r.m.func;
+          if (fn && fmap[fn]) { fmap[fn].total++; if (r.killed) fmap[fn].killed++; }
+          else { modT++; if (r.killed) modK++; }
+        }
+        const rows = Object.keys(fmap).map(k => {
+          const d = fmap[k];
+          const ms = d.total ? d.killed / d.total : null;
+          const risk = ms === null ? null : Math.round(d.cx * (1 - ms) * 100) / 100;
+          return { name: d.name, cx: d.cx, rank: d.rank, killed: d.killed, total: d.total, mutscore: ms, risk: risk };
+        });
+        rows.sort((a, b) => ((a.risk === null) - (b.risk === null)) || ((b.risk || 0) - (a.risk || 0)));
+        render(rows, { killed: modK, total: modT });
+      } catch (err) {
+        msg('<b>Something went wrong building the risk report.</b><p>' + escHtml(err && err.message ? err.message : String(err)) + '</p>');
+      } finally {
+        busy = false; runBtn.disabled = false;
+      }
+    }
+    runBtn.addEventListener("click", run);
+    const goRisk = $("goRisk");
+    if (goRisk) goRisk.addEventListener("click", () => { const el = document.getElementById("risk"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
+    msg("A multi-function example is loaded \u2014 some functions are well tested, one isn\u2019t. Hit <b>Generate risk report</b> to see which function to test next.");
+  })();
+  /* ---- FILE UPLOAD (load code/tests from a local file) ---- */
+  (function fileUpload() {
+    document.querySelectorAll(".ed-up").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var ta = document.getElementById(btn.getAttribute("data-target"));
+        if (!ta) return;
+        var inp = document.createElement("input");
+        inp.type = "file";
+        inp.accept = ".py,.pyw,.js,.mjs,.cjs,.jsx,.ts,.tsx,.java,.c,.h,.cpp,.cc,.cxx,.hpp,.go,.rs,.cs,.txt,.text,text/plain";
+        inp.addEventListener("change", function () {
+          var f = inp.files && inp.files[0];
+          if (!f) return;
+          var rd = new FileReader();
+          rd.onload = function () { ta.value = String(rd.result); ta.dispatchEvent(new Event("input", { bubbles: true })); ta.focus(); };
+          rd.readAsText(f);
+        });
+        inp.click();
+      });
+    });
+  })();
+  /* ---- CI INTEGRATION (client-side config generator) ---- */
+  (function ciGenerator() {
+    var out = document.getElementById("ciOut");
+    if (!out) return;
+    var fname = document.getElementById("ciFilename");
+    var badge = document.getElementById("ciBadge");
+    var provWrap = document.getElementById("ciProviders");
+    var cTests = document.getElementById("ciTests");
+    var cCx = document.getElementById("ciCx");
+    var vCx = document.getElementById("ciCxVal");
+    var cMut = document.getElementById("ciMut");
+    var vMut = document.getElementById("ciMutVal");
+    var copyBtn = document.getElementById("ciCopy");
+    var runBtn = document.getElementById("ciRun");
+    var generated = true;
+    var PLACEHOLDER = "# Pick your provider and gates above,\n# then hit \u201cGenerate config\u201d to build a\n# ready-to-commit CI file for susgrade.";
+
+    var REPO = "CodemasterAman/SUSGRADE"; // matches the code repo linked in the nav + footer
+    var provider = "gha";
+    var FILES = {
+      gha: ".github/workflows/ci.yml",
+      gitlab: ".gitlab-ci.yml",
+      precommit: ".pre-commit-config.yaml",
+      make: "Makefile"
+    };
+    var STEP_NAME = { tests: "Run the test suite", complexity: "Complexity gate", mutation: "Mutation gate" };
+
+    function clampInt(v, lo, hi, dflt) {
+      v = parseInt(v, 10);
+      if (isNaN(v)) return dflt;
+      return Math.max(lo, Math.min(hi, v));
+    }
+    function fmtScore(pct) {
+      var s = (pct / 100).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+      return s === "" ? "0" : s;
+    }
+    // Ordered list of gate commands, built from the toggles.
+    function commands() {
+      var cx = clampInt(vCx.value, 1, 50, 10);
+      var mut = fmtScore(clampInt(vMut.value, 0, 100, 80));
+      var out = [];
+      if (cTests.checked) out.push({ key: "tests", cmd: "pytest backend/tests -q" });
+      if (cCx.checked) out.push({ key: "complexity", cmd: "susgrade check backend/app --max-complexity " + cx });
+      if (cMut.checked) out.push({ key: "mutation", cmd: "susgrade mutation --source examples/subject.py --tests examples/test_subject.py --min-score " + mut });
+      return out;
+    }
+
+    function gha(cmds) {
+      var head = [
+        "name: susgrade",
+        "",
+        "on:",
+        "  push:",
+        "    branches: [ main ]",
+        "  pull_request:",
+        "",
+        "jobs:",
+        "  quality-gate:",
+        "    runs-on: ubuntu-latest",
+        "    steps:",
+        "      - uses: actions/checkout@v4",
+        "      - uses: actions/setup-python@v5",
+        "        with:",
+        "          python-version: \"3.12\"",
+        "      - name: Install susgrade",
+        "        run: pip install -e \"./backend[dev]\""
+      ];
+      cmds.forEach(function (c) {
+        head.push("      - name: " + STEP_NAME[c.key]);
+        head.push("        run: " + c.cmd);
+      });
+      return head.join("\n") + "\n";
+    }
+    function gitlab(cmds) {
+      var body = [
+        "quality-gate:",
+        "  image: python:3.12",
+        "  before_script:",
+        "    - pip install -e \"./backend[dev]\"",
+        "  script:"
+      ];
+      if (!cmds.length) body.push("    # enable a gate above");
+      cmds.forEach(function (c) { body.push("    - " + c.cmd); });
+      return body.join("\n") + "\n";
+    }
+    function precommit(cmds) {
+      var body = [
+        "# one-time setup:  pip install -e \"./backend[dev]\" pre-commit && pre-commit install",
+        "repos:",
+        "  - repo: local",
+        "    hooks:"
+      ];
+      if (!cmds.length) body.push("      # enable a gate above");
+      cmds.forEach(function (c) {
+        body.push("      - id: susgrade-" + c.key);
+        body.push("        name: susgrade " + c.key + " gate");
+        body.push("        entry: " + c.cmd);
+        body.push("        language: system");
+        body.push("        pass_filenames: false");
+        body.push("        always_run: true");
+      });
+      return body.join("\n") + "\n";
+    }
+    function makefile(cmds) {
+      // Makefile recipes MUST be tab-indented.
+      var body = [".PHONY: ci", "ci:", "\tpip install -e \"./backend[dev]\""];
+      cmds.forEach(function (c) { body.push("\t" + c.cmd); });
+      return body.join("\n") + "\n";
+    }
+
+    function render() {
+      var cmds = commands();
+      var text = provider === "gitlab" ? gitlab(cmds)
+        : provider === "precommit" ? precommit(cmds)
+        : provider === "make" ? makefile(cmds)
+        : gha(cmds);
+      if (generated) {
+        out.textContent = text;
+        out.classList.remove("ci-placeholder");
+        if (fname) fname.textContent = FILES[provider];
+      } else {
+        out.textContent = PLACEHOLDER;
+        out.classList.add("ci-placeholder");
+        if (fname) fname.textContent = "your CI config";
+      }
+      if (badge) badge.textContent =
+        "[![CI](https://github.com/" + REPO + "/actions/workflows/ci.yml/badge.svg)]" +
+        "(https://github.com/" + REPO + "/actions/workflows/ci.yml)";
+    }
+    function generate() {
+      generated = true;
+      render();
+      out.classList.remove("ci-flash"); void out.offsetWidth; out.classList.add("ci-flash");
+    }
+
+    if (provWrap) provWrap.addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest(".ci-prov") : null;
+      if (!btn) return;
+      provider = btn.getAttribute("data-prov");
+      provWrap.querySelectorAll(".ci-prov").forEach(function (x) { x.classList.toggle("is-active", x === btn); });
+      render();
+    });
+    [cTests, cCx, vCx, cMut, vMut].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener("input", render);
+      el.addEventListener("change", render);
+    });
+    // Clicking a number field shouldn't toggle its sibling checkbox.
+    [vCx, vMut].forEach(function (el) { if (el) el.addEventListener("click", function (e) { e.stopPropagation(); }); });
+
+    if (runBtn) runBtn.addEventListener("click", generate);
+
+    if (copyBtn) copyBtn.addEventListener("click", function () {
+      if (!generated) generate();           // copying implies "give me the real config"
+      var t = out.textContent, orig = copyBtn.textContent;
+      function done() { copyBtn.textContent = "\u2713 copied"; setTimeout(function () { copyBtn.textContent = orig; }, 1400); }
+      function fallback() {
+        var ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done, function () { fallback(); done(); });
+      } else { fallback(); done(); }
+    });
+
+    render();
+  })();
+
+
+
+  /* ---- Report export: JSON / CSV / Markdown / print-to-PDF. Shared by the complexity report and the codebase scan. ---- */
+  function expEsc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function expCsvCell(v) { v = String(v == null ? "" : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function expDownload(filename, text, mime) {
+    try {
+      var blob = new Blob([text], { type: mime + ";charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename; a.style.display = "none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    } catch (e) { toast("Couldn't export \u2014 " + (e && e.message ? e.message : "try another format")); }
+  }
+  function expJSON(rep) {
+    var obj = { tool: "susgrade", report: rep.title, source: rep.subtitle || null, generated: new Date().toISOString() };
+    if (rep.summary) obj.summary = rep.summary;
+    obj.rows = rep.rows.map(function (r) { var o = {}; rep.columns.forEach(function (c) { o[c.key] = r[c.key]; }); return o; });
+    return JSON.stringify(obj, null, 2);
+  }
+  function expCSV(rep) {
+    var lines = [rep.columns.map(function (c) { return expCsvCell(c.label); }).join(",")];
+    rep.rows.forEach(function (r) { lines.push(rep.columns.map(function (c) { return expCsvCell(r[c.key]); }).join(",")); });
+    return lines.join("\r\n") + "\r\n";
+  }
+  function expMD(rep) {
+    var out = ["# " + rep.title];
+    if (rep.subtitle) out.push("", "_" + rep.subtitle + "_");
+    if (rep.summaryText) out.push("", rep.summaryText);
+    out.push("", "| " + rep.columns.map(function (c) { return c.label; }).join(" | ") + " |",
+      "|" + rep.columns.map(function () { return " --- "; }).join("|") + "|");
+    rep.rows.forEach(function (r) { out.push("| " + rep.columns.map(function (c) { return String(r[c.key] == null ? "" : r[c.key]).replace(/\|/g, "\\|"); }).join(" | ") + " |"); });
+    out.push("", "_Generated by susgrade on " + new Date().toISOString().slice(0, 10) + "_");
+    return out.join("\n") + "\n";
+  }
+  function expPrintHTML(rep) {
+    var thead = "<tr>" + rep.columns.map(function (c) { return "<th>" + expEsc(c.label) + "</th>"; }).join("") + "</tr>";
+    var tbody = rep.rows.map(function (r) { return "<tr>" + rep.columns.map(function (c) { return "<td>" + expEsc(r[c.key]) + "</td>"; }).join("") + "</tr>"; }).join("");
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + expEsc(rep.title) + '</title>' +
+      '<style>*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#141414;margin:40px;line-height:1.5}' +
+      'h1{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}.sub{color:#555;font-size:13px;margin:0 0 2px}.stamp{color:#999;font-size:12px;margin:0 0 20px}' +
+      '.sum{background:#f4f4f2;border:1px solid #e6e6e3;border-radius:8px;padding:12px 16px;font-size:13px;margin:0 0 22px}' +
+      'table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:10px;color:#555;border-bottom:2px solid #141414;padding:9px 10px}' +
+      'td{padding:8px 10px;border-bottom:1px solid #e8e8e8}tr:nth-child(even) td{background:#fafafa}' +
+      '.foot{margin-top:26px;color:#aaa;font-size:11px}@media print{body{margin:0}@page{margin:14mm}}</style></head><body>' +
+      '<h1>' + expEsc(rep.title) + '</h1>' +
+      (rep.subtitle ? '<p class="sub">' + expEsc(rep.subtitle) + '</p>' : '') +
+      '<p class="stamp">Generated ' + expEsc(new Date().toLocaleString()) + '</p>' +
+      (rep.summaryText ? '<div class="sum">' + expEsc(rep.summaryText) + '</div>' : '') +
+      '<table><thead>' + thead + '</thead><tbody>' + tbody + '</tbody></table>' +
+      '<p class="foot">susgrade \u00b7 test-effectiveness report \u00b7 generated 100% in your browser</p>' +
+      '<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script></body></html>';
+  }
+  function expReport(rep, fmt) {
+    var slug = rep.slug || "susgrade-report";
+    if (fmt === "json") expDownload(slug + ".json", expJSON(rep), "application/json");
+    else if (fmt === "csv") expDownload(slug + ".csv", expCSV(rep), "text/csv");
+    else if (fmt === "md") expDownload(slug + ".md", expMD(rep), "text/markdown");
+    else if (fmt === "pdf") {
+      var w = window.open("", "_blank");
+      if (!w) { expDownload(slug + ".html", expPrintHTML(rep), "text/html"); toast("Pop-up blocked \u2014 saved a printable HTML report instead"); return; }
+      w.document.open(); w.document.write(expPrintHTML(rep)); w.document.close();
+    }
+  }
+  function expBar(accentVar) {
+    return '<div class="exp-bar" style="--exp-accent:var(' + accentVar + ')"><span class="exp-label">Export</span>' +
+      '<button type="button" class="exp-btn" data-fmt="json">JSON</button>' +
+      '<button type="button" class="exp-btn" data-fmt="csv">CSV</button>' +
+      '<button type="button" class="exp-btn" data-fmt="md">Markdown</button>' +
+      '<button type="button" class="exp-btn" data-fmt="pdf">PDF</button></div>';
+  }
+  function expWire(containerEl, rep) {
+    var bar = containerEl.querySelector(".exp-bar");
+    if (!bar) return;
+    bar.querySelectorAll("[data-fmt]").forEach(function (btn) { btn.addEventListener("click", function () { expReport(rep, btn.dataset.fmt); }); });
+  }
+
+  /* ---- Batch & GitHub-repo scan (reuses the complexity engines above) ---- */
+  (function scanModule() {
+    if (!$("scanOut")) return;
+    var outEl = $("scanOut");
+    var filesPane = $("scanFilesPane"), repoPane = $("scanRepoPane");
+    var UPLOAD_CAP = 80, REPO_CAP = 40;
+
+    var EXT_LANG = {
+      py: "py", pyw: "py",
+      js: "js", mjs: "js", cjs: "js", jsx: "js",
+      ts: "typescript", tsx: "typescript",
+      java: "java", c: "c", h: "c",
+      cpp: "cpp", cc: "cpp", cxx: "cpp", hpp: "cpp", hh: "cpp",
+      cs: "c_sharp", go: "go", rs: "rust", php: "php",
+      kt: "kotlin", kts: "kotlin", swift: "swift"
+    };
+    function extOf(name) { var m = String(name).toLowerCase().match(/\.([a-z0-9+]+)$/); return m ? m[1] : ""; }
+    function langOf(name) { return EXT_LANG[extOf(name)] || null; }
+    function escH(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function baseName(p) { var a = String(p).split("/"); return a[a.length - 1]; }
+
+    // analyse one file with the right real parser; returns a result object, null (unsupported), or throws (parse error)
+    async function analyzeOne(name, src) {
+      var l = langOf(name);
+      if (!l) return null;
+      if (l === "js") { var ac = await ensureAcorn(); return analyzeJS(src, ac); }
+      if (TS_LANGS[l]) { return await analyzeWithTS(src, l); }
+      return toResult(estimate(src)); // python
+    }
+
+    // ---- mode toggle ----
+    var modeBtns = document.querySelectorAll("#scanModes .ci-prov");
+    modeBtns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        modeBtns.forEach(function (x) { x.classList.toggle("is-active", x === b); });
+        var m = b.dataset.mode;
+        filesPane.hidden = m !== "files";
+        repoPane.hidden = m !== "repo";
+      });
+    });
+
+    // ---- file upload / drag-drop ----
+    var fileInput = $("scanFileInput"), drop = $("scanDrop"), browse = $("scanBrowse");
+    browse.addEventListener("click", function (e) { e.stopPropagation(); fileInput.click(); });
+    drop.addEventListener("click", function () { fileInput.click(); });
+    fileInput.addEventListener("change", function () { var fs = [].slice.call(fileInput.files); fileInput.value = ""; handleFiles(fs); });
+    ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-drag"); }); });
+    drop.addEventListener("dragleave", function (e) { if (!drop.contains(e.relatedTarget)) drop.classList.remove("is-drag"); });
+    drop.addEventListener("drop", function (e) {
+      e.preventDefault(); drop.classList.remove("is-drag");
+      var fs = e.dataTransfer && e.dataTransfer.files ? [].slice.call(e.dataTransfer.files) : [];
+      handleFiles(fs);
+    });
+
+    function readFile(f) {
+      return new Promise(function (res) {
+        var rd = new FileReader();
+        rd.onload = function () { res({ name: f.name, src: String(rd.result) }); };
+        rd.onerror = function () { res({ name: f.name, src: null }); };
+        rd.readAsText(f);
+      });
+    }
+
+    async function handleFiles(files) {
+      if (!files.length) return;
+      var supported = files.filter(function (f) { return langOf(f.name); });
+      var skipped = files.length - supported.length;
+      if (!supported.length) { renderError("None of those files are in a supported language.", "Supported: .py .js .ts .java .c .cpp .go .rs .cs .php .kt .swift"); return; }
+      var capped = supported.length > UPLOAD_CAP;
+      supported = supported.slice(0, UPLOAD_CAP);
+      renderLoading("Reading " + supported.length + " file" + (supported.length > 1 ? "s" : "") + "\u2026");
+      var contents = await Promise.all(supported.map(readFile));
+      await analyzeAll(contents, { skipped: skipped, source: "upload", truncated: capped, totalFound: files.length });
+    }
+
+    // ---- GitHub repo ----
+    var repoInput = $("scanRepoInput");
+    $("scanRepoRun").addEventListener("click", scanRepo);
+    repoInput.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); scanRepo(); } });
+
+    function parseRepo(v) {
+      v = String(v || "").trim().replace(/^https?:\/\/(www\.)?github\.com\//i, "").replace(/\.git$/i, "").replace(/\/+$/, "");
+      var parts = v.split("/").filter(Boolean);
+      if (parts.length < 2) return null;
+      return { owner: parts[0], repo: parts[1] };
+    }
+
+    async function ghJson(url) {
+      var r;
+      try { r = await fetch(url, { headers: { "Accept": "application/vnd.github+json" } }); }
+      catch (e) { throw { msg: "Couldn't reach GitHub \u2014 check your connection." }; }
+      if (r.status === 403 || r.status === 429) {
+        var rem = r.headers.get("x-ratelimit-remaining");
+        throw { msg: "GitHub's unauthenticated API limit (60/hour) is reached." + (rem === "0" ? " Try again later, or scan uploaded files instead." : "") };
+      }
+      if (r.status === 404) throw { msg: "Repo not found \u2014 check the owner/name, and that it's public." };
+      if (!r.ok) throw { msg: "GitHub API error (" + r.status + ")." };
+      return r.json();
+    }
+
+    async function scanRepo() {
+      var pr = parseRepo(repoInput.value);
+      if (!pr) { renderError("Enter a repo as owner/name, or paste a github.com URL.", ""); return; }
+      renderLoading("Fetching " + pr.owner + "/" + pr.repo + "\u2026");
+      try {
+        var meta = await ghJson("https://api.github.com/repos/" + enc(pr.owner) + "/" + enc(pr.repo));
+        var branch = meta.default_branch || "main";
+        var tree = await ghJson("https://api.github.com/repos/" + enc(pr.owner) + "/" + enc(pr.repo) + "/git/trees/" + encodeURIComponent(branch) + "?recursive=1");
+        var blobs = (tree.tree || []).filter(function (n) { return n.type === "blob" && langOf(n.path); });
+        if (!blobs.length) { renderError("No source files in a supported language were found in " + pr.owner + "/" + pr.repo + ".", ""); return; }
+        var truncated = blobs.length > REPO_CAP || tree.truncated;
+        var pick = blobs.slice(0, REPO_CAP);
+        renderLoading("Fetching " + pick.length + " file" + (pick.length > 1 ? "s" : "") + " from " + pr.owner + "/" + pr.repo + "\u2026");
+        var contents = await fetchRaw(pr, branch, pick);
+        await analyzeAll(contents, { skipped: 0, source: "repo", repo: pr.owner + "/" + pr.repo, truncated: truncated, totalFound: blobs.length });
+      } catch (err) {
+        renderError(err && err.msg ? err.msg : "Couldn't scan that repo.", "");
+      }
+    }
+    function enc(s) { return encodeURIComponent(s); }
+
+    // fetch raw file contents with limited concurrency (raw.githubusercontent.com is CORS-open and not API-rate-limited)
+    async function fetchRaw(pr, branch, blobs) {
+      var out = [], idx = 0, CONC = Math.min(6, blobs.length);
+      var base = "https://raw.githubusercontent.com/" + enc(pr.owner) + "/" + enc(pr.repo) + "/" + encodeURIComponent(branch) + "/";
+      async function worker() {
+        while (idx < blobs.length) {
+          var i = idx++, b = blobs[i];
+          var url = base + b.path.split("/").map(encodeURIComponent).join("/");
+          try { var r = await fetch(url); out[i] = { name: b.path, src: r.ok ? await r.text() : null }; }
+          catch (e) { out[i] = { name: b.path, src: null }; }
+        }
+      }
+      var ws = []; for (var k = 0; k < CONC; k++) ws.push(worker());
+      await Promise.all(ws);
+      return out;
+    }
+
+    // ---- analyse everything + render the table ----
+    async function analyzeAll(contents, meta) {
+      renderLoading("Analysing " + contents.length + " file" + (contents.length > 1 ? "s" : "") + "\u2026");
+      var rows = [];
+      for (var i = 0; i < contents.length; i++) {
+        var c = contents[i];
+        if (c.src == null) { rows.push({ name: c.name, lang: langOf(c.name), error: "couldn't read" }); continue; }
+        try {
+          var res = await analyzeOne(c.name, c.src);
+          if (!res) continue;
+          var worst = res.functions.slice().sort(function (a, b) { return b.complexity - a.complexity; })[0] || null;
+          rows.push({ name: c.name, lang: langOf(c.name), fns: res.functions.length, total: res.total_complexity, avg: res.average_complexity, max: res.max_complexity, worst: worst });
+        } catch (e) { rows.push({ name: c.name, lang: langOf(c.name), error: "parse error" }); }
+      }
+      renderTable(rows, meta);
+    }
+
+    function renderTable(rows, meta) {
+      var ok = rows.filter(function (r) { return !r.error && r.fns != null; });
+      var errored = rows.filter(function (r) { return r.error; });
+      if (!ok.length && !errored.length) { renderError("No functions found to score.", ""); return; }
+      if (!ok.length) { renderError("Couldn't parse any of those files.", errored.slice(0, 4).map(function (e) { return baseName(e.name) + " \u2014 " + e.error; }).join("; ")); return; }
+      ok.sort(function (a, b) { return (b.max || 0) - (a.max || 0); });
+      var totFns = ok.reduce(function (s, r) { return s + r.fns; }, 0);
+      var riskiest = ok[0];
+      var scanRep = {
+        title: "susgrade \u2014 codebase scan",
+        subtitle: meta.source === "repo" ? "GitHub repo: " + meta.repo : "uploaded files (" + ok.length + ")",
+        summaryText: ok.length + " file" + (ok.length !== 1 ? "s" : "") + " \u00b7 " + totFns + " function" + (totFns !== 1 ? "s" : "") + " \u00b7 riskiest " + baseName(riskiest.name) + (riskiest.worst ? " (" + riskiest.worst.name + " = " + riskiest.worst.complexity + ")" : ""),
+        summary: { files: ok.length, functions: totFns, riskiest_file: riskiest ? riskiest.name : null },
+        columns: [{ key: "file", label: "File" }, { key: "language", label: "Language" }, { key: "functions", label: "Functions" }, { key: "total", label: "Total complexity" }, { key: "avg", label: "Avg complexity" }, { key: "max", label: "Max complexity" }, { key: "worst_function", label: "Worst function" }, { key: "worst_complexity", label: "Worst complexity" }, { key: "rank", label: "Rank" }],
+        rows: ok.map(function (r) { return { file: r.name, language: labelFor(r.lang), functions: r.fns, total: r.total, avg: (r.avg != null ? r.avg : ""), max: r.max, worst_function: r.worst ? r.worst.name : "", worst_complexity: r.worst ? r.worst.complexity : "", rank: tsRank(r.max || 1) }; }),
+        slug: "susgrade-scan" + (meta.source === "repo" ? "-" + meta.repo.replace(/[^\w.-]+/g, "-") : "")
+      };
+      var head = meta.source === "repo" ? "scanned <b>" + escH(meta.repo) + "</b>" : "scanned " + ok.length + " file" + (ok.length !== 1 ? "s" : "");
+      var stats = "<b>" + ok.length + "</b> file" + (ok.length !== 1 ? "s" : "") + " &nbsp;&middot;&nbsp; <b>" + totFns + "</b> function" + (totFns !== 1 ? "s" : "") +
+        " &nbsp;&middot;&nbsp; riskiest <b>" + (riskiest ? escH(baseName(riskiest.name)) : "\u2014") + "</b>" + (riskiest && riskiest.worst ? " (" + escH(riskiest.worst.name) + " = " + riskiest.worst.complexity + ")" : "");
+      var body = ok.map(function (r) {
+        var rk = tsRank(r.max || 1), col = COLOR[rk];
+        var wn = r.worst ? escH(r.worst.name) + " <span class=\"scan-wc\" style=\"color:" + col + "\">" + r.worst.complexity + "</span>" : "\u2014";
+        return "<tr>" +
+          "<td class=\"scan-file\"><span class=\"scan-lang\">" + escH(labelFor(r.lang)) + "</span><span>" + escH(r.name) + "</span></td>" +
+          "<td class=\"scan-num\">" + r.fns + "</td>" +
+          "<td class=\"scan-num\">" + r.total + "</td>" +
+          "<td class=\"scan-num\">" + (r.avg != null ? r.avg : "\u2014") + "</td>" +
+          "<td class=\"scan-num\"><span class=\"scan-max\" style=\"color:" + col + "\">" + r.max + "</span></td>" +
+          "<td class=\"scan-worst\">" + wn + "</td>" +
+          "<td><span class=\"scan-pill\" style=\"background:" + col + "\">" + rk + "</span></td>" +
+          "</tr>";
+      }).join("");
+      var notes = "";
+      if (meta.truncated) notes += "<div class=\"scan-errnote\">Showing the first " + ok.length + " of " + (meta.totalFound || ok.length) + " source files \u2014 scan a subfolder for the rest.</div>";
+      else if (meta.skipped) notes += "<div class=\"scan-errnote\">" + meta.skipped + " unsupported file" + (meta.skipped !== 1 ? "s" : "") + " skipped.</div>";
+      if (errored.length) notes += "<div class=\"scan-errnote\">" + errored.length + " file" + (errored.length !== 1 ? "s" : "") + " skipped (" + errored.slice(0, 4).map(function (e) { return escH(baseName(e.name)) + " \u2014 " + e.error; }).join("; ") + (errored.length > 4 ? "; \u2026" : "") + ")</div>";
+      outEl.innerHTML =
+        "<div class=\"scan-summary\"><span class=\"scan-eyebrow\"><span class=\"slash\" style=\"color:var(--blue)\">/</span> " + head + "</span><span class=\"scan-stats\">" + stats + "</span></div>" +
+        "<div class=\"scan-tablewrap\"><table class=\"scan-table\"><thead><tr><th>File</th><th>Fns</th><th>Total</th><th>Avg</th><th>Max</th><th>Worst function</th><th>Rank</th></tr></thead><tbody>" + body + "</tbody></table></div>" +
+        notes + expBar("--blue");
+      expWire(outEl, scanRep);
+    }
+
+    function renderLoading(msg) { outEl.innerHTML = '<div class="scan-empty scan-loading">' + escH(msg) + '</div>'; }
+    function renderError(msg, sub) { outEl.innerHTML = '<div class="scan-empty scan-error"><div class="scan-drop-big">' + escH(msg) + '</div>' + (sub ? '<p>' + escH(sub) + '</p>' : '') + '</div>'; }
+  })();
+
 })();
 </script>
 </body>
