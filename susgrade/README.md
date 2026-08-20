@@ -374,7 +374,7 @@ Built as a Software Verification and Testing project (course **CSE4149**) at **M
 
 | Name | Registration |
 |---|---|
-| **Aman Behera** | 23FE10CSE00607 |
+| **Aman Behera** | 23FE10CSE00697 |
 | **Bhomik Jain** | 23FE10CSE00707 |
 
 ---
