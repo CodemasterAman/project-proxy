@@ -433,6 +433,20 @@
   .exp-label { font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-right:2px; }
   .exp-btn { font-family:'Space Mono',monospace; font-size:11.5px; font-weight:700; padding:6px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--dim); cursor:pointer; transition:color .15s, background-color .15s, border-color .15s, transform .15s; display:inline-flex; align-items:center; gap:5px; }
   .exp-btn:hover { color:#fff; background:var(--exp-accent, var(--blue)); border-color:var(--exp-accent, var(--blue)); transform:translateY(-1px); }
+  /* PROOF */
+  .proof-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  @media (max-width:980px){ .proof-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .proof-grid{ grid-template-columns:1fr; } }
+  .proof-card { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:26px; transition:background-color .4s ease, border-color .4s ease, transform .2s ease, box-shadow .2s ease; }
+  .proof-card:hover { transform:translateY(-3px); }
+  .proof-card:nth-child(1){ box-shadow:5px 5px 0 var(--green); }
+  .proof-card:nth-child(2){ box-shadow:5px 5px 0 var(--blue); }
+  .proof-card:nth-child(3){ box-shadow:5px 5px 0 var(--violet); }
+  .proof-card:nth-child(4){ box-shadow:5px 5px 0 var(--coral); }
+  .proof-num { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2.6rem,4.4vw,3.4rem); line-height:.9; letter-spacing:-.03em; color:var(--text); }
+  .proof-card:nth-child(1) .proof-num{ color:var(--green); } .proof-card:nth-child(2) .proof-num{ color:var(--blue); } .proof-card:nth-child(3) .proof-num{ color:var(--violet); } .proof-card:nth-child(4) .proof-num{ color:var(--coral); }
+  .proof-card h3 { font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.09em; text-transform:uppercase; margin:15px 0 9px; color:var(--dim); }
+  .proof-card p { color:var(--dim); font-size:.92rem; line-height:1.55; }
 </style>
 </head>
 <body>
@@ -732,6 +746,39 @@
         <div class="how-card reveal reveal-3">
           <div class="how-num">/ 03</div><h3>Test where it's hot</h3>
           <p>Start with the gnarliest function, not the first one you see. That's where bugs hide and where each new test buys you the most safety.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="section" id="proof">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="eyebrow"><span class="slash">/</span> tested &amp; benchmarked</div>
+        <h2>We test the <em>tester</em>.</h2>
+        <p class="lead">A tool that tells you how good your tests are had better have good tests of its own. susgrade does &mdash; and every score it reports comes from a real parser, checked against the reference, never a heuristic guess.</p>
+      </div>
+      <div class="proof-grid">
+        <div class="proof-card reveal">
+          <div class="proof-num">54</div>
+          <h3>tests, all green</h3>
+          <p>23 unit tests on the analysis engine and 31 end-to-end browser tests &mdash; run on every push, and every one passes.</p>
+        </div>
+        <div class="proof-card reveal reveal-2">
+          <div class="proof-num">12</div>
+          <h3>languages, zero guesses</h3>
+          <p>Every number comes from the language&rsquo;s own parser &mdash; Python&rsquo;s AST, Acorn, Tree-sitter &mdash; checked function-for-function against the reference. No regex, no estimates.</p>
+        </div>
+        <div class="proof-card reveal reveal-3">
+          <div class="proof-num">8</div>
+          <h3>self-gated in CI</h3>
+          <p>susgrade runs its own complexity gate on its own codebase &mdash; its gnarliest function scores 8, comfortably under the 10 it enforces. It eats its own dog food.</p>
+        </div>
+        <div class="proof-card reveal reveal-3">
+          <div class="proof-num">0</div>
+          <h3>code uploaded, ever</h3>
+          <p>No backend, no accounts, no servers. Your code is analysed entirely in this browser tab &mdash; the Network panel stays silent.</p>
         </div>
       </div>
     </div>
