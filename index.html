@@ -549,7 +549,6 @@
           </div>
           <div class="toolbar">
             <div class="toolbar-left">
-              <button class="btn-sm btn-mut magnetic" id="goMut">Run mutation scan <span>→</span></button>
               <button type="button" class="ed-up" data-target="code">↑ file</button>
               <div class="toolbar-hint" id="hint"><span>edits</span><kbd>⌘</kbd><kbd>↵</kbd></div>
             </div>
@@ -1627,8 +1626,6 @@ def apply_discount(price, tier):
       }
     }
     runBtn.addEventListener("click", run);
-    const goMut = $("goMut");
-    if (goMut) goMut.addEventListener("click", () => { const el = document.getElementById("mutation"); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
     msg("Your code and a deliberately weak test suite are loaded. Hit <b>Run mutation analysis</b> \u2014 it runs entirely in your browser (first run loads Python, then it\u2019s instant).");
   })();
 
@@ -2077,7 +2074,10 @@ def apply_discount(price, tier):
       catch (e) { throw { msg: "Couldn't reach GitHub \u2014 check your connection." }; }
       if (r.status === 403 || r.status === 429) {
         var rem = r.headers.get("x-ratelimit-remaining");
-        throw { msg: "GitHub's unauthenticated API limit (60/hour) is reached." + (rem === "0" ? " Try again later, or scan uploaded files instead." : "") };
+        var reset = r.headers.get("x-ratelimit-reset");
+        var when = "";
+        if (rem === "0" && reset) { var d = new Date(parseInt(reset, 10) * 1000); if (!isNaN(d.getTime())) when = " Resets around " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "."; }
+        throw { msg: "GitHub's unauthenticated API limit (60 requests/hour) is reached." + (rem === "0" ? " Scan uploaded files instead, or try again later." + when : "") };
       }
       if (r.status === 404) throw { msg: "Repo not found \u2014 check the owner/name, and that it's public." };
       if (!r.ok) throw { msg: "GitHub API error (" + r.status + ")." };
